@@ -196,35 +196,35 @@ Column 13: Sequence between junctions
 ```
 ## Demonstration of k-mer method
 - Grid engine, e.g. Torque, is required for k-mer method.
-- At first, all k-mers (k = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create k-mer data of control,
-    e.g.
-    % perl split_sort_uniq.pl hg38
-    or
-    % qsub -v target=hg38 split_sort_uniq.pl
-- To create count data of k-mer,
-    e.g.
-    % perl count_qsub.pl hg38 /mnt/ssd
-    count_qsub.pl is a launcher of count.pl for all sort_uniq subfiles.
-    The second argument is temporally directory of local disk on the node. This can be omitted, but encouraged.
-- Output of count.pl is separated by subfiles. merge.pl merges separated data.
-    e.g.
-    % perl merge_qsub.pl hg38 /mnt/ssd
-    merge_qsub.pl is a launcher of merge.pl for all count subfiles.
-- merged files are converted to last-base-count data.
-    e.g.
-    % perl lbc_qsub.pl hg38 /mnt/ssd
-    lbc_qsub.pl is a launcher of last_base_count.pl for all merged subfiles.
-- To create lbc files of target (e.g ERR194147),
-    % perl split_sort_uniq.pl ERR194147
-    % perl count_qsub.pl ERR194147 /mnt/ssd
-    % perl merge_qsub.pl ERR194147 /mnt/ssd
-    % perl lbc_qsub.pl ERR194147 /mnt/ssd
-- SNP detection between target(ERR194147) and control(hg38).
-    % perl snp_qsub.pl ERR194147 hg38 /mnt/ssd 10
+- At first, all k-mers (k = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create k-mer data of control,  
+    e.g.  
+    % perl split_sort_uniq.pl hg38  
+    or  
+    % qsub -v target=hg38 split_sort_uniq.pl  
+- To create count data of k-mer,  
+    e.g.  
+    % perl count_qsub.pl hg38 /mnt/ssd  
+    count_qsub.pl is a launcher of count.pl for all sort_uniq subfiles.  
+    The second argument is temporally directory of local disk on the node. This can be omitted, but encouraged.  
+- Output of count.pl is separated by subfiles. merge.pl merges separated data.  
+    e.g.  
+    % perl merge_qsub.pl hg38 /mnt/ssd  
+    merge_qsub.pl is a launcher of merge.pl for all count subfiles.  
+- merged files are converted to last-base-count data.  
+    e.g.  
+    % perl lbc_qsub.pl hg38 /mnt/ssd  
+    lbc_qsub.pl is a launcher of last_base_count.pl for all merged subfiles.  
+- To create lbc files of target (e.g ERR194147),  
+    % perl split_sort_uniq.pl ERR194147  
+    % perl count_qsub.pl ERR194147 /mnt/ssd  
+    % perl merge_qsub.pl ERR194147 /mnt/ssd  
+    % perl lbc_qsub.pl ERR194147 /mnt/ssd  
+- SNP detection between target(ERR194147) and control(hg38).  
+    % perl snp_qsub.pl ERR194147 hg38 /mnt/ssd 10  
     snp_qsub.pl is a launcher of snp.pl for detection of SNP at the last base of k-mer between target and control.
-- To map SNPs,
-    % perl map_qsub.pl ERR194147 hg38 /mnt/ssd
-- To verify mapped SNPs,
+- To map SNPs,  
+    % perl map_qsub.pl ERR194147 hg38 /mnt/ssd  
+- To verify mapped SNPs,  
     % perl verify_snp_qsub.pl ERR194147 default hg38 kmer /mnt/ssd
 - A part of verify_snp.pl result is
 ```
@@ -287,4 +287,4 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
 1. In case the result obtained using PED in used for publication in academic journals etc., please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
-Copyright (C) 2018 National Agriculture and Food Research Organization. All rights reserved. 
+Copyright (C) 2017 National Agriculture and Food Research Organization. All rights reserved. 
