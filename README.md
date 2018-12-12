@@ -1,6 +1,6 @@
 # PED : Polymorphic Edge Detection
 
-Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of k-mers.
+Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers.
 
 ### Polymorphic Edge
 
@@ -25,11 +25,11 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
     Individual_A AAATGGTACATTTATATTAT
     Individual_B AAATGGTACATTTATATTAC
           
-All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of k-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The k-mer method detects edges of polymorphism by difference of last base of k-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
+All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
 ### Installation
 
- - Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by k-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
+ - Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by *k*-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
 -  To make reference data of hg38,  
     % cd hg38  
     % sh setup.sh  
@@ -107,12 +107,12 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.  
     For stand alone computer,  
     % perl align.pl target_name reference margin  
-    e.g.  
+    *e.g.*  
     % perl align.pl ERR194147 hg38 0 /tmp/ssd  
     % perl align.pl ERR194147 hg38 5 /tmp/ssd  
     % perl align.pl ERR194147 hg38 10 /tmp/ssd  
     % perl align.pl ERR194147 hg38 15 /tmp/ssd  
-    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the k-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
+    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
 
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
@@ -196,13 +196,13 @@ Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
 ## Demonstration of *k*-mer method
-- Grid engine, e.g. Torque, is required for *k*-mer method.
-- At first, all *k*-mers (*k* = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create k-mer data of control,  
+- Grid engine, *e.g.* Torque, is required for *k*-mer method.
+- At first, all *k*-mers (*k* = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create *k*-mer data of control,  
     *e.g.*  
     % perl split_sort_uniq.pl hg38  
     or  
     % qsub -v target=hg38 split_sort_uniq.pl  
-- To create count data of k-mer,  
+- To create count data of *k*-mer,  
     *e.g.*  
     % perl count_qsub.pl hg38 /mnt/ssd  
     count_qsub.pl is a launcher of count.pl for all sort_uniq subfiles.  
@@ -286,6 +286,6 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The copyright and all other rights of PED belong to NARO.
 1. Selling, renting, re-use of license, or use for business purposes etc. of PED shall not be allowed. For commercial use, license of commercial use is required. Inquiries for such commercial license are directed to ped_request@ml.affrc.go.jp.
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
-1. In case the result obtained using PED in used for publication in academic journals etc., please refer the publication of PED and/or acknowledge the use of PED in the publication. 
+1. In case the result obtained using PED in used for publication in academic journals *etc.,* please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
 Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved. 
