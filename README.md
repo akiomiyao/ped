@@ -18,13 +18,14 @@ DNA polymorphism is any difference of DNA sequence between individuals. These di
                                        |
                                        Chr11 80442977
 
-Short read sequence is aligned with reference sequence from both 5'- and 3'-ends. Positions indicated over and bellow of the alignment are first mismatched base, i.e., polymorphic edge. The bidirectional alignment clearly indicates two bases (GT) deletion in the short read. The bidirectional can detect not only deletion but also SNP, insertion, inversion and translocation.
-### K-mer method
+Short read sequence is aligned with reference sequence from both 5'- and 3'-ends. Positions indicated over and bellow of the alignment are first mismatched base, *i.e.,* polymorphic edge. The bidirectional alignment clearly indicates two bases (GT) deletion in the short read. The bidirectional can detect not only deletion but also SNP, insertion, inversion and translocation.
+
+### *K*-mer method
 
     Individual_A AAATGGTACATTTATATTAT
     Individual_B AAATGGTACATTTATATTAC
           
-All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k = 20) in each position. For example, the Individual_A has the k-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of k-mer of Individual_A is T, and Individual_B is C. The last base of k-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The k-mer method detects edges of polymorphism by difference of last base of k-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
+All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of k-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The k-mer method detects edges of polymorphism by difference of last base of k-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
 ### Installation
 
@@ -36,7 +37,7 @@ All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k =
     % cd TAIR10  
     % sh setup.sh  
 - For rice, soybean and mouse, execute shetup.sh in IRGSP1.0, Gmax275v2.0 and GRCm38 directory, respectively.
-- 'wget' is required. If your machine do not have wget program, install wget from package before run setup.sh. Making reference data takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
+- 'wget' is required. If your machine do not have wget program, install wget from package before run setup.sh. Making reference data of human genome takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
 
 ## Demonstration of bidirectional alignment method
 
@@ -44,27 +45,27 @@ All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k =
     Tool kit can be download from
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
 
-    Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of Arabidopsis is recommended.
+    Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of *Arabidopsis* is recommended.
     
-### Arabidopsis thaliana
+### *Arabidopsis thaliana*
 - Short read data SRR8181712 is used for demonstration.
-- % perl download.pl SRR8181712
+- % perl download.pl SRR8181712  
     SRR8181712_1.fastq will be downloaded in SRR8181712/read directory.
--  To make sorted unique sequence,
+-  To make sorted unique sequence,  
     % perl sort_uniq.pl SRR8181712
 -  Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.
     For stand alone computer,  
     % perl align.pl target_name reference margin  
-    e.g.  
+    *e.g.*  
     % perl align.pl SRR8181712 TAIR10 0 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 5 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 10 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 15 /tmp/ssd  
-    At the first step of the method, k-mer (k=20) sequences from both ends of short read will be mapped to the reference genome. If the k-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, k-mers begin inside of the margin. This will increase the coverage of polymorphisms.
+    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.
 
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
-    e.g.  
+    *e.g.*  
     % qsub -v target=SRR8181712,ref=TAIR10,margin=0,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=SRR8181712,ref=TAIR10,margin=5,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=SRR8181712,ref=TAIR10,margin=10,tmpdir=/mnt/ssd align.pl  
@@ -79,26 +80,26 @@ All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k =
     tmpdir for qsub run of split_snp.pl is optional.  
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
-    e.g.  
+    *e.g.*  
     % perl verify_snp.pl SRR8181712 default TAIR10 01 bi /mnt/ssd  
     or  
     % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl  
     
-    target : target name, e.g. SRR8181712  
-    control : e.g. SRR7686247 or 'default', if you want to use reference data for control  
-    ref : reference genome, e.g. TAIR10  
+    target : target name, *e.g.* SRR8181712  
+    control : *e.g.* SRR7686247 or 'default', if you want to use reference data for control  
+    ref : reference genome, *e.g.* TAIR10  
     number : specify number of splited subfile  
     type : specify type of input data (bi, kmer or vcf)  
     tmpdir : specify temporary directofy on local disk (can be omitted)  
 - To verify indel,  
     % perl verify_indel.pl target control reference number type tmpdir  
-    e.g.  
+    *e.g.*  
     % perl verify_indel.pl SRR8181712 default TAIR10 01 bi /mnt/ssd  
     or  
     % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi,tmpdir=/mnt/ssd verify_indel.pl 
 
 ### Human
-- Short read data ERR194147 is used for demonstration. ERR194147 is a short reads of whole genome sequence from a member of the Coriell CEPH/UTAH 1463 family for a "platinum" standard comprehensive set for variant calling improvement.
+- Short read data ERR194147 is used for demonstration. ERR194147 is a short reads of whole genome sequence from a member of the [Coriell CEPH/UTAH 1463 family](https://www.coriell.org/0/Sections/Collections/NIGMS/CEPHFamiliesDetail.aspx?PgId=441&fam=1463&) for a "[platinum](https://www.illumina.com/platinumgenomes.html)" standard comprehensive set for variant calling improvement.
 - % perl download.pl ERR194147  
     ERR194147_1.fastq and ERR194147_2.fastq will be downloaded in ERR194147/read directory.
 - To make sorted unique sequence,  
@@ -111,11 +112,11 @@ All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k =
     % perl align.pl ERR194147 hg38 5 /tmp/ssd  
     % perl align.pl ERR194147 hg38 10 /tmp/ssd  
     % perl align.pl ERR194147 hg38 15 /tmp/ssd  
-    At the first step of the method, k-mer (k=20) sequences from both ends of short read will be mapped to the reference genome. If the k-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, k-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
+    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the k-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
 
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
-    e.g.  
+    *e.g.*  
     % qsub -v target=ERR194147,ref=hg38,margin=0,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=ERR194147,ref=hg38,margin=5,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=ERR194147,ref=hg38,margin=10,tmpdir=/mnt/ssd align.pl  
@@ -130,14 +131,14 @@ All short reads from Individual_A and Individual_B are sliced to k-mer (e.g. k =
     tmpdir for qsub run of split_snp.pl is optional.  
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
-    e.g.  
+    *e.g.*  
     % perl verify_snp.pl ERR194147 default hg38 01 bi /mnt/ssd  
     or  
     % qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl  
 
-  target : target name, e.g. ERR194147  
-  control : e.g. ERR194146 or 'default', if you want to use reference data for control  
-  ref : reference genome, e.g. hg38  
+  target : target name, *e.g.* ERR194147  
+  control : *e.g.* ERR194146 or 'default', if you want to use reference data for control  
+  ref : reference genome, *e.g.* hg38  
   number : specify number of splited subfile  
   type : specify type of input data (bi, kmer or vcf)  
   tmpdir : specify temporary directofy on local disk (can be omitted)  
@@ -165,7 +166,7 @@ Column 10: Genotype (M: homozygous, H: heterozygous)
 ```
 - To verify indel,  
     % perl verify_indel.pl target control reference number type tmpdir  
-    e.g.  
+    *e.g.*  
     % perl verify_indel.pl ERR194147 default hg38 01 bi /mnt/ssd  
     or  
     % qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_indel.pl
@@ -194,24 +195,24 @@ Column 11: Number of reads in the target sort_uniq file with target type control
 Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
-## Demonstration of k-mer method
-- Grid engine, e.g. Torque, is required for k-mer method.
-- At first, all k-mers (k = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create k-mer data of control,  
-    e.g.  
+## Demonstration of *k*-mer method
+- Grid engine, e.g. Torque, is required for *k*-mer method.
+- At first, all *k*-mers (*k* = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create k-mer data of control,  
+    *e.g.*  
     % perl split_sort_uniq.pl hg38  
     or  
     % qsub -v target=hg38 split_sort_uniq.pl  
 - To create count data of k-mer,  
-    e.g.  
+    *e.g.*  
     % perl count_qsub.pl hg38 /mnt/ssd  
     count_qsub.pl is a launcher of count.pl for all sort_uniq subfiles.  
     The second argument is temporally directory of local disk on the node. This can be omitted, but encouraged.  
 - Output of count.pl is separated by subfiles. merge.pl merges separated data.  
-    e.g.  
+    *e.g.*  
     % perl merge_qsub.pl hg38 /mnt/ssd  
     merge_qsub.pl is a launcher of merge.pl for all count subfiles.  
 - merged files are converted to last-base-count data.  
-    e.g.  
+    *e.g.*  
     % perl lbc_qsub.pl hg38 /mnt/ssd  
     lbc_qsub.pl is a launcher of last_base_count.pl for all merged subfiles.  
 - To create lbc files of target (e.g ERR194147),  
@@ -221,7 +222,7 @@ Column 13: Sequence between junctions
     % perl lbc_qsub.pl ERR194147 /mnt/ssd  
 - SNP detection between target(ERR194147) and control(hg38).  
     % perl snp_qsub.pl ERR194147 hg38 /mnt/ssd 10  
-    snp_qsub.pl is a launcher of snp.pl for detection of SNP at the last base of k-mer between target and control.
+    snp_qsub.pl is a launcher of snp.pl for detection of SNP at the last base of *k*-mer between target and control.
 - To map SNPs,  
     % perl map_qsub.pl ERR194147 hg38 /mnt/ssd  
 - To verify mapped SNPs,  
@@ -287,4 +288,4 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
 1. In case the result obtained using PED in used for publication in academic journals etc., please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
-Copyright (C) 2017 National Agriculture and Food Research Organization. All rights reserved. 
+Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved. 
