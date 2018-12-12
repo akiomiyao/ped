@@ -33,7 +33,7 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 -  To make reference data of hg38,  
     % cd hg38  
     % sh setup.sh  
--  To make reference data of Arabidopsis thaliana,  
+-  To make reference data of *Arabidopsis thaliana,*  
     % cd TAIR10  
     % sh setup.sh  
 - For rice, soybean and mouse, execute shetup.sh in IRGSP1.0, Gmax275v2.0 and GRCm38 directory, respectively.
