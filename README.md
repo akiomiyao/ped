@@ -58,13 +58,14 @@ or
     % perl sort_uniq.pl SRR8181712
 -  Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.
     For stand alone computer,  
-    % perl align.pl target_name reference margin  
+    % perl align.pl target_name reference margin tmpdir  
     *e.g.*  
     % perl align.pl SRR8181712 TAIR10 0 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 5 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 10 /tmp/ssd  
     % perl align.pl SRR8181712 TAIR10 15 /tmp/ssd  
-    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.
+    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
+    /tmp/ssd (tmpdir, specify to a directory on the fast local disk) is optional.
 
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
@@ -109,14 +110,15 @@ or
     % perl sort_uniq.pl ERR194147
 - Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.  
     For stand alone computer,  
-    % perl align.pl target_name reference margin  
+    % perl align.pl target_name reference margin tmpdir  
     *e.g.*  
     % perl align.pl ERR194147 hg38 0 /tmp/ssd  
     % perl align.pl ERR194147 hg38 5 /tmp/ssd  
     % perl align.pl ERR194147 hg38 10 /tmp/ssd  
     % perl align.pl ERR194147 hg38 15 /tmp/ssd  
     At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
-
+    /tmp/ssd (tmpdir, specify to a directory on the fast local disk) is optional.  
+    
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
     *e.g.*  
