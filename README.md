@@ -164,9 +164,9 @@ Column 3: Reference base at the SNP position
 Column 4: Alternative base
 Column 5: Number of detected reads with alternative base
 Column 6: Number of reads in the control sort_uniq file with control type polymorphism
-Column 7: Number of reads in the control sort_uniq file with target type control type polymorphism
-Column 8: Number of reads in the target sort_uniq file with control type control type polymorphism
-Column 9: Number of reads in the target sort_uniq file with target type control type polymorphism
+Column 7: Number of reads in the control sort_uniq file with target type polymorphism
+Column 8: Number of reads in the target sort_uniq file with control type polymorphism
+Column 9: Number of reads in the target sort_uniq file with target type polymorphism
 Column 10: Genotype (M: homozygous, H: heterozygous)
 ```
 - To verify indel,  
@@ -194,9 +194,9 @@ Column 5: Direction
 Column 6: Type of polymorphism (insertion, deletion, inversion and translocation)
 Column 7: Size of insertion or deletion
 Column 8: Number of reads in the control sort_uniq file with control type polymorphism
-Column 9: Number of reads in the control sort_uniq file with target type control type polymorphism
-Column 10: Number of reads in the target sort_uniq file with control type control type polymorphism
-Column 11: Number of reads in the target sort_uniq file with target type control type polymorphism
+Column 9: Number of reads in the control sort_uniq file with target type polymorphism
+Column 10: Number of reads in the target sort_uniq file with control type polymorphism
+Column 11: Number of reads in the target sort_uniq file with target type polymorphism
 Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
