@@ -29,7 +29,10 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 
 ### Installation
 
- - Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by *k*-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
+- Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by *k*-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
+- Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
+or  
+% git clone https://github.com/akiomiyao/ped.git
 -  To make reference data of hg38,  
     % cd hg38  
     % sh setup.sh  
