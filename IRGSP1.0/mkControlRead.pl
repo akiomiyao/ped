@@ -15,7 +15,7 @@ for(1 .. 12){
     $i = 0;
     while(1){
 	$read = substr($data, $i, 100);
-	last if lenth($read) != 100;
+	last if length($read) != 100;
 	if ($read !~ /[MRWSYKVHDBN]/){
 	    print OUT "$read\n";
 	    print OUT &complement($read) . "\n";
