@@ -37,7 +37,7 @@ or
     % cd TAIR10  
     % sh setup.sh  
 -  To make reference data of rice,  
-    % cd IRGSP1.0
+    % cd IRGSP1.0  
     % sh setup.sh  
 -  To make reference data of hg38,  
     % cd hg38  
@@ -63,10 +63,10 @@ or
     For stand alone computer,  
     % perl align.pl target_name reference margin tmpdir  
     *e.g.*  
-    % perl align.pl SRR8181712 TAIR10 0
-    % perl align.pl SRR8181712 TAIR10 5
-    % perl align.pl SRR8181712 TAIR10 10
-    % perl align.pl SRR8181712 TAIR10 15
+    % perl align.pl SRR8181712 TAIR10 0  
+    % perl align.pl SRR8181712 TAIR10 5  
+    % perl align.pl SRR8181712 TAIR10 10  
+    % perl align.pl SRR8181712 TAIR10 15  
     At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
 
 
