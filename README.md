@@ -33,13 +33,16 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git
--  To make reference data of hg38,  
-    % cd hg38  
-    % sh setup.sh  
 -  To make reference data of *Arabidopsis thaliana,*  
     % cd TAIR10  
     % sh setup.sh  
-- For rice, soybean and mouse, execute shetup.sh in IRGSP1.0, Gmax275v2.0 and GRCm38 directory, respectively.
+-  To make reference data of rice,  
+    % cd IRGSP1.0
+    % sh setup.sh  
+-  To make reference data of hg38,  
+    % cd hg38  
+    % sh setup.sh  
+- For soybean and mouse, execute shetup.sh in Gmax275v2.0 and GRCm38 directory, respectively.
 - 'wget' is required. If your machine do not have wget program, install wget from package before run setup.sh. Making reference data of human genome takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
 
 ## Demonstration of bidirectional alignment method
@@ -60,34 +63,33 @@ or
     For stand alone computer,  
     % perl align.pl target_name reference margin tmpdir  
     *e.g.*  
-    % perl align.pl SRR8181712 TAIR10 0 /tmp/ssd  
-    % perl align.pl SRR8181712 TAIR10 5 /tmp/ssd  
-    % perl align.pl SRR8181712 TAIR10 10 /tmp/ssd  
-    % perl align.pl SRR8181712 TAIR10 15 /tmp/ssd  
+    % perl align.pl SRR8181712 TAIR10 0
+    % perl align.pl SRR8181712 TAIR10 5
+    % perl align.pl SRR8181712 TAIR10 10
+    % perl align.pl SRR8181712 TAIR10 15
     At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
-    /tmp/ssd (tmpdir, specify to a directory on the fast local disk) is optional.
+
 
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
     *e.g.*  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=0,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=5,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=10,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=15,tmpdir=/mnt/ssd align.pl  
-    Tmp directory on local disk for qsub makes speed up the processing. More than 1 TB SSD of local disk for tmpdir is recommended.
+    % qsub -v target=SRR8181712,ref=TAIR10,margin=0 align.pl  
+    % qsub -v target=SRR8181712,ref=TAIR10,margin=5 align.pl  
+    % qsub -v target=SRR8181712,ref=TAIR10,margin=10 align.pl  
+    % qsub -v target=SRR8181712,ref=TAIR10,margin=15 align.pl  
 -  From result of align.pl, snp and indel data are gathered and then split for verification.  
     % perl split_snp.pl SRR8181712  
     % perl split_indel.pl SRR8181712  
     or  
-    % qsub -v target=SRR8181712,tmpdir=/mnt/ssd split_snp.pl  
+    % qsub -v target=SRR8181712 split_snp.pl  
     % qsub -v target=SRR8181712 split_indel.pl  
     tmpdir for qsub run of split_snp.pl is optional.  
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
     *e.g.*  
-    % perl verify_snp.pl SRR8181712 default TAIR10 01 bi /mnt/ssd  
+    % perl verify_snp.pl SRR8181712 default TAIR10 01 bi  
     or  
-    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl  
+    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi verify_snp.pl  
     
     target : target name, *e.g.* SRR8181712  
     control : *e.g.* SRR7686247 or 'default', if you want to use reference data for control  
@@ -98,9 +100,9 @@ or
 - To verify indel,  
     % perl verify_indel.pl target control reference number type tmpdir  
     *e.g.*  
-    % perl verify_indel.pl SRR8181712 default TAIR10 01 bi /mnt/ssd  
+    % perl verify_indel.pl SRR8181712 default TAIR10 01 bi
     or  
-    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi,tmpdir=/mnt/ssd verify_indel.pl 
+    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi verify_indel.pl 
 
 ### Human
 - Short read data ERR194147 is used for demonstration. ERR194147 is a short reads of whole genome sequence from a member of the [Coriell CEPH/UTAH 1463 family](https://www.coriell.org/0/Sections/Collections/NIGMS/CEPHFamiliesDetail.aspx?PgId=441&fam=1463&) for a "[platinum](https://www.illumina.com/platinumgenomes.html)" standard comprehensive set for variant calling improvement.
@@ -112,12 +114,12 @@ or
     For stand alone computer,  
     % perl align.pl target_name reference margin tmpdir  
     *e.g.*  
-    % perl align.pl ERR194147 hg38 0 /tmp/ssd  
-    % perl align.pl ERR194147 hg38 5 /tmp/ssd  
-    % perl align.pl ERR194147 hg38 10 /tmp/ssd  
-    % perl align.pl ERR194147 hg38 15 /tmp/ssd  
+    % perl align.pl ERR194147 hg38 0 /mnt/ssd  
+    % perl align.pl ERR194147 hg38 5 /mnt/ssd  
+    % perl align.pl ERR194147 hg38 10 /mnt/ssd  
+    % perl align.pl ERR194147 hg38 15 /mnt/ssd  
     At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
-    /tmp/ssd (tmpdir, specify to a directory on the fast local disk) is optional.  
+    /mnt/ssd (tmpdir, specify to a directory on the fast local disk) is optional.  
     
     For the computer cluster,  
     % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
@@ -126,7 +128,7 @@ or
     % qsub -v target=ERR194147,ref=hg38,margin=5,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=ERR194147,ref=hg38,margin=10,tmpdir=/mnt/ssd align.pl  
     % qsub -v target=ERR194147,ref=hg38,margin=15,tmpdir=/mnt/ssd align.pl  
-    Tmp directory on local disk for qsub makes speed up the processing. More than 1 TB SSD of local disk for tmpdir is recommended.
+    'tmpdir' on local disk for qsub makes speed up the processing. More than 1 TB SSD of local disk for tmpdir is recommended.
 - From result of align.pl, snp and indel data are gathered and then split for verification.  
     % perl split_snp.pl ERR194147  
     % perl split_indel.pl ERR194147  
@@ -276,7 +278,7 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 Version 1.0
 
 ## Citing PED
-Cite this article as:
+Cite this article as: TBA
 
 ## License
 NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0
