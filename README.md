@@ -97,7 +97,7 @@ or
     ref : reference genome, *e.g.* TAIR10  
     number : specify number of splited subfile  
     type : specify type of input data (bi, kmer or vcf)  
-    tmpdir : specify temporary directofy on local disk (can be omitted)  
+    tmpdir : specify temporary directory on fast local disk, such as SSD (can be omitted)  
 - To verify indel,  
     % perl verify_indel.pl target control reference number type tmpdir  
     *e.g.*  
