@@ -62,6 +62,7 @@ or
 -  Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.
     For stand alone computer,  
     % perl align.pl target_name reference margin tmpdir  
+    'tmpdir' is optional.    
     *e.g.*  
     % perl align.pl SRR8181712 TAIR10 0  
     % perl align.pl SRR8181712 TAIR10 5  
@@ -83,7 +84,7 @@ or
     or  
     % qsub -v target=SRR8181712 split_snp.pl  
     % qsub -v target=SRR8181712 split_indel.pl  
-    tmpdir for qsub run of split_snp.pl is optional.  
+
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
     *e.g.*  
