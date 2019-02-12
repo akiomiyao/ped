@@ -34,11 +34,11 @@ opendir(DIR, "$target/tmp");
 closedir(DIR);
 
 foreach (sort @file){
-    $number = (split('\.', $_))[2];
+    @number = split('\.', $_);
     if ($tmpdir eq ""){
-	$cmd = "qsub -v target=$target,number=$number count.pl";
+	$cmd = "qsub -v target=$target,number=$number[$#number] count.pl";
     }else{
-	$cmd = "qsub -v target=$target,number=$number,tmpdir=$tmpdir count.pl";
+	$cmd = "qsub -v target=$target,number=$number[$#number],tmpdir=$tmpdir count.pl";
     }
     print "$cmd\n";
     system($cmd);
