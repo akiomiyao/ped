@@ -33,7 +33,9 @@ opendir(DIR, $target);
 closedir(DIR);
 
 foreach $file (sort @file){
-    ($target, $tag) = (split('\.', $file))[0, 2];
+    @row = split('\.', $file);
+    $tag = $row[$#row -1];
+    $target = (split('\.count', $file))[0];
     $cmd = "qsub -v target=$target,tag=$tag,tmpdir=$tmpdir last_base_count.pl";
     print "$cmd\n";
     system($cmd);
