@@ -28,16 +28,16 @@ if($target eq ""){
     exit;
 }
 
-@nuc = ('A', 'C', 'G', 'T');
+opendir(DIR, $target);
+foreach (grep(/count/, readdir(DIR))){
+    @row = split('\.', $_);
+    $tag{$row[$#row - 2]} = 1;
+}
+closedir(DIR);
 
-foreach $a (@nuc){
-    foreach $b (@nuc){
-	foreach $c (@nuc){
-	    $tag = $a . $b . $c;
-	    $cmd = "qsub -v target=$target,tag=$tag,tmpdir=$tmpdir merge.pl";
-	    print "$cmd\n";
-	    system($cmd);
-	    sleep(1);
-	}
-    }
+foreach $tag (sort keys %tag){
+    $cmd = "qsub -v target=$target,tag=$tag,tmpdir=$tmpdir merge.pl";
+    print "$cmd\n";
+    system($cmd);
+    sleep(1);
 }

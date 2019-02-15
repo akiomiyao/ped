@@ -54,10 +54,13 @@ while(1){
     $last ++;
     $last = "000" . $last;
     $last = substr($last, length($last) - 4, 4);
-    $output = "$last[0].$last[1].$last[2].$last";
+    $last[$#last] = "";
+    
+    $output = join('.', @last) . $last;
     $cmd = "join -a 1 -a 2 $file[0] $file[1] | awk '{print \$1 \"\t\" \$2 + \$3}' > $output && rm $file[0] $file[1]";
     system($cmd);
 }
 
-$final = "$last[0].$last[1].$last[2]";
+$final = join('.', @last);
+chop($final);
 system("mv $output $final && gzip $final && mv $final.gz $workdir && cd .. && rm -r $target && rm $workdir/*.$tag.*.gz");
