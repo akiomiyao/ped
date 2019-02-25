@@ -22,9 +22,9 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
-$target = "$ARGV[0]/$ARGV[0].indel.sort";
+$target = "$ARGV[0]/$ARGV[0].*.sort";
 
-open(IN, "grep $ARGV[2] $target|");
+open(IN, "cat $target | grep $ARGV[2] |");
 while(<IN>){
     chomp;
     @row = split;
