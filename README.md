@@ -27,12 +27,32 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
           
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
-### Installation
+
+
+## Installation
 
 - Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by *k*-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git
+
+- To download sequence data, fastq-dump from NCBI is required.
+    Tool kit can be download from
+    https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
+- To download reference date, wget is required.  
+    If your machine do not have wget program, install wget from package.
+    
+## Simple demonstration
+- % perl demo_bidirectional.pl  
+    After 5 hours or less, you will find results in SRR8181712 directory.
+    SRR8181712.snp.vcf is the vcf file for SNPs.
+    SRR8181712.indel is list of structural variation.
+- To confirm the alignment for detected polymorphisms,  
+  % perl search.pl target chr pos  
+  e.g. % perl search.pl SRR8181712 1 1617636  
+  Alignments will be selected by the search script.  
+
+## Making Reference data sets
 -  To make reference data of *Arabidopsis thaliana,*  
     % cd TAIR10  
     % sh setup.sh  
@@ -43,13 +63,9 @@ or
     % cd hg38  
     % sh setup.sh  
 - For soybean and mouse, execute shetup.sh in Gmax275v2.0 and GRCm38 directory, respectively.
-- 'wget' is required. If your machine do not have wget program, install wget from package before run setup.sh. Making reference data of human genome takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
+- Making reference data of human genome takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
 
-## Demonstration of bidirectional alignment method
-
-- To download sequence data, fastq-dump from NCBI is required.
-    Tool kit can be download from
-    https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
+## Step by step demonstration of bidirectional alignment method
 
     Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of *Arabidopsis* is recommended.
     
@@ -98,6 +114,9 @@ or
     number : specify number of splited subfile  
     type : specify type of input data (bi, kmer or vcf)  
     tmpdir : specify temporary directory on fast local disk, such as SSD (can be omitted)  
+- Conversion to vcf file
+    % perl snp2vcf.pl SRR8181712
+    The verified SNPs will be converted to the vcf format.  
 - To verify indel,  
     % perl verify_indel.pl target control reference number type tmpdir  
     *e.g.*  
