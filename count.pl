@@ -71,9 +71,8 @@ sub cluster{
 sub standalone{
    $target = $ARGV[0];
    $input_file = $target . ".sort_uniq";
-
    open(IN, "$target/$input_file");
-   open(OUT, "|sort -S 2G -T ./ | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr//bin/perl last_base_count.pl > $target/$target.lbc");
+   open(OUT, "|sort -S 2G -T ./$target | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr//bin/perl last_base_count.pl > $target/$target.lbc");
    while(<IN>){
        chomp;
        $length = length($_);
