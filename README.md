@@ -45,14 +45,14 @@ or
 ## Simple demonstration
 - % perl demo_bidirectional.pl  
     After 5 hours or less, you will find results in SRR8181712 directory.
-    SRR8181712.snp.vcf is the vcf file for SNPs.
+    SRR8181712.snp.vcf is the vcf file for SNPs.  
     SRR8181712.indel is list of structural variation.
 - To confirm the alignment for detected polymorphisms,  
-  % perl search.pl target chr pos  
+  % perl search.pl target chr position  
   e.g. % perl search.pl SRR8181712 1 1617636  
   Alignments will be selected by the search script.  
 
-## Making Reference data sets
+## Making reference data sets
 -  To make reference data of *Arabidopsis thaliana,*  
     % cd TAIR10  
     % sh setup.sh  
@@ -67,7 +67,7 @@ or
 
 ## Step by step demonstration of bidirectional alignment method
 
-    Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of *Arabidopsis* is recommended.
+Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of *Arabidopsis* is recommended.
     
 ### *Arabidopsis thaliana*
 - Short read data SRR8181712 is used for demonstration.
