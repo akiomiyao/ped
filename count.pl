@@ -11,7 +11,10 @@ $usage = '
      count.pl - create count of kmers from sort_uniq data. 
 
 e.g. qsub -v target=ERR194147,number=0001,tmpdir=/mnt/ssd count.pl
-  or perl count.pl SRR8181712
+
+     For stand alone machine
+e.g. perl count.pl SRR8181712
+     perl count.pl DRR054198
 
      target is name of target.
      number is number of split target file (e.g. 0001).
@@ -20,6 +23,7 @@ e.g. qsub -v target=ERR194147,number=0001,tmpdir=/mnt/ssd count.pl
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
+
 
 if($ENV{target} ne ""){
     $target    = $ENV{target};
@@ -30,10 +34,8 @@ if($ENV{target} ne ""){
     &cluster;
 }elsif($ARGV[0] ne ""){
     &standalone;
-    exit;
 }else{
     print $usage;
-    exit;
 }
 
 sub cluster{
@@ -55,7 +57,7 @@ sub cluster{
 	system("cp $workdir/tmp/$input_file $tmpdir");
     }
     open(IN, "$input_file");
-    open(OUT, "|sort -S 2G -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
+    open(OUT, "|sort -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
     while(<IN>){
 	chomp;
 	$length = length($_);
@@ -69,18 +71,117 @@ sub cluster{
 }
 
 sub standalone{
-   $target = $ARGV[0];
-   $input_file = $target . ".sort_uniq";
-   open(IN, "$target/$input_file");
-   open(OUT, "|sort -S 2G -T ./$target | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr//bin/perl last_base_count.pl > $target/$target.lbc");
-   while(<IN>){
-       chomp;
-       $length = length($_);
-       for ($i = 0; $i <= $length - 20; $i++){
-	   $seq = substr($_, $i, 20);
-	   if ($seq !~ /N/){
-	       print OUT "$seq\n";
-	   }
-       }
-   }
+    $target = $ARGV[0];
+    chdir $target;
+    $input_file = $target . ".sort_uniq";
+    if (-e "tmp"){
+	system("rm -rf tmp");
+    }
+    system("mkdir tmp");
+    $count = 0;
+    $file_count = 1;
+    open(IN, $input_file);
+    open(OUT, "> tmp/$input_file.$file_count");
+    while(<IN>){
+	if ($count == 10000000){
+	    $file_count ++;
+	    open(OUT, "> tmp/$target.sort_uniq.$file_count");
+	    $count = 0;
+	}
+	$count++;
+	print OUT;
+    }
+    close(IN);
+    close(OUT);
+    for ($j = 1; $j <= $file_count; $j++){
+	open(IN, "tmp/$input_file.$j");
+	$number = "000$j";
+	$number = substr($number, length($number) -4, 4);
+	print "$input_file.$j / $file_count is processing.\n";
+	$reads = 0;
+	open(OUT, "|sort -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
+	while(<IN>){
+	    $reads++;
+	    chomp;
+	    $length = length($_);
+	    for ($i = 0; $i <= $length - 20; $i++){
+		$seq = substr($_, $i, 20);
+		if ($seq !~ /N/){
+		    print OUT "$seq\n";
+		}
+	    }
+	}
+	close(IN);
+	close(OUT);
+	&split_count($number);
+    }
+    &merge;
+}
+
+sub split_count{
+    my $number = shift;
+    open(IN, "$target.count.$number");
+    while(<IN>){
+	$head = substr($_, 0, 3);
+	$head{$head} = 1;
+	if ($prev ne $head){
+	    $output_file = "$target.count.$head.$number";
+	    open(OUT, "> $output_file");
+	}
+	print OUT "$_";
+	$prev = $head;
+    }
+    close(IN);
+    close(OUT);
+    system("rm $target.count.$number");
+}
+
+sub merge{
+    foreach $head (sort keys %head){
+	while(1){
+	    @file = ();
+	    opendir(DIR, ".");
+	    @file = sort(grep(/count\.$head\.[0-9]/, readdir(DIR)));
+	    closedir(DIR);
+	    $total = @file;
+	    if ($total == 1){
+		last;
+	    }
+	    @last = split('\.', $file[$#file]);
+	    $last = $last[$#last];
+	    $last ++;
+	    $last = "000" . $last;
+	    $last = substr($last, length($last) - 4, 4);
+	    $last[$#last] = "";
+	    
+	    $output = join('.', @last) . $last;
+	    $cmd = "join -a 1 -a 2 $file[0] $file[1] | awk '{print \$1 \"\t\" \$2 + \$3}' > $output && rm $file[0] $file[1]";
+	    system($cmd);
+	}
+	$tag = "";
+	$prev = "";
+	$final = "$target.lbc.$head";
+	open(IN, $output);
+	open(OUT, "> $final");
+	while(<IN>){
+	    chomp;
+	    ($seq, $count) = split;
+	    $tag = substr($seq, 0, 19);
+	    $nuc = substr($seq, 19, 1);
+	    
+	    if ($tag ne $prev and $prev ne ""){
+		print OUT "$prev\t$A\t$C\t$G\t$T\n";
+		$A = 0;
+		$C = 0;
+		$G = 0;
+		$T = 0;
+	    }
+	    $$nuc = $count;
+	    
+	    $prev = $tag;
+	}
+	print OUT "$prev\t$A\t$C\t$G\t$T\n";
+	close(OUT);
+	system("rm $output");
+    }
 }
