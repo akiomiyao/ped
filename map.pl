@@ -12,6 +12,10 @@ $usage = '
 
 e.g. qsub -v target=ERR194147,ref=hg38,tag=AAA,tmpdir=/mnt/ssd map.pl
 
+     For standalone machine
+e.g. perl map.pl DRR054198 IRGSP1.0 
+     perl map.pl SRR8181712 TAIR10
+
      target is name of target.
      ref is name of reference.
      tmpdir can be ommited.
@@ -21,13 +25,26 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 ';
 
 if($ENV{target} ne ""){
-    $target    = $ENV{target};
-    $ref       = $ENV{ref};
-    $tag       = $ENV{tag};
-    $cwd       = $ENV{PBS_O_WORKDIR};
-    $tmpdir    = $ENV{tmpdir};
-    $workdir   = "$cwd/$target";
-    $refdir    = "$cwd/$ref";
+    $target      = $ENV{target};
+    $ref         = $ENV{ref};
+    $tag         = $ENV{tag};
+    $cwd         = $ENV{PBS_O_WORKDIR};
+    $tmpdir      = $ENV{tmpdir};
+    $workdir     = "$cwd/$target";
+    $refdir      = "$cwd/$ref";
+    $target_file = "$target.snp.$tag";
+    $ref_file    = "zcat ref20_uniq.$tag.gz|";
+    $output_file = "$target.map.$tag";
+}elsif($ARGV[0] ne ""){
+    $cwd       = `pwd`;
+    chomp($cwd);
+    $target      = $ARGV[0];
+    $ref         = $ARGV[1];
+    $workdir     = "$cwd/$target";
+    $refdir      = "$cwd/$ref";
+    $target_file = "cat $workdir/$target.snp.[ACGT][ACGT][ACGT]|";
+    $output_file = "$target.map.AAA";
+    $ref_file    = "zcat $refdir/ref20_uniq.*.gz|";
 }else{
     print $usage;
     exit;
@@ -47,8 +64,8 @@ if ($tmpdir eq ""){
 chdir $tmpdir;
 
 $s = {};
-open(OUT, "> $target.map.$tag");
-open(IN, "$target.snp.$tag");
+open(OUT, "> $output_file");
+open(IN, $target_file);
 while(<IN>){
     chomp;
     @row = split;
@@ -58,7 +75,7 @@ while(<IN>){
     }
 }
 
-open(IN, "zcat ref20_uniq.$tag.gz|");
+open(IN, $ref_file);
 while(<IN>){
     chomp;
     @row = split;
@@ -84,9 +101,11 @@ while(<IN>){
     }
 }
 close(OUT);
+
 if ($tmpdir ne $workdir){
     system("cp $target.map.$tag $workdir && rm -r $tmpdir");
 }
+
 sub complement{
     my $seq = shift;
     my @seq = split('', $seq);
