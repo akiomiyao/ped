@@ -10,11 +10,14 @@
 $usage = '
      verify_snp.pl - verification program for SNPs.
 
+
+e.g. qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl
+
+     For standalone machine
 e.g. perl verify_snp.pl target control reference number type tmpdir
-
      perl verify_snp.pl ERR194147 default hg38 01 bi /mnt/ssd
-
-     qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl
+     perl verify_snp.pl DRR054198 default IRGSP1.0 01 bi
+     perl verify_snp.pl DRR054198 default IRGSP1.0 AAA kmer
 
 target  : target name e.g. ERR194147
 control : e.g. ERR194146, or \'default\' if you want to use reference data for control
@@ -218,7 +221,7 @@ if ($file_type eq "gz"){
 }else{
     system("join $cwd/$target/$target.sort_uniq target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number && rm *.snp.sort.$number target.snp.st.$number");
 }
-system("sort -S 100M -T $tmpdir target.snp.$number| uniq -c > target.snp.count.$number && rm target.snp.$number");
+system("sort -T $tmpdir target.snp.$number| uniq -c > target.snp.count.$number && rm target.snp.$number");
     
 &openTag;
 if ($type eq "vcf"){
@@ -285,7 +288,7 @@ close(IN);
 &sortTag;
 
 system("cat *.snp.sort.$number | join $control - | cut -d ' ' -f 2- > control.snp.$number");
-system("sort -S 100M -T $tmpdir control.snp.$number| uniq -c > control.snp.count.$number && rm *.snp.sort.$number control.snp.$number");
+system("sort -T $tmpdir control.snp.$number| uniq -c > control.snp.count.$number && rm *.snp.sort.$number control.snp.$number");
 
 open(IN, "target.snp.count.$number");
 while(<IN>){
@@ -321,7 +324,7 @@ if ($type eq "vcf"){
     open(OUT, "> $workdir/$target.snp.verify.$number");
     open(IN, "$cwd/$target/$target.snp.$number");
 }elsif ($type eq "kmer"){
-    open(OUT, "> $workdir/$target.verify.$number");
+    open(OUT, "> $workdir/$target.kmer.verify.$number");
     open(IN, "$cwd/$target/$target.map.$number");
 }
 while(<IN>){
@@ -382,7 +385,7 @@ if ($tmpdir ne "."){
     }elsif ($type eq "bi"){
 	system("cp $target.snp.verify.$number $cwd/$target");
     }elsif ($type eq "kmer"){
-	system("cp $target.verify.$number $cwd/$target");
+	system("cp $target.kmer.verify.$number $cwd/$target");
     }
     system("rm -r $workdir");
 }
@@ -414,7 +417,7 @@ sub sortTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		system("sort -S 100M -T $tmpdir $workdir/$tag.snp.tmp.$number > $workdir/$tag.snp.sort.$number && rm $workdir/$tag.snp.tmp.$number");
+		system("sort -T $tmpdir $workdir/$tag.snp.tmp.$number > $workdir/$tag.snp.sort.$number && rm $workdir/$tag.snp.tmp.$number");
 	    }
 	}
     }
