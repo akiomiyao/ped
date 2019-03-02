@@ -11,6 +11,8 @@ $usage = '
      sort_uniq.pl - make sorted unique read data. 
 
 e.g. perl sort_uniq.pl target
+     perl sort_uniq.pl DRR054198
+     perl sort_uniq.pl SRR8181712
 
      qsub -v target=ERR194147,tmpdir=/mnt/ssd sort_uniq.pl
 
@@ -49,7 +51,7 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 	}
 	$cmd = "cat $workdir/read/*|";
 	$type = "fastq";
-    }elsif(/gz$|gz2$/){
+    }elsif(/gz$|bz2$/){
 	if ($type ne "" and $type ne "gz"){
 	    print "Different compression format in read directory is not acceptable.";
 	    exit;
@@ -68,7 +70,7 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 closedir(DIR);
 
 open(IN, $cmd);
-open(OUT, "|sort -S 1G -T $tmpdir |uniq > $workdir/$target.sort_uniq");
+open(OUT, "|sort -T $tmpdir |uniq > $workdir/$target.sort_uniq");
 while(<IN>){
     if ($count == 1 and !/N/){
 	chomp;
@@ -85,6 +87,7 @@ close(OUT);
 if ($tmpdir ne $workdir){
     system("rm -r $tmpdir");
 }
+
 sub complement{
     my $seq = shift;
     my @seq = split('', $seq);
