@@ -43,8 +43,8 @@ or
     If your machine do not have wget program, install wget from package.
     
 ## Simple demonstration
-- % perl demo_bidirectional.pl  
-    After 5 hours or less, you will find results in SRR8181712 directory.
+- % perl demo_bidirectional.pl SRR8181712  
+    After 5 hours or less, you will find results in SRR8181712 directory.  
     SRR8181712.snp.vcf is the vcf file for SNPs.  
     SRR8181712.indel is list of structural variation.
 - To confirm the alignment for detected polymorphisms,  
@@ -223,7 +223,12 @@ Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
 ## Demonstration of *k*-mer method
-- Grid engine, *e.g.* Torque, is required for *k*-mer method.
+## Simple demonstration
+- % perl demo_kmer.pl SRR8181712  
+    After 1.5 days, you will find results in SRR8181712 directory.  
+
+## Step by Step demonstration  
+- Grid engine, *e.g.* Torque, may be required for *k*-mer method.
 - At first, all *k*-mers (*k* = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create *k*-mer data of control,  
     *e.g.*  
     % perl split_sort_uniq.pl hg38  
