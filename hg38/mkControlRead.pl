@@ -7,7 +7,7 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-open(OUT, "|sort -T ./ -S 100M |uniq > hg38.sort_uniq");
+open(OUT, "|sort -T ./ |uniq > hg38.sort_uniq");
 for(1 .. 22, 'X', 'Y'){
     open(IN, "chr$_");
     $data = <IN>;
