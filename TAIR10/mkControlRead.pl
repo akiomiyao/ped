@@ -7,7 +7,7 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-open(OUT, "|sort -T ./ -S 100M |uniq > TAIR10.sort_uniq");
+open(OUT, "|sort -T ./ |uniq > TAIR10.sort_uniq");
 for(1 .. 5){
     open(IN, "chr$_");
     $data = <IN>;
