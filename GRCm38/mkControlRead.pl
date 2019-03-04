@@ -7,7 +7,7 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-open(OUT, "|sort -T ./ -S 100M |uniq > GRCm38.sort_uniq");
+open(OUT, "|sort -T ./ |uniq > GRCm38.sort_uniq");
 for(1 .. 19, 'X' , 'Y'){
     open(IN, "chr$_");
     $data = <IN>;
