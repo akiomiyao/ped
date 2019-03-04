@@ -7,7 +7,7 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-open(OUT, "|sort -T ./ -S 100M |uniq > Gmax275v2.0.sort_uniq");
+open(OUT, "|sort -T ./ |uniq > Gmax275v2.0.sort_uniq");
 for(1 .. 2735){
     open(IN, "chr$_");
     $data = <IN>;
