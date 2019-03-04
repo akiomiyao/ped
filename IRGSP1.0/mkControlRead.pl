@@ -7,7 +7,7 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-open(OUT, "|sort -T ./ -S 100M |uniq > IRGSP1.0.sort_uniq");
+open(OUT, "|sort -T ./ |uniq > IRGSP1.0.sort_uniq");
 for(1 .. 12){
     open(IN, "chr$_");
     $data = <IN>;
