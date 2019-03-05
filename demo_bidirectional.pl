@@ -15,6 +15,10 @@ e.g. perl demo_bidirectional.pl accession
 
      This demonstration script is for sequence of Arabidopsis thaliana.
 
+     Downloading time by fastq-dump from the Sequence Read Archive
+     depends on the traffic from/to NCBI. Sometimes, it requires
+     half day or more.
+
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
@@ -39,7 +43,7 @@ if (! -e "$target/$target.sort_uniq"){
     report("Making sort_uniq sequence of $target.");
     system("perl sort_uniq.pl $target");
 }
-exit;
+
 report("Aligning of $target sequence to reference genome.");
 system("perl align.pl $target TAIR10 5");
 report("Splitting alignment of SNP.");
