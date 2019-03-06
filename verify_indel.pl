@@ -88,45 +88,31 @@ $number = "01" if $number eq "";
 
 chdir $workdir;
 
-if ($ref eq "hg38"){
-    @chr = (1 .. 22, 'X', 'Y');
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$cwd/$ref/$chr not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "GRCm38"){
-    @chr = (1 .. 19, 'X', 'Y');
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$cwd/$ref/$chr not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif ($ref eq "TAIR10"){
-    @chr = (1 .. 5);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$cwd/$ref/$chr not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "IRGSP1.0"){ 
-    @chr = (1 .. 12);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$cwd/$ref/$chr not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "Gmax275v2.0"){
-    @chr = (1 .. 2735);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-	if (-e $chr_file){
-	    open (IN, $chr_file) ;
-	    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+open(IN, "../config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+	if ($row[2] != 0){
+	    for ($i = $row[2]; $i <= $row[3]; $i++){
+		push(@chr, $i);
+	    }
+	}
+	if ($row[4] ne ""){
+	    foreach ($i = 4; $i <= $#row; $i++){
+		push(@chr, $row[$i]);
+	    }
 	}
     }
 }
 close(IN);
+
+foreach $i (@chr){
+    my $chr_file = "$ref_path/chr$i";
+    open (IN, $chr_file);
+    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+    close(IN);
+}
 
 if ($file_type eq "gz"){
     open(IN, "zcat $target_sort_uniq 2> /dev/null |");
@@ -258,7 +244,7 @@ if (-e "$cwd/$target/$target.sort_uniq.gz"){
 }else{
     system("join $cwd/$target/$target.sort_uniq indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number && rm indel_target.st.$number");
 }
-system("sort -S 100M -T $tmpdir indel_target.$number| uniq -c > indel_target.count.$number && rm indel_target.$number");
+system("sort -T $tmpdir indel_target.$number| uniq -c > indel_target.count.$number && rm indel_target.$number");
 
 &openTag;
 
@@ -368,7 +354,7 @@ while(<IN>){
 &sortTag;
 
 system("cat *.indel_sort.$number | join $control - | cut -d ' ' -f 2- > indel_control.$number && rm *.indel_sort.$number");
-system("sort -S 100M -T $tmpdir indel_control.$number| uniq -c > indel_control.count.$number && rm indel_control.$number");
+system("sort -T $tmpdir indel_control.$number| uniq -c > indel_control.count.$number && rm indel_control.$number");
 
 open(IN, "indel_target.count.$number");
 while(<IN>){
@@ -450,9 +436,9 @@ foreach $chr (@chr){
     next if ! $chr_exist{$chr};
     open(IN, "$target.indel_result.$number");
     if ($ftype eq "vcf"){
-	open(OUT, "|sort -S 100M -T $tmpdir -k 2 -n >> $cwd/$target/$target.indel_vcf.verify.$number");
+	open(OUT, "|sort -T $tmpdir -k 2 -n >> $cwd/$target/$target.indel_vcf.verify.$number");
     }else{
-	open(OUT, "|sort -S 100M -T $tmpdir -k 2 -n >> $cwd/$target/$target.indel.verify.$number");
+	open(OUT, "|sort -T $tmpdir -k 2 -n >> $cwd/$target/$target.indel.verify.$number");
     }
     while(<IN>){
 	@row = split;
@@ -497,7 +483,7 @@ sub sortTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		system("sort -S 100M -T $tmpdir $tag.indel_tmp.$number > $tag.indel_sort.$number && rm $tag.indel_tmp.$number");
+		system("sort -T $tmpdir $tag.indel_tmp.$number > $tag.indel_sort.$number && rm $tag.indel_tmp.$number");
 	    }
 	}
     }
