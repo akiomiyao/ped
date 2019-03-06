@@ -91,7 +91,7 @@ $number = "01" if $number eq "";
 
 chdir $workdir;
 
-open(IN, "../config");
+open(IN, "$cwd/config");
 while(<IN>){
     chomp;
     @row = split;
