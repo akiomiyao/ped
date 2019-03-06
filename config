@@ -1,0 +1,36 @@
+#
+# This file is a part of PED; Config file for Polymorphic Edge Detection.
+#
+# Copyright (C) 2017 National Agriculture and Food Research Organization. All Rights Reserved.
+#
+# License: refer to https://github.com/akiomiyao/ped
+#
+
+
+hg38	description	Genome Reference Consortium Human Build 38
+hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+hg38	chromosome  1	22	X	Y
+
+IRGSP1.0	description	Reference Genome of Rice (Olyza sativa L. cv. Nipponbare)	
+IRGSP1.0	wget	https://rapdb.dna.affrc.go.jp/download/archive/irgsp1/IRGSP-1.0_genome.fasta.gz
+IRGSP1.0	chromosome	1	12
+
+TAIR10	description	Reference Genome of Arabidopsis thaliana
+TAIR10	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-41/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
+TAIR10	chromosome	1	5
+
+GRCm38	description	Genome Reference Consortium Mouse Build 38
+GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna.toplevel.fa.gz  
+GRCm38	chromosome	1	19	X	Y
+
+Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2 Gmax_275_v2.0.fa.gz 
+Gmax275v2.0	wget	https://phytozome.jgi.doe.gov/pz/portal.html
+Gmax275v2.0	chromosome	1	2735
+
+WBcel235	description	Caenorhabditis elegans WBcel235	
+WBcel235	wget	ftp://ftp.ensembl.org/pub/release-95/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+WBcel235	chromosome	0	0	I	II	III	IV	V	X
+
+dmel626	description	Drosophila melanogaster	release 6.26
+dmel626	wget	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.26_FB2019_01/fasta/dmel-all-chromosome-r6.26.fasta.gz
+dmel626	chromosome	0	0	2L	2R	3L	3R	4	X	Y
