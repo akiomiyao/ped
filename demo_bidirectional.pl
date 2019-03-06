@@ -62,7 +62,7 @@ report("Verifying Indels.");
 system("perl verify_indel.pl $target default TAIR10 01 bi");
 report("Making vcf file of SNP");
 system("perl snp2vcf.pl $target");
-system("mv $target.indel.verify.01 $target.indel");
+system("mv $target/$target.indel.verify.01 $target/$target.indel");
 report("Complete.");
 
 sub report{
