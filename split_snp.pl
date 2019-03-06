@@ -46,12 +46,38 @@ if ($ARGV[0] ne ""){
 
 chdir $workdir;
 
+open(IN, "../config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+	if ($row[2] != 0){
+	    for ($i = $row[2]; $i <= $row[3]; $i++){
+		push(@chr, $i);
+	    }
+	}
+	if ($row[4] ne ""){
+	    foreach ($i = 4; $i <= $#row; $i++){
+		push(@chr, $row[$i]);
+	    }
+	}
+    }
+}
+close(IN);
+
+foreach $i (@chr){
+    my $chr_file = "$ref_path/chr$i";
+    open (IN, $chr_file);
+    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+    close(IN);
+}
+
 if ($cwd eq ""){
     open(IN, "cat $target.aln.*|");
 }else{
     open(IN, "cat $cwd/$target/$target.aln.*|");
 }
-open(OUT, "|sort -S 100M -T $workdir |uniq > $workdir/$target.aln.sort");
+open(OUT, "|sort -T $workdir |uniq > $workdir/$target.aln.sort");
 while(<IN>){
     chomp;
     if (/snp/){
@@ -75,7 +101,7 @@ close(IN);
 close(OUT);
 
 open(IN, "$workdir/$target.aln.sort");
-open(OUT, "|sort -S 100M -T $workdir |uniq -c |awk '{print \$2, \$3, \$4, \$5, \$1}' >$workdir/$target.snp.tmp");
+open(OUT, "|sort -T $workdir |uniq -c |awk '{print \$2, \$3, \$4, \$5, \$1}' >$workdir/$target.snp.tmp");
 while(<IN>){
     foreach $dat(split('\t', $_)){
 	if ($dat =~/^#/){
@@ -86,7 +112,7 @@ while(<IN>){
 }
 
 system("rm $workdir/$target.snp") if -e "$workdir/$target.snp";
-foreach $chr (1 .. 22, 'X', 'Y'){
+foreach $chr (@chr){
     open(IN, "$workdir/$target.snp.tmp");
     open(OUT, "|sort -k 2 -n -S 100M -T $workdir >> $workdir/$target.snp");
     while(<IN>){
