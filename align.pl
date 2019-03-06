@@ -70,41 +70,30 @@ if ($tmpdir ne ""){
 
 chdir $workdir;
 
-if ($ref eq "hg38"){
-    foreach $i (1 .. 22, 'X', 'Y'){
-        my $chr_file = "$ref_path/chr$i";
-        open (IN, $chr_file);
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "GRCm38"){
-    foreach $i (1 .. 19, 'X', 'Y'){
-        my $chr_file = "$ref_path/chr$i";
-        open (IN, $chr_file);
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "TAIR10"){
-    foreach $i (1 .. 5){
-        my $chr_file = "$ref_path/chr$i";
-        open (IN, $chr_file);
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "IRGSP1.0"){
-    for ($i = 1; $i <= 12; $i++){
-        $chr = "chr$i";
-        open (IN, "$ref_path/$chr") || die "$chr not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "Gmax275v2.0"){
-    for ($i = 1; $i <= 2735; $i++){
-        $chr = "chr$i";
-	if (-e "$ref_path/$chr"){
-	    open (IN, "$ref_path/$chr") ;
-	    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+open(IN, "../config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+	if ($row[2] != 0){
+	    for ($i = $row[2]; $i <= $row[3]; $i++){
+		push(@chr, $i);
+	    }
+	}
+	if ($row[4] ne ""){
+	    foreach ($i = 4; $i <= $#row; $i++){
+		push(@chr, $row[$i]);
+	    }
 	}
     }
-}else{
-    print "Get reference seqeunce failed.\n";
-    exit;
+}
+close(IN);
+
+foreach $i (@chr){
+    my $chr_file = "$ref_path/chr$i";
+    open (IN, $chr_file);
+    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+    close(IN);
 }
 
 open(IN, "$target.sort_uniq");
