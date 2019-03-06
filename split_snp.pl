@@ -10,10 +10,10 @@
 $usage = '
      split_snp.pl - split data of align.pl output. 
 
-e.g. perl split_snp.pl target
-     perl split_snp ERR194147
+e.g. perl split_snp.pl target ref
+     perl split_snp ERR194147 hg38
 
-     qsub -v target=ERR194147,tmpdir=/mnt/ssd split_snp.pl
+     qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_snp.pl
 
      tmpdir can be ommitted.
 
@@ -23,11 +23,13 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
-    $workdir = `pwd`;
-    chomp($workdir);
-    $workdir .= "/$target";
+    $ref = $ARGV[1];
+    $cwd = `pwd`;
+    chomp($cwd);
+    $workdir = "$cwd/$target";
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
+    $ref       = $ENV{ref};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
     if ($tmpdir ne ""){
@@ -46,7 +48,7 @@ if ($ARGV[0] ne ""){
 
 chdir $workdir;
 
-open(IN, "../config");
+open(IN, "$cwd/config");
 while(<IN>){
     chomp;
     @row = split;
@@ -64,13 +66,6 @@ while(<IN>){
     }
 }
 close(IN);
-
-foreach $i (@chr){
-    my $chr_file = "$ref_path/chr$i";
-    open (IN, $chr_file);
-    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    close(IN);
-}
 
 if ($cwd eq ""){
     open(IN, "cat $target.aln.*|");
@@ -114,7 +109,7 @@ while(<IN>){
 system("rm $workdir/$target.snp") if -e "$workdir/$target.snp";
 foreach $chr (@chr){
     open(IN, "$workdir/$target.snp.tmp");
-    open(OUT, "|sort -k 2 -n -S 100M -T $workdir >> $workdir/$target.snp");
+    open(OUT, "|sort -k 2 -n -T $workdir >> $workdir/$target.snp");
     while(<IN>){
 	@row = split;
 	if ($row[0] eq $chr){
