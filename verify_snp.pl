@@ -91,43 +91,30 @@ $number = "01" if $number eq "";
 
 chdir $workdir;
 
-if ($ref eq "hg38"){
-    @chr = (1 .. 22, 'X', 'Y');
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$chr_file not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "GRCm38"){
-    @chr = (1 .. 19, 'X', 'Y');
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$chr_file not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif ($ref eq "TAIR10"){
-    @chr = (1 .. 5);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$chr_file not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif ($ref eq "IRGSP1.0"){ 
-    @chr = (1 .. 12);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-        open (IN, $chr_file) || die "$chr_file not found.";
-        ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    }
-}elsif($ref eq "Gmax275v2.0"){
-    @chr = (1 .. 2735);
-    foreach $i (@chr){
-        my $chr_file = "$cwd/$ref/chr$i";
-	if (-e $chr_file){
-	    open (IN, $chr_file) ;
-	    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+open(IN, "../config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+	if ($row[2] != 0){
+	    for ($i = $row[2]; $i <= $row[3]; $i++){
+		push(@chr, $i);
+	    }
+	}
+	if ($row[4] ne ""){
+	    foreach ($i = 4; $i <= $#row; $i++){
+		push(@chr, $row[$i]);
+	    }
 	}
     }
+}
+close(IN);
+
+foreach $i (@chr){
+    my $chr_file = "$ref_path/chr$i";
+    open (IN, $chr_file);
+    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
+    close(IN);
 }
 
 if ($file_type eq "gz"){
