@@ -65,7 +65,9 @@ if (! -d $target){
 
 chdir $target;
 
-if (! -e $wget{$target}){
+@row = split('/', $wget{$target});
+$remote_file = $row[$#row];
+if (! -e $remote_file){
     system("wget $wget{$target}");
 }
 
@@ -86,6 +88,7 @@ sub mkChr{
 	    $ref = (split)[0];
 	    $ref =~ s/>//;
 	    $ref =~ s/chr//i;
+	    $ref += 0;
 	    $ref = "chr$ref";
 	    open(OUT, "> $ref");
 	    open(FA, "> $ref.fa");
