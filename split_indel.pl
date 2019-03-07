@@ -10,10 +10,10 @@
 $usage = '
      split_indel.pl - split data of align.pl output. 
 
-e.g. perl split_indel.pl target
-     perl split_indel ERR194147
+e.g. perl split_indel.pl target reference
+     perl split_indel ERR194147 hg38
 
-     qsub -v target=ERR194147,tmpdir=/mnt/ssd split_indel.pl
+     qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_indel.pl
 
      tmpdir can be ommitted.
 
@@ -22,12 +22,14 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 ';
 
 if ($ARGV[0] ne ""){
-    $target = $ARGV[0];
-    $workdir = `pwd`;
-    chomp($workdir);
-    $workdir .= "/$target";
+    $target  = $ARGV[0];
+    $ref     = $ARGV[1];
+    $cwd = `pwd`;
+    chomp($cwd);
+    $workdir = "$cwd/$target";
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
+    $ref       = $ENV{ref};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
     if ($tmpdir ne ""){
@@ -44,14 +46,31 @@ if ($ARGV[0] ne ""){
     exit;
 }
 
-chdir $workdir;
+open(IN, "$cwd/config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+	if ($row[2] != 0){
+	    for ($i = $row[2]; $i <= $row[3]; $i++){
+		push(@chr, $i);
+	    }
+	}
+	if ($row[4] ne ""){
+	    foreach ($i = 4; $i <= $#row; $i++){
+		push(@chr, $row[$i]);
+	    }
+	}
+    }
+}
+close(IN);
 
 if ($cwd eq ""){
     open(IN, "cat $workdir/$target.aln.*|");
 }else{
     open(IN, "cat $cwd/$target/$target.aln.*|");
 }
-open(OUT, "|sort -S 100M -T $workdir |uniq > $workdir/$target.indel.sort");
+open(OUT, "|sort -T $workdir |uniq > $workdir/$target.indel.tmp");
 while(<IN>){
     chomp;
     if (/ion/){
@@ -71,6 +90,21 @@ while(<IN>){
 }
 close(IN);
 close(OUT);
+
+system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
+foreach $chr (@chr){
+    open(IN, "$workdir/$target.indel.tmp");
+    open(OUT, "|sort -k 2 -n -T $workdir >> $workdir/$target.indel.sort");
+    while(<IN>){
+	@row = split;
+	if ($row[1] eq $chr){
+	    print OUT;
+	}
+    }
+    close(IN);
+    close(OUT);
+}
+system("rm $workdir/$target.indel.tmp");
 
 $fcount = "01";
 open(IN, "$workdir/$target.indel.sort");
