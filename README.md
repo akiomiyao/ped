@@ -46,13 +46,13 @@ or
 - % perl mkref.pl dmel626  
 - % perl download.pl SRR5989890
 - % perl bidirectional.pl SRR5989890 dmel626  
-    After several hours, you will find results in SRR5989890 directory.  
-    SRR5989890.indel   is list of structural variation.
-    SRR5989890.snp     is list of SNPs.  
+    After two hours, you will find results in SRR5989890 directory.  
+    SRR5989890.indel is list of structural variation.  
+    SRR5989890.snp is list of SNPs.  
     SRR5989890.snp.vcf is the vcf file for SNPs.  
 - To confirm the alignment for detected polymorphisms,  
   % perl search.pl target chr position  
-  e.g. % perl search.pl SRR5989890 2L SRR5989890  
+  e.g. % perl search.pl SRR5989890 2L 15920731  
   Alignments will be selected by the search script.  
 
 ## Making reference data sets
@@ -75,7 +75,7 @@ or
 - If you want to analyze local file,  
   % mkdir mydata1  
   % mkdir mydata1/read  
-  % cp somewhere/madata1.fastq mydata1/read  
+  % cp somewhere/mydata1.fastq mydata1/read  
   % perl bidirectional.pl mydata1 Reference
 
 ## Step by step demonstration of bidirectional alignment method
