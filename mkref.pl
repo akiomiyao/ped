@@ -87,13 +87,18 @@ sub mkChr{
 	    close(FA);
 	    $ref = (split)[0];
 	    $ref =~ s/>//;
-	    $ref =~ s/chr//i;
-	    $ref += 0;
-	    $ref = "chr$ref";
-	    open(OUT, "> $ref");
-	    open(FA, "> $ref.fa");
-	    print FA ">$ref\n";
-	}else{
+	    if ($ref =~ /\_/){
+		$flag = 1;
+	    }else{
+		$flag = 0;
+		$ref =~ s/chr//i;
+		$ref += 0 if $ref =~ /^[0-9]*$/;
+		$ref = "chr$ref";
+		open(OUT, "> $ref");
+		open(FA, "> $ref.fa");
+		print FA ">$ref\n";
+	    }
+	}elsif(! $flag){
 	    y/a-z/A-Z/;
 	    print OUT;
 	    print FA "$_\n";
