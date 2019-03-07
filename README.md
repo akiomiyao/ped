@@ -31,7 +31,7 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 
 ## Installation
 
-- Programs run on Unix platforms (Linux, MacOS, FreeBSD). At least 2 TB disk space is required. For analysis by *k*-mer method, computer cluster and scheduler are required. Programs for bidirectional method can be run on a computer, but using computer cluster is recommended.
+- Programs run on Unix platforms (Linux, MacOS, FreeBSD). 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git
@@ -42,28 +42,41 @@ or
 - To download reference date, wget is required.  
     If your machine do not have wget program, install wget from package.
     
-## Simple demonstration
-- % perl demo_bidirectional.pl SRR8181712  
-    After 5 hours or less, you will find results in SRR8181712 directory.  
-    SRR8181712.snp.vcf is the vcf file for SNPs.  
-    SRR8181712.indel is list of structural variation.
+## Simple instruction for bidirectional method
+- % perl mkref.pl dmel626  
+- % perl download.pl SRR5989890
+- % perl bidirectional.pl SRR5989890 dmel626  
+    After several hours, you will find results in SRR5989890 directory.  
+    SRR5989890.indel   is list of structural variation.
+    SRR5989890.snp     is list of SNPs.  
+    SRR5989890.snp.vcf is the vcf file for SNPs.  
 - To confirm the alignment for detected polymorphisms,  
   % perl search.pl target chr position  
-  e.g. % perl search.pl SRR8181712 1 1617636  
+  e.g. % perl search.pl SRR5989890 2L SRR5989890  
   Alignments will be selected by the search script.  
 
 ## Making reference data sets
--  To make reference data of *Arabidopsis thaliana,*  
-    % cd TAIR10  
-    % sh setup.sh  
--  To make reference data of rice,  
-    % cd IRGSP1.0  
-    % sh setup.sh  
--  To make reference data of hg38,  
-    % cd hg38  
-    % sh setup.sh  
-- For soybean and mouse, execute shetup.sh in Gmax275v2.0 and GRCm38 directory, respectively.
-- Making reference data of human genome takes two days. Making the data sets of reference genome is only required at the first usage of PED. 
+- % perl mkref.pl  
+    Without specify reference, reference name and description are listed.  
+    If you want to make new reference, add the information about the reference to 'config' file.  
+- For example,  
+  % perl mkref.pl hg38  
+    Data set of human genome hg38 will be made. It takes about two days.  
+  % perl mkref.pl dmel626  
+    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.
+
+## Set up data directory
+- If you want to download short read sequence from NCBI SRA,  
+  % perl download.pl Accession  
+  For example,  
+  % perl download.pl SRR5989890  
+    Directory SRR5989890 will be made, fastq files will be downloaded to  
+    SRR5989890/read directory.
+- If you want to analyze local file,  
+  % mkdir mydata1  
+  % mkdir mydata1/read  
+  % cp somewhere/madata1.fastq mydata1/read  
+  % perl bidirectional.pl mydata1 Reference
 
 ## Step by step demonstration of bidirectional alignment method
 
@@ -95,11 +108,11 @@ Because data of human is big, it takes long time for downloading from SRA. To ch
     % qsub -v target=SRR8181712,ref=TAIR10,margin=10 align.pl  
     % qsub -v target=SRR8181712,ref=TAIR10,margin=15 align.pl  
 -  From result of align.pl, snp and indel data are gathered and then split for verification.  
-    % perl split_snp.pl SRR8181712  
-    % perl split_indel.pl SRR8181712  
+    % perl split_snp.pl SRR8181712 TAIR10  
+    % perl split_indel.pl SRR8181712 TAIR10  
     or  
-    % qsub -v target=SRR8181712 split_snp.pl  
-    % qsub -v target=SRR8181712 split_indel.pl  
+    % qsub -v target=SRR8181712,ref=TAIR10 split_snp.pl  
+    % qsub -v target=SRR8181712,ref=TAIR10 split_indel.pl  
 
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
@@ -150,11 +163,11 @@ Because data of human is big, it takes long time for downloading from SRA. To ch
     % qsub -v target=ERR194147,ref=hg38,margin=15,tmpdir=/mnt/ssd align.pl  
     'tmpdir' on local disk for qsub makes speed up the processing. More than 1 TB SSD of local disk for tmpdir is recommended.
 - From result of align.pl, snp and indel data are gathered and then split for verification.  
-    % perl split_snp.pl ERR194147  
-    % perl split_indel.pl ERR194147  
+    % perl split_snp.pl ERR194147 hg38  
+    % perl split_indel.pl ERR194147 hg38  
     or  
-    % qsub -v target=ERR194147,tmpdir=/mnt/ssd split_snp.pl  
-    % qsub -v target=ERR194147 split_indel.pl  
+    % qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_snp.pl  
+    % qsub -v target=ERR194147,ref=hg38 split_indel.pl  
     tmpdir for qsub run of split_snp.pl is optional.  
 - To verify SNPs,  
     % perl verify_snp.pl target control reference number type tmpdir  
@@ -224,7 +237,7 @@ Column 13: Sequence between junctions
 ```
 ## Demonstration of *k*-mer method
 ## Simple demonstration
-- % perl demo_kmer.pl SRR8181712  
+- % perl kmer.pl SRR8181712 TAIR10  
     After 1.5 days, you will find results in SRR8181712 directory.  
 
 ## Step by Step demonstration  
