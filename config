@@ -9,7 +9,7 @@
 
 hg38	description	Genome Reference Consortium Human Build 38
 hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
-hg38	chromosome  1	22	X	Y
+hg38	chromosome	1	22	X	Y
 
 IRGSP1.0	description	Reference Genome of Rice (Olyza sativa L. cv. Nipponbare)	
 IRGSP1.0	wget	https://rapdb.dna.affrc.go.jp/download/archive/irgsp1/IRGSP-1.0_genome.fasta.gz
