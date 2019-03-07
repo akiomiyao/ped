@@ -23,8 +23,8 @@ GRCm38	description	Genome Reference Consortium Mouse Build 38
 GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna.toplevel.fa.gz  
 GRCm38	chromosome	1	19	X	Y
 
-Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2 Gmax_275_v2.0.fa.gz 
-Gmax275v2.0	wget	https://phytozome.jgi.doe.gov/pz/portal.html
+Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2
+Gmax275v2.0	wget	ftp://ftp.jgi-psf.org/pub/compgen/phytozome/v9.0/early_release/Gmax_275_Wm82.a2.v1/assembly/Gmax_275_v2.0.fa.gz
 Gmax275v2.0	chromosome	1	2735
 
 WBcel235	description	Caenorhabditis elegans WBcel235	
