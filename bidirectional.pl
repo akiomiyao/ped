@@ -47,7 +47,12 @@ if ($ARGV[1] eq ""){
 $target = $ARGV[0];
 $ref    = $ARGV[1];
 
-report("Aligning of $target sequence to reference genome.");
+if (! -e "$target/$target.sort_uniq"){
+    report("Making $target.sort_uniq.");
+    system("perl sort_uniq.pl $target");
+}
+
+report("Aligning of $target sequence to $ref genome.");
 system("perl align.pl $target $ref 5");
 
 ## If you want more sensitivity, remove #s below.
@@ -55,24 +60,30 @@ system("perl align.pl $target $ref 5");
 #system("perl align.pl $target $ref 10");
 #system("perl align.pl $target $ref 15");
 
-report("Splitting alignment of SNP.");
-system("perl split_snp.pl $target");
 report("Splitting alignment of Indel.");
-system("perl split_indel.pl $target");
+system("perl split_indel.pl $target $ref");
+report("Splitting alignment of SNP.");
+system("perl split_snp.pl $target $ref");
+
 opendir(DIR, $target);
-while(readdir(DIR)){
-    if (/$target.snp.[0-9][0-9]$/){
+foreach(sort readdir(DIR)){
+    if (/$target.indel.[0-9][0-9]$/){
 	$number = (split('\.', $_))[2];
-	report("Verifying SNPs. $number");
+	report("Verifying indel $number");
+	system("perl verify_indel.pl $target default $ref $number bi");
+    }elsif(/$target.snp.[0-9][0-9]$/){
+	$number = (split('\.', $_))[2];
+	report("Verifying SNPs $number");
 	system("perl verify_snp.pl $target default $ref $number bi");
     }
 }
-report("Verifying Indels.");
-system("perl verify_indel.pl $target default $ref 01 bi");
+closedir(DIR);
+
 report("Making vcf file of SNP");
 system("perl snp2vcf.pl $target");
-system("mv $target/$target.indel.verify.01 $target/$target.indel");
-report("Complete.");
+system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.??");
+system("cat $target/$target.snp.verify.* > $target/$target.snp && rm $target/$target.snp.verify.* $target/$target.snp.??");
+report("bidirectional.pl complete.");
 
 sub report{
     my $message = shift;
