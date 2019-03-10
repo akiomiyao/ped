@@ -44,7 +44,8 @@ or
     
 ## Simple instruction for bidirectional method
 - % perl mkref.pl dmel626  
-  Directory dmel626 for reference of Drosophila melanogaster release 6.26 will be created. 
+  Directory dmel626 for reference of Drosophila melanogaster release 6.26
+  will be created.  
 - % perl download.pl SRR5989890  
   Data directory of SRR5989890 will be created. Fastq data will be downloaded
   in SRR5989890/read subdirectory.
