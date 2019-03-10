@@ -13,6 +13,10 @@ $usage = "
 e.g. perl mkref.pl target
      perl mkref.pl TAIR10
 
+For computer cluster,
+     qsub -v target=target mkref.pl
+     qsub -v target=hg38 mkref.pl
+
 Author: Akio Miyao <miyao\@affrc.go.jp>
 
 Currently, target listed below are available.
@@ -23,11 +27,19 @@ modifiing the config file.
 Name\tDescription
 ";
 
-$target = $ARGV[0];
+$cwd = `pwd`;
+chomp($cwd);
+
+if ($ARGV[0] ne ""){
+    $target = $ARGV[0];
+}elsif ($ENV{target} ne ""){
+    $target    = $ENV{target};
+    $cwd       = $ENV{PBS_O_WORKDIR};
+}
 
 @nuc = ('A', 'C', 'G', 'T');
 
-open(IN, "config");
+open(IN, "$cwd/config");
 while(<IN>){
     chomp;
     @row = split('\t', $_);
@@ -59,16 +71,16 @@ if ($target eq ""){
     exit;
 }
 
-if (! -d $target){
-    system("mkdir $target");
+if (! -d "$cwd/$target"){
+    system("mkdir $cwd/$target");
 }
 
-chdir $target;
+chdir "$cwd/$target";
 
 @row = split('/', $wget{$target});
 $remote_file = $row[$#row];
 if (! -e $remote_file){
-    system("wget $wget{$target}");
+    system("/usr/local/bin/wget -o wget-log $wget{$target}");
 }
 
 &mkChr;
