@@ -24,7 +24,7 @@ For converting result of kmer method, option 'kmer' at 2nd argument is required.
 }
 
 if ($type eq "kmer"){
-    open(IN, "cat $target/$target.kmer.verify.*|");
+    open(IN, "cat $target/$target.kmer.snp|");
     open(OUT, "> $target/$target.kmer.vcf");
 }else{
     open(IN, "cat $target/$target.snp.verify.*|");
