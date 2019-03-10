@@ -43,9 +43,13 @@ or
     If your machine do not have wget program, install wget from package.
     
 ## Simple instruction for bidirectional method
-- % perl mkref.pl dmel626  
+- % perl mkref.pl dmel626
+  Directory dmel626 for reference of Drosophila melanogaster release 6.26 will be created. 
 - % perl download.pl SRR5989890
-- % perl bidirectional.pl SRR5989890 default dmel626  
+  Data directory of SRR5989890 will be created. Fastq data will be downloaded
+  in SRR5989890/read subdirectory.
+- % perl bidirectional.pl target control reference  
+  e.g perl bidirectional.pl SRR5989890 default dmel626  
     After two hours, you will find results in SRR5989890 directory.  
     SRR5989890.indel is list of structural variation.  
     SRR5989890.snp is list of SNPs.  
@@ -96,7 +100,7 @@ or
   tmpdir : specify temporary directofy on local disk (can be omitted).
            tmpdir is specified as fourth argument of scrpit.
 
-## Examples results
+## Examples of result
 A part of SNP list of bidirectional method is  
 ```
 1       994949  C       T       11      50      0       21      17      H
