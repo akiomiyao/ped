@@ -54,25 +54,28 @@ or
   % perl search.pl target chr position  
   e.g. % perl search.pl SRR5989890 2L 15920731  
   Alignments will be selected by the search script.  
-- if you want to run with computer cluster,
+- if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl SRR5989890 default dmel626
 - Run without arguments, help for script will be shown.
 
 ## Simple instruction for kmer method
 - % perl kmer.pl target control reference  
 - % perl kmer.pl SRR8181712 default TAIR10  
-- if you want to run with computer cluster,
+- if you want to run with computer cluster,  
   % perl qsub_kmer.pl SRR8181712 default TAIR10
 
 ## Making reference data sets
 - % perl mkref.pl  
     Without specify reference, reference name and description are listed.  
-    If you want to make new reference, add the information about the reference to 'config' file.  
+    If you want to make new reference, add the information about the reference to 'config' file.
+- To run by computer cluster,  
+  % qsub -v target=target mkref.pl
 - For example,  
   % perl mkref.pl hg38  
     Data set of human genome hg38 will be made. It takes about two days.  
   % perl mkref.pl dmel626  
-    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.
+    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.  
+  % qsub -v target=dmel626 mkref.pl
 
 ## Set up data directory
 - If you want to download short read sequence from NCBI SRA,  
@@ -93,6 +96,7 @@ or
   tmpdir : specify temporary directofy on local disk (can be omitted).
            tmpdir is specified as fourth argument of scrpit.
 
+## Examples results
 A part of SNP list of bidirectional method is  
 ```
 1       994949  C       T       11      50      0       21      17      H
