@@ -64,7 +64,7 @@ if($ENV{target} ne ""){
 	}
 	system("mkdir $tmpdir");
 	system("cp $workdir/$target.lbc.$tag.gz $tmpdir && cp $controldir/$control.lbc.$tag.gz $tmpdir");
-	system("gzip -d *.lbc.$tag.gz");
+	system("gzip -d $tmpdir/*$tag.gz");
     }
     
     chdir $tmpdir;
