@@ -32,14 +32,14 @@ if($ENV{target} ne ""){
 
 if ($tmpdir eq ""){
     $tmpdir = $workdir;
+    system("gzip -d $tmpdir/*.count.$tag.*.gz");
 }else{
     system("mkdir $tmpdir/$target");
     $tmpdir = "$tmpdir/$target";
+    system("cp $workdir/*.count.$tag.*.gz $tmpdir && gzip -d $tmpdir/*.gz");
 }
 
 chdir $tmpdir;
-
-system("cp $workdir/*.$tag.*.gz . && gzip -d *.gz");
 
 while(1){
     opendir(DIR, ".");
@@ -63,4 +63,9 @@ while(1){
 
 $final = join('.', @last);
 chop($final);
-system("mv $output $final && gzip $final && mv $final.gz $workdir && cd .. && rm -r $target && rm $workdir/*.$tag.*.gz");
+
+if ($tmpdir eq $workdir){
+    system("mv $output $final && gzip $final && rm *.count.$tag.*.gz");
+}else{
+    system("mv $output $final && gzip $final && mv $final.gz $workdir && cd .. && rm -r $target && rm $workdir/*.$tag.*.gz");
+}
