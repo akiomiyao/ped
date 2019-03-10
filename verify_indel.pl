@@ -63,7 +63,7 @@ $usage";
     if (! -e $ref_path){
 	system("mkdir $ref_path");
     }
-    system("/usr/bin/rsync -a $cwd/$ref/$ref.sort_uniq $ref_path");
+    system("/usr/bin/rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
     $workdir = "$tmpdir/$target";
     if (-d $workdir){
 	system("rm -r $workdir");
@@ -88,7 +88,7 @@ $number = "01" if $number eq "";
 
 chdir $workdir;
 
-open(IN, "../config");
+open(IN, "$cwd/config");
 while(<IN>){
     chomp;
     @row = split;
