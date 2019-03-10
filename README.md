@@ -45,7 +45,7 @@ or
 ## Simple instruction for bidirectional method
 - % perl mkref.pl dmel626  
 - % perl download.pl SRR5989890
-- % perl bidirectional.pl SRR5989890 dmel626  
+- % perl bidirectional.pl SRR5989890 default dmel626  
     After two hours, you will find results in SRR5989890 directory.  
     SRR5989890.indel is list of structural variation.  
     SRR5989890.snp is list of SNPs.  
@@ -54,6 +54,15 @@ or
   % perl search.pl target chr position  
   e.g. % perl search.pl SRR5989890 2L 15920731  
   Alignments will be selected by the search script.  
+- if you want to run with computer cluster,
+  % perl qsub_bidirectional.pl SRR5989890 default dmel626
+- Run without arguments, help for script will be shown.
+
+## Simple instruction for kmer method
+- % perl kmer.pl target control reference  
+- % perl kmer.pl SRR8181712 default TAIR10  
+- if you want to run with computer cluster,
+  % perl qsub_kmer.pl SRR8181712 default TAIR10
 
 ## Making reference data sets
 - % perl mkref.pl  
@@ -78,112 +87,13 @@ or
   % cp somewhere/mydata1.fastq mydata1/read  
   % perl bidirectional.pl mydata1 Reference
 
-## Step by step demonstration of bidirectional alignment method
-
-Because data of human is big, it takes long time for downloading from SRA. To check the performance, data of *Arabidopsis* is recommended.
-    
-### *Arabidopsis thaliana*
-- Short read data SRR8181712 is used for demonstration.
-- % perl download.pl SRR8181712  
-    SRR8181712_1.fastq will be downloaded in SRR8181712/read directory.
--  To make sorted unique sequence,  
-    % perl sort_uniq.pl SRR8181712
--  Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.
-    For stand alone computer,  
-    % perl align.pl target_name reference margin tmpdir  
-    'tmpdir' is optional.    
-    *e.g.*  
-    % perl align.pl SRR8181712 TAIR10 0  
-    % perl align.pl SRR8181712 TAIR10 5  
-    % perl align.pl SRR8181712 TAIR10 10  
-    % perl align.pl SRR8181712 TAIR10 15  
-    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
-
-
-    For the computer cluster,  
-    % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
-    *e.g.*  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=0 align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=5 align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=10 align.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10,margin=15 align.pl  
--  From result of align.pl, snp and indel data are gathered and then split for verification.  
-    % perl split_snp.pl SRR8181712 TAIR10  
-    % perl split_indel.pl SRR8181712 TAIR10  
-    or  
-    % qsub -v target=SRR8181712,ref=TAIR10 split_snp.pl  
-    % qsub -v target=SRR8181712,ref=TAIR10 split_indel.pl  
-
-- To verify SNPs,  
-    % perl verify_snp.pl target control reference number type tmpdir  
-    *e.g.*  
-    % perl verify_snp.pl SRR8181712 default TAIR10 01 bi  
-    or  
-    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi verify_snp.pl  
-    
-    target : target name, *e.g.* SRR8181712  
-    control : *e.g.* SRR7686247 or 'default', if you want to use reference data for control  
-    ref : reference genome, *e.g.* TAIR10  
-    number : specify number of splited subfile  
-    type : specify type of input data (bi, kmer or vcf)  
-    tmpdir : specify temporary directory on fast local disk, such as SSD (can be omitted)  
-- Conversion to vcf file
-    % perl snp2vcf.pl SRR8181712
-    The verified SNPs will be converted to the vcf format.  
-- To verify indel,  
-    % perl verify_indel.pl target control reference number type tmpdir  
-    *e.g.*  
-    % perl verify_indel.pl SRR8181712 default TAIR10 01 bi
-    or  
-    % qsub -v target=SRR8181712,control=default,ref=TAIR10,number=01,type=bi verify_indel.pl 
-
-### Human
-- Short read data ERR194147 is used for demonstration. ERR194147 is a short reads of whole genome sequence from a member of the [Coriell CEPH/UTAH 1463 family](https://www.coriell.org/0/Sections/Collections/NIGMS/CEPHFamiliesDetail.aspx?PgId=441&fam=1463&) for a "[platinum](https://www.illumina.com/platinumgenomes.html)" standard comprehensive set for variant calling improvement.
-- % perl download.pl ERR194147  
-    ERR194147_1.fastq and ERR194147_2.fastq will be downloaded in ERR194147/read directory.
-- To make sorted unique sequence,  
-    % perl sort_uniq.pl ERR194147
-- Because the bidirectional alignment method can detect not only SNP but also insertion, deletion, inversion and translocation, we recommend the bidirectional alignment method for usual analysis.  
-    For stand alone computer,  
-    % perl align.pl target_name reference margin tmpdir  
-    *e.g.*  
-    % perl align.pl ERR194147 hg38 0 /mnt/ssd  
-    % perl align.pl ERR194147 hg38 5 /mnt/ssd  
-    % perl align.pl ERR194147 hg38 10 /mnt/ssd  
-    % perl align.pl ERR194147 hg38 15 /mnt/ssd  
-    At the first step of the method, *k*-mer (*k* = 20) sequences from both ends of short read will be mapped to the reference genome. If the *k*-mer sequence is repetitive to the genome sequence, the alignment will be failed. If the margin is given, *k*-mers begin inside of the margin. This will increase the coverage of polymorphisms.  
-    /mnt/ssd (tmpdir, specify to a directory on the fast local disk) is optional.  
-    
-    For the computer cluster,  
-    % qsub -v target=target_name,ref=reference,margin=0,tmpdir=path_of_tmpdir align.pl  
-    *e.g.*  
-    % qsub -v target=ERR194147,ref=hg38,margin=0,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=ERR194147,ref=hg38,margin=5,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=ERR194147,ref=hg38,margin=10,tmpdir=/mnt/ssd align.pl  
-    % qsub -v target=ERR194147,ref=hg38,margin=15,tmpdir=/mnt/ssd align.pl  
-    'tmpdir' on local disk for qsub makes speed up the processing. More than 1 TB SSD of local disk for tmpdir is recommended.
-- From result of align.pl, snp and indel data are gathered and then split for verification.  
-    % perl split_snp.pl ERR194147 hg38  
-    % perl split_indel.pl ERR194147 hg38  
-    or  
-    % qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_snp.pl  
-    % qsub -v target=ERR194147,ref=hg38 split_indel.pl  
-    tmpdir for qsub run of split_snp.pl is optional.  
-- To verify SNPs,  
-    % perl verify_snp.pl target control reference number type tmpdir  
-    *e.g.*  
-    % perl verify_snp.pl ERR194147 default hg38 01 bi /mnt/ssd  
-    or  
-    % qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_snp.pl  
-
   target : target name, *e.g.* ERR194147  
   control : *e.g.* ERR194146 or 'default', if you want to use reference data for control  
-  ref : reference genome, *e.g.* hg38  
-  number : specify number of splited subfile  
-  type : specify type of input data (bi, kmer or vcf)  
-  tmpdir : specify temporary directofy on local disk (can be omitted)  
+  referene : reference genome, *e.g.* hg38  
+  tmpdir : specify temporary directofy on local disk (can be omitted).
+           tmpdir is specified as fourth argument of scrpit.
 
-A part of verify_snp.pl result is  
+A part of SNP list of bidirectional method is  
 ```
 1       994949  C       T       11      50      0       21      17      H
 1       994962  G       T       1       50      0       21      0       
@@ -204,13 +114,8 @@ Column 8: Number of reads in the target sort_uniq file with control type polymor
 Column 9: Number of reads in the target sort_uniq file with target type polymorphism
 Column 10: Genotype (M: homozygous, H: heterozygous)
 ```
-- To verify indel,  
-    % perl verify_indel.pl target control reference number type tmpdir  
-    *e.g.*  
-    % perl verify_indel.pl ERR194147 default hg38 01 bi /mnt/ssd  
-    or  
-    % qsub -v target=ERR194147,control=default,ref=hg38,number=01,type=bi,tmpdir=/mnt/ssd verify_indel.pl
-- A part of verify_indel.pl result is
+
+- A part of indel result is
 ```
 1       923312  1       923312  f       deletion        -1      50      0       0       31      M
 1       931147  1       931131  f       insertion       4       50      0       5       19              CCCTCCCTCCC
@@ -235,44 +140,8 @@ Column 11: Number of reads in the target sort_uniq file with target type polymor
 Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
-## Demonstration of *k*-mer method
-## Simple demonstration
-- % perl kmer.pl SRR8181712 TAIR10  
-    After 1.5 days, you will find results in SRR8181712 directory.  
 
-## Step by Step demonstration  
-- Grid engine, *e.g.* Torque, may be required for *k*-mer method.
-- At first, all *k*-mers (*k* = 20) on each position of short read sequence from the sort_uniq data. Because the sort_uniq data is too big to handling, the sort_uniq data is split to sub files. Usually, the control is reference sequence data. To create *k*-mer data of control,  
-    *e.g.*  
-    % perl split_sort_uniq.pl hg38  
-    or  
-    % qsub -v target=hg38 split_sort_uniq.pl  
-- To create count data of *k*-mer,  
-    *e.g.*  
-    % perl count_qsub.pl hg38 /mnt/ssd  
-    count_qsub.pl is a launcher of count.pl for all sort_uniq subfiles.  
-    The second argument is temporally directory of local disk on the node. This can be omitted, but encouraged.  
-- Output of count.pl is separated by subfiles. merge.pl merges separated data.  
-    *e.g.*  
-    % perl merge_qsub.pl hg38 /mnt/ssd  
-    merge_qsub.pl is a launcher of merge.pl for all count subfiles.  
-- merged files are converted to last-base-count data.  
-    *e.g.*  
-    % perl lbc_qsub.pl hg38 /mnt/ssd  
-    lbc_qsub.pl is a launcher of last_base_count.pl for all merged subfiles.  
-- To create lbc files of target (e.g ERR194147),  
-    % perl split_sort_uniq.pl ERR194147  
-    % perl count_qsub.pl ERR194147 /mnt/ssd  
-    % perl merge_qsub.pl ERR194147 /mnt/ssd  
-    % perl lbc_qsub.pl ERR194147 /mnt/ssd  
-- SNP detection between target(ERR194147) and control(hg38).  
-    % perl snp_qsub.pl ERR194147 hg38 /mnt/ssd 10  
-    snp_qsub.pl is a launcher of snp.pl for detection of SNP at the last base of *k*-mer between target and control.
-- To map SNPs,  
-    % perl map_qsub.pl ERR194147 hg38 /mnt/ssd  
-- To verify mapped SNPs,  
-    % perl verify_snp_qsub.pl ERR194147 default hg38 kmer /mnt/ssd
-- A part of verify_snp.pl result is
+- A part of SNP result by kmer method is
 ```
 X       54009891        AAAAAAAAAAGTGGCTCTT     T       T       GT      f       0       0       0       40      1       1       17      21      50      0       12      0       
 6       112904084       AAACGACACTTTTTTTTTT     C       C       AC      r       0       0       40      0       0       1       31      22      50      0       30      0       
