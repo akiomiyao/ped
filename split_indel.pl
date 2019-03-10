@@ -13,9 +13,8 @@ $usage = '
 e.g. perl split_indel.pl target reference
      perl split_indel ERR194147 hg38
 
-     qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_indel.pl
+     qsub -v target=ERR194147,ref=hg38 split_indel.pl
 
-     tmpdir can be ommitted.
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
@@ -26,25 +25,16 @@ if ($ARGV[0] ne ""){
     $ref     = $ARGV[1];
     $cwd = `pwd`;
     chomp($cwd);
-    $workdir = "$cwd/$target";
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $ref       = $ENV{ref};
-    $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
-    if ($tmpdir ne ""){
-	if (-d "$tmpdir/$target"){
-	    system("rm -r $tmpdir/$target");
-	}
-	system("mkdir $tmpdir/$target");
-	$workdir = "$tmpdir/$target";
-    }else{
-	$workdir = "$cwd/$target";
-    }
 }else{
     print $usage;
     exit;
 }
+
+$workdir = "$cwd/$target";
 
 open(IN, "$cwd/config");
 while(<IN>){
@@ -65,11 +55,7 @@ while(<IN>){
 }
 close(IN);
 
-if ($cwd eq ""){
-    open(IN, "cat $workdir/$target.aln.*|");
-}else{
-    open(IN, "cat $cwd/$target/$target.aln.*|");
-}
+open(IN, "cat $workdir/$target.aln.*|");
 open(OUT, "|sort -T $workdir |uniq > $workdir/$target.indel.tmp");
 while(<IN>){
     chomp;
@@ -93,6 +79,7 @@ close(OUT);
 
 system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
 foreach $chr (@chr){
+    print ERR "$chr\n";
     open(IN, "$workdir/$target.indel.tmp");
     open(OUT, "|sort -k 2 -n -T $workdir >> $workdir/$target.indel.sort");
     while(<IN>){
@@ -121,7 +108,3 @@ while(<IN>){
 }
 close(IN);
 close(OUT);
-
-if ($tmpdir ne ""){
-    system("cp $target.indel.sort $target.indel.?? $cwd/$target && rm -r $workdir");
-}
