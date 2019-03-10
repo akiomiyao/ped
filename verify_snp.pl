@@ -66,7 +66,7 @@ $usage";
     if (! -e $ref_path){
 	system("mkdir $ref_path");
     }
-    system("/usr/bin/rsync -a $cwd/$ref/$ref.sort_uniq $ref_path");
+    system("/usr/bin/rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
     $workdir = "$tmpdir/$target";
     if (-d $workdir){
 	system("rm -r $workdir");
