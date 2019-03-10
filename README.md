@@ -43,9 +43,9 @@ or
     If your machine do not have wget program, install wget from package.
     
 ## Simple instruction for bidirectional method
-- % perl mkref.pl dmel626
+- % perl mkref.pl dmel626  
   Directory dmel626 for reference of Drosophila melanogaster release 6.26 will be created. 
-- % perl download.pl SRR5989890
+- % perl download.pl SRR5989890  
   Data directory of SRR5989890 will be created. Fastq data will be downloaded
   in SRR5989890/read subdirectory.
 - % perl bidirectional.pl target control reference  
@@ -83,7 +83,7 @@ or
 
 ## Set up data directory
 - If you want to download short read sequence from NCBI SRA,  
-  % perl download.pl Accession  
+  % perl download.pl accession  
   For example,  
   % perl download.pl SRR5989890  
     Directory SRR5989890 will be made, fastq files will be downloaded to  
@@ -92,7 +92,7 @@ or
   % mkdir mydata1  
   % mkdir mydata1/read  
   % cp somewhere/mydata1.fastq mydata1/read  
-  % perl bidirectional.pl mydata1 Reference
+  % perl bidirectional.pl mydata1 reference
 
   target : target name, *e.g.* ERR194147  
   control : *e.g.* ERR194146 or 'default', if you want to use reference data for control  
