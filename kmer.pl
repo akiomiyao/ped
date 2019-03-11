@@ -75,7 +75,7 @@ system("perl snp.pl $target $ref");
 report("Making map");
 system("perl map.pl $target $ref");
 report("Verifying");
-system("perl verify_snp.pl $target default $ref AAA kmer");
+system("perl verify_snp.pl $target $control $ref AAA kmer");
 report("Convert to vcf");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");

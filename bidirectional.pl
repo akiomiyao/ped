@@ -83,11 +83,11 @@ foreach(sort readdir(DIR)){
     if (/$target.indel.[0-9][0-9]$/){
 	$number = (split('\.', $_))[2];
 	report("Verifying indel $number");
-	system("perl verify_indel.pl $target default $ref $number bi");
+	system("perl verify_indel.pl $target $control $ref $number bi");
     }elsif(/$target.snp.[0-9][0-9]$/){
 	$number = (split('\.', $_))[2];
 	report("Verifying SNPs $number");
-	system("perl verify_snp.pl $target default $ref $number bi");
+	system("perl verify_snp.pl $target $control $ref $number bi");
     }
 }
 closedir(DIR);
