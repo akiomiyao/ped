@@ -49,7 +49,7 @@ while(<IN>){
 	$wget{$row[0]} = $row[2];
     }elsif($row[0] eq $target && $row[1] eq "chromosome"){
 	@row = split;
-	if ($row[2] != 0){
+	if ($row[3] != 0){
 	    for ($i = $row[2]; $i <= $row[3]; $i++){
 		push(@chr, $i);
 	    }

@@ -40,7 +40,7 @@ while(<IN>){
     chomp;
     @row = split;
     if($row[0] eq $ref && $row[1] eq "chromosome"){
-	if ($row[2] != 0){
+	if ($row[3] != 0){
 	    for ($i = $row[2]; $i <= $row[3]; $i++){
 		push(@chr, $i);
 	    }
