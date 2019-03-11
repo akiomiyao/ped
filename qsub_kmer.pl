@@ -71,6 +71,21 @@ close(IN);
 
 report("kmer.pl start.");
 
+if (! -e "$target/$target.sort_uniq"){
+    report("Making $target.sort_uniq.");
+    $qsub = "-v target=$target sort_uniq.pl";
+    @job = ();
+    &doQsub($qsub);
+}
+
+if (! -e "$control/$control.sort_uniq"){
+    report("Making $control.sort_uniq.");
+    $qsub = "-v control=$control sort_uniq.pl";
+    @job = ();
+    &doQsub($qsub);
+}
+&holdUntilJobEnd;
+
 if (! -e "$ref/$ref.lbc.AAA.gz"){
     report("Making kmer count of $ref.");
     $qsub = "-v target=$ref split_sort_uniq.pl";
