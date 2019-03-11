@@ -25,7 +25,7 @@ GRCm38	chromosome	1	19	X	Y
 
 Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2
 Gmax275v2.0	wget	ftp://ftp.jgi-psf.org/pub/compgen/phytozome/v9.0/early_release/Gmax_275_Wm82.a2.v1/assembly/Gmax_275_v2.0.fa.gz
-Gmax275v2.0	chromosome	1	2735
+Gmax275v2.0	chromosome	1	20
 
 WBcel235	description	Caenorhabditis elegans WBcel235	
 WBcel235	wget	ftp://ftp.ensembl.org/pub/release-95/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
