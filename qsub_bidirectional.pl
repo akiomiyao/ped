@@ -62,8 +62,15 @@ if (! -e "$target/$target.sort_uniq"){
     $qsub = "-v target=$target sort_uniq.pl";
     @job = ();
     &doQsub($qsub);
-    &holdUntilJobEnd;
 }
+
+if (! -e "$control/$control.sort_uniq"){
+    report("Making $control.sort_uniq.");
+    $qsub = "-v control=$control sort_uniq.pl";
+    @job = ();
+    &doQsub($qsub);
+}
+&holdUntilJobEnd;
 
 report("Aligning of $target sequence to $ref genome.");
 @job = ();

@@ -10,13 +10,18 @@
 $usage = '
      bidirectional.pl - pipeline for bidirectional method for stand alone macnine. 
 
-     run  perl bidirectional.pl accession reference
-     e.g. perl bidirectional.pl SRR8181712 TAIR10
+     run  perl bidirectional.pl accession control reference
+     e.g. perl bidirectional.pl SRR8181712 default TAIR10
 
      This script is for stand alone machine.
-
+     If you want to detect polymorphisms between target and control (e.g.SRR1581142),
+     set SRR1581142 as the control.
+     If you want to use the control, downloading control sequeces and making the sort_uniq data are required, before the run the kmer.pl.
      Before run the script, downloading target reads and reference genome data
      are required.
+       For example,
+       % perl download.pl SRR1581142
+       % perl sort_uniq.pl SRR1581142
 
      To make the reference data,
      run  perl mkref.pl reference
@@ -44,12 +49,20 @@ if ($ARGV[1] eq ""){
     exit;
 }
 
-$target = $ARGV[0];
-$ref    = $ARGV[1];
+$target  = $ARGV[0];
+$control = $ARGV[1];
+$ref     = $ARGV[2];
+
+$control = $ref if $control eq "default";
 
 if (! -e "$target/$target.sort_uniq"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
+}
+
+if (! -e "$control/$control.sort_uniq"){
+    report("Making $control.sort_uniq.");
+    system("perl sort_uniq.pl $control");
 }
 
 report("Aligning of $target sequence to $ref genome.");
