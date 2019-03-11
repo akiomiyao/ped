@@ -10,8 +10,8 @@
 $usage = '
      kmer.pl - pipeline of kmer method for standalone machine. 
 
-     run  perl kmer.pl accession  reference
-     e.g. perl kmer.pl SRR8181712 TAIR10
+     run  perl kmer.pl accession control reference
+     e.g. perl kmer.pl SRR8181712 default TAIR10
 
      This script is for stand alone machine.
 
@@ -44,10 +44,23 @@ if ($ARGV[1] eq ""){
     exit;
 }
 
-$target = $ARGV[0];
-$ref    = $ARGV[1];
+$target  = $ARGV[0];
+$control = $ARGV[1];
+$ref     = $ARGV[2];
+
+$control = $ref if $control eq "default";
 
 report("kmer.pl start.");
+
+if (! -e "$target/$target.sort_uniq"){
+    report("Making $target.sort_uniq.");
+    system("perl sort_uniq.pl $target");
+}
+
+if (! -e "$control/$control.sort_uniq"){
+    report("Making $control.sort_uniq.");
+    system("perl sort_uniq.pl $control");
+}
 
 if (! -e "$ref/$ref.lbc.AAA.gz"){
     report("Making kmer count of $ref.");
@@ -66,7 +79,6 @@ system("perl verify_snp.pl $target default $ref AAA kmer");
 report("Convert to vcf");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");
-
 
 sub report{
     my $message = shift;
