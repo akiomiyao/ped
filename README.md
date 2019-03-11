@@ -43,25 +43,35 @@ or
     If your machine do not have wget program, install wget from package.
     
 ## Simple instruction for bidirectional method
-- % perl mkref.pl dmel626  
+- % perl mkref.pl reference  
+  e.g. perl mkref.pl dmel626  
   Directory dmel626 for reference of Drosophila melanogaster release 6.26
   will be created.  
-- % perl download.pl SRR5989890  
-  Data directory of SRR5989890 will be created. Fastq data will be downloaded
-  in SRR5989890/read subdirectory.
+- % perl download.pl accession  
+  e.g. perl download.pl SRR5989890  
+  Data directory of SRR5989890 will be created.  
+  Fastq data will be downloaded in SRR5989890/read subdirectory.
 - % perl bidirectional.pl target control reference  
-  e.g perl bidirectional.pl SRR5989890 default dmel626  
+  e.g. perl bidirectional.pl SRR5989890 default dmel626  
     After two hours, you will find results in SRR5989890 directory.  
     SRR5989890.indel is list of structural variation.  
     SRR5989890.snp is list of SNPs.  
     SRR5989890.snp.vcf is the vcf file for SNPs.  
+    If you want to detect polymorphisms between target and control (e.g.SRR8182352),  
+    set SRR8182352 as the control.  
+    At first, bidirectional method detects polymorphisms between target and reference.  
+    The detected polymorphisms are verified by counting target and control reads with/without polymorphisms.  
+    If you want to use the control, downloading control sequeces and making the sort_uniq data are required, before the run the bidirectional.pl.  
+    For example,  
+    % perl download.pl SRR8182352  
+    % perl sort_uniq.pl SRR8182352  
 - To confirm the alignment for detected polymorphisms,  
   % perl search.pl target chr position  
   e.g. % perl search.pl SRR5989890 2L 15920731  
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
-  % perl qsub_bidirectional.pl SRR5989890 default dmel626
-- Run without arguments, help for script will be shown.
+  % perl qsub_bidirectional.pl SRR5989890 default dmel626  
+- Run without arguments, help for script will be shown.  
 
 ## Simple instruction for kmer method
 - % perl kmer.pl target control reference  
@@ -72,7 +82,7 @@ or
 ## Making reference data sets
 - % perl mkref.pl  
     Without specify reference, reference name and description are listed.  
-    If you want to make new reference, add the information about the reference to 'config' file.
+    If you want to make new reference, add the information about the reference to 'config' file.  
 - To run by computer cluster,  
   % qsub -v target=target mkref.pl
 - For example,  
