@@ -80,7 +80,7 @@ chdir "$cwd/$target";
 @row = split('/', $wget{$target});
 $remote_file = $row[$#row];
 if (! -e $remote_file){
-    system("/usr/local/bin/wget -o wget-log $wget{$target}");
+    system("wget -o wget-log $wget{$target}");
 }
 
 &mkChr;
