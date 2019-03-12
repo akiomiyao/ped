@@ -76,7 +76,7 @@ or
   retruns 'M' or 'H' marked SNPs and indels of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
   % perl search.pl target chr position  
-  e.g. % perl search.pl ERR3063487 2L 15920731  
+  e.g. % perl search.pl ERR3063487 II 948033  
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
