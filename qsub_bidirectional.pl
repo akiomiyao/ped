@@ -66,7 +66,7 @@ if (! -e "$target/$target.sort_uniq"){
 
 if (! -e "$control/$control.sort_uniq"){
     report("Making $control.sort_uniq.");
-    $qsub = "-v control=$control sort_uniq.pl";
+    $qsub = "-v target=$control sort_uniq.pl";
     @job = ();
     &doQsub($qsub);
 }
