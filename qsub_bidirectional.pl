@@ -85,11 +85,11 @@ foreach $margin (0, 5, 10, 15){
 &holdUntilJobEnd;
 
 @job = ();
-report("Splitting alignment of Indel. ");
+report("Splitting of Indel alignment. ");
 $qsub = "-v target=$target,ref=$ref split_indel.pl";
 &doQsub($qsub);
 
-report("Splitting alignment of SNP.");
+report("Splitting of SNP alignment.");
 $qsub = "-v target=$target,ref=$ref split_snp.pl";
 &doQsub($qsub);
 &holdUntilJobEnd;
