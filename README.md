@@ -34,82 +34,86 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - Programs run on Unix platforms (Linux, MacOS, FreeBSD). 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
-% git clone https://github.com/akiomiyao/ped.git
+% git clone https://github.com/akiomiyao/ped.git  
 
-- To download sequence data, fastq-dump from NCBI is required.
-    Tool kit can be download from
+- To download sequence data, fastq-dump from NCBI is required.  
+    Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
 - To download reference date, wget is required.  
     If your machine do not have wget program, install wget from package.
     
-## Simple instruction for bidirectional method
+## Simple instruction for bidirectional method  
 - % perl mkref.pl reference  
-  e.g. perl mkref.pl dmel626  
-  Directory dmel626 for reference of Drosophila melanogaster release 6.26
-  will be created.  
-- % perl download.pl accession  
-  e.g. perl download.pl SRR5989890  
-  Data directory of SRR5989890 will be created.  
-  Fastq data will be downloaded in SRR5989890/read subdirectory.
-- % perl bidirectional.pl target control reference  
-  e.g. perl bidirectional.pl SRR5989890 default dmel626  
-    After two hours, you will find results in SRR5989890 directory.  
-    SRR5989890.indel is list of structural variation.  
-    SRR5989890.snp is list of SNPs.  
-    SRR5989890.snp.vcf is the vcf file for SNPs.  
-    If you want to detect polymorphisms between target and control (e.g.SRR8182352),  
-    set SRR8182352 as the control.  
-    At first, bidirectional method detects polymorphisms between target and reference.  
-    The detected polymorphisms are verified by counting target and control reads with/without polymorphisms.  
-    If you want to use the control, downloading control sequeces and making the sort_uniq data are required, before the run the bidirectional.pl.  
-    For example,  
-    % perl download.pl SRR8182352  
-    % perl sort_uniq.pl SRR8182352  
-- To confirm the alignment for detected polymorphisms,  
-  % perl search.pl target chr position  
-  e.g. % perl search.pl SRR5989890 2L 15920731  
-  Alignments will be selected by the search script.  
-- if you want to run with computer cluster,  
-  % perl qsub_bidirectional.pl SRR5989890 default dmel626  
-- Run without arguments, help for script will be shown.  
-
-## Simple instruction for kmer method
-- % perl kmer.pl target control reference  
-- % perl kmer.pl SRR8181712 default TAIR10  
-- if you want to run with computer cluster,  
-  % perl qsub_kmer.pl SRR8181712 default TAIR10
-
-## Making reference data sets
-- % perl mkref.pl  
-    Without specify reference, reference name and description are listed.  
-    If you want to make new reference, add the information about the reference to 'config' file.  
-- To run by computer cluster,  
-  % qsub -v target=target mkref.pl
-- For example,  
-  % perl mkref.pl hg38  
-    Data set of human genome hg38 will be made. It takes about two days.  
-  % perl mkref.pl dmel626  
-    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.  
-  % qsub -v target=dmel626 mkref.pl
-
-## Set up data directory
-- If you want to download short read sequence from NCBI SRA,  
-  % perl download.pl accession  
   For example,  
-  % perl download.pl SRR5989890  
-    Directory SRR5989890 will be made, fastq files will be downloaded to  
-    SRR5989890/read directory.
+  % perl mkref.pl WBcel235  
+  Directory WBcel235 for reference of Caenorhabditis elegans WBcel235 will be created.  
+- % perl download.pl accession  
+  For example,  
+  % perl download.pl ERR3063486  
+  % perl download.pl ERR3063487   
+  Data directory of ERR3063486 and ERR3063487 will be created.  
+  Fastq data will be downloaded in read subdirectory.  
+  ERR3063486 is read data of Caenorhabditis elegans mutant.  
+  ERR3063487 is read data of Caenorhabditis elegans wild-type.  
 - If you want to analyze local file,  
   % mkdir mydata1  
   % mkdir mydata1/read  
   % cp somewhere/mydata1.fastq mydata1/read  
-  % perl bidirectional.pl mydata1 reference
+  % perl bidirectional.pl mydata1 control reference  
+- % perl bidirectional.pl target control reference  
+  For example,  
+  % perl bidirectional.pl ERR3063487 default WBcel235  
+   After two hours, you will find results in ERR3063487 directory.  
+   ERR3063487.indel is list of structural variation.  
+   ERR3063487.snp is list of SNPs.  
+   ERR3063487.snp.vcf is the vcf file for SNPs.  
+    
+- Our verify process counts reads containing polymorphic region.  
+  Basically, counts are from target and reference.  
+  If control is specified, counts from target and control will be listed.  
+  For example,  
+  % perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
+  retruns 'M' or 'H' marked SNPs and indels of ERR3063487 which are absent in ERR3063486.  
+- To confirm the alignment for detected polymorphisms,  
+  % perl search.pl target chr position  
+  e.g. % perl search.pl ERR3063487 2L 15920731  
+  Alignments will be selected by the search script.  
+- if you want to run with computer cluster,  
+  % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
+- Run without arguments, help for script will be shown.  
+- I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
+  I found data set of Caenorhabditis elegans.
+  But, I could not contact to uploaded scientist because of no email or contact address was descirbed.  
+  I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
-  target : target name, *e.g.* ERR194147  
-  control : *e.g.* ERR194146 or 'default', if you want to use reference data for control  
-  referene : reference genome, *e.g.* hg38  
-  tmpdir : specify temporary directofy on local disk (can be omitted).
-           tmpdir is specified as fourth argument of scrpit.
+## Simple instruction for kmer method
+- % perl kmer.pl target control reference  
+- % perl kmer.pl ERR3063487 ERR3063486 WBcel235  
+- if you want to run with computer cluster,  
+  % perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235
+  ERR3063487 specific SNPs will be detected.  
+- if you want to detect SNPs against reference genome,  
+  % perl kmer.pl ERR3063487 default WBcel235
+
+## Making reference data sets
+- % perl mkref.pl  
+  Without specify reference, reference name and description are listed.  
+  If you want to make new reference, add the information about the reference to 'config' file.  
+  For example,  
+  % perl mkref.pl hg38  
+    Data set of human genome hg38 will be made. It takes about two days.  
+  % perl mkref.pl GRCm38  
+    Data set of mouse genome GRCm38 will be made. It takes about two days.  
+  % perl mkref.pl dmel626  
+    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.  
+  % perl mkref.pl IRGSP1.0  
+    Data set of rice (Olyza sativa L. cv. Nipponbare) will be made.  
+  % perl mkref.pl TAIR10  
+    Data set of Arabidopsis thaliana will be made.  
+- To run by computer cluster,  
+  % qsub -v target=target mkref.pl  
+  For example,    
+  % qsub -v target=hg38 mkref.pl  
 
 ## Examples of result
 A part of SNP list of bidirectional method is  
@@ -197,182 +201,169 @@ Column 20: Genotype (M: homozygous, H: heterozygous)
 ```
 
 ## Detection of polymorphisms between target and control
-Our verify process counts reads containing polymorphic region.  
-Basically, counts are from target and reference.  
-If control is specified, counts from target and control will be listed.  
-For example,  
-ERR3063488 is read data of Caenorhabditis elegans mutant.  
-ERR3063489 is read data of Caenorhabditis elegans wild-type.  
-% perl bidirectional.pl ERR3063488 ERR3063489 WBcel235  
-retruns 'M' or 'H' marked SNPs and indels of ERR3063488 which are absent in ERR3063489.  
 
-I appreciate the release of short reads to SRA by ENS Lyon.  
   
-SNPs between ERR3063488 and ERR3063489  
+SNPs between ERR3063487 and ERR3063486  
 ```
-I       332222  T       G       1       11      0       5       3       H
-I       1448800 G       A       2       5       1       9       4       H
-I       6283523 A       C       1       12      1       6       3       H
-I       6415699 A       C       5       17      1       13      7       H
-I       8167808 T       A       10      22      0       0       13      M
-I       8702729 T       C       21      21      0       0       28      M
-I       10509827        G       A       3       21      0       0       18      M
-I       10885278        A       C       3       7       0       6       3       H
-I       11533386        A       C       5       18      1       10      5       H
-I       11600291        A       C       2       12      1       5       3       H
-I       12219825        T       G       2       11      0       7       5       H
-I       12595119        T       G       2       14      0       9       4       H
-I       12902496        A       C       2       9       1       6       3       H
-I       14207159        A       C       6       12      1       11      7       H
-I       14208132        A       C       4       7       0       8       5       H
-I       14403748        G       A       5       15      0       0       9       M
-I       14457330        A       C       1       14      1       7       4       H
-I       14668351        T       G       1       9       1       5       4       H
-II      3941726 A       C       2       11      0       9       4       H
-II      5996649 A       T       10      23      0       0       18      M
-II      6900518 T       G       2       9       1       7       4       H
-II      7801318 A       C       4       9       0       9       4       H
-II      7880040 A       G       13      10      0       0       17      M
-II      10529763        T       G       1       13      1       9       4       H
-II      10836830        C       A       2       10      0       5       3       H
-II      11490799        C       T       10      19      0       0       16      M
-II      11664180        T       C       2       8       1       5       3       H
-II      13072968        A       C       1       5       0       10      5       H
-II      13315213        A       T       6       14      1       6       4       H
-II      13359250        A       T       12      14      0       0       21      M
-II      14004296        A       C       3       19      0       6       3       H
-II      15240134        T       C       1       11      1       5       3       H
-III     2056209 T       C       8       20      0       13      11      H
-III     3065696 A       C       1       7       0       6       3       H
-III     4176111 T       C       12      25      0       0       21      M
-III     6896648 C       A       1       12      0       5       3       H
-III     6932472 T       G       16      19      0       0       27      M
-III     6972389 T       G       12      20      0       0       18      M
-III     8190132 T       G       2       10      1       9       4       H
-III     8843993 A       T       12      7       0       0       17      M
-III     9052039 A       C       4       10      1       6       3       H
-III     10961250        T       C       3       10      0       8       4       H
-III     11051821        C       T       17      17      0       0       21      M
-III     11557788        T       G       3       9       0       9       6       H
-III     12099100        T       G       2       22      0       9       4       H
-III     12508403        C       A       18      14      0       0       27      M
-IV      448629  T       G       16      22      0       0       24      M
-IV      1001401 A       T       12      13      0       0       21      M
-IV      1372875 T       G       2       16      1       9       4       H
-IV      1476073 A       C       3       12      0       6       4       H
-IV      1781639 C       T       7       17      0       0       11      M
-IV      1845669 C       G       1       16      0       0       18      M
-IV      1991053 G       T       12      11      0       0       16      M
-IV      3626736 T       A       9       14      0       0       17      M
-IV      3660762 T       G       4       17      0       7       4       H
-IV      3990444 A       C       4       17      0       8       4       H
-IV      6946911 C       G       14      18      0       0       20      M
-IV      7957975 T       G       3       7       0       5       3       H
-IV      9594931 G       A       9       15      0       0       14      M
-IV      10545314        G       A       14      19      0       0       22      M
-IV      12625239        A       C       11      11      0       0       12      M
-IV      12804123        T       C       1       13      0       8       4       H
-IV      13058123        C       T       12      16      0       0       14      M
-IV      15914692        C       A       17      17      0       0       25      M
-IV      16388039        A       C       4       11      0       9       4       H
-IV      16667859        A       C       1       7       0       7       4       H
-IV      17009515        G       A       9       27      0       0       22      M
-V       8959    A       C       1       12      0       5       4       H
-V       1317773 A       C       2       14      0       9       4       H
-V       2028980 T       G       14      11      0       0       19      M
-V       4646273 T       C       1       11      0       7       4       H
-V       6100769 T       G       2       11      0       11      5       H
-V       8259099 C       T       14      27      0       0       19      M
-V       10100458        A       C       3       14      1       11      5       H
-V       11871371        A       T       10      24      0       0       17      M
-V       13536894        T       C       15      19      0       1       23      M
-V       14563775        T       C       4       14      0       6       3       H
-V       15197495        A       C       3       18      0       11      5       H
-V       15790839        C       T       1       20      0       0       12      M
-V       16365541        A       G       9       12      0       0       17      M
-V       16726243        T       G       3       15      1       10      5       H
-V       16967163        T       G       2       12      1       7       4       H
-V       18144888        C       A       11      19      0       0       22      M
-V       18999888        C       A       14      26      0       0       26      M
-V       19044283        T       G       3       12      1       6       3       H
-X       1521358 T       G       7       15      0       0       15      M
-X       1911051 T       G       4       11      1       5       3       H
-X       2526842 T       G       1       17      0       7       4       H
-X       3455431 T       G       3       16      0       5       3       H
-X       4554851 C       T       13      25      0       0       19      M
-X       5458200 A       C       1       12      1       6       3       H
-X       6988370 C       T       18      14      0       0       23      M
-X       7536774 C       A       5       17      0       0       13      M
-X       11154570        G       A       17      29      0       0       17      M
-X       11576895        A       G       1       9       1       6       4       H
-X       11577936        T       G       7       16      0       8       4       H
-X       11732798        C       A       7       8       0       0       9       M
-X       12180689        A       C       3       13      1       6       4       H
-X       13358034        C       A       14      15      0       0       22      M
-X       13672823        A       C       1       10      0       5       3       H
-X       14693495        A       G       16      19      0       0       23      M
-X       15361048        A       C       2       14      0       8       4       H
-X       16244315        C       G       10      14      0       0       9       M
-X       17007533        G       A       9       18      0       0       19      M
-X       17030601        T       G       2       5       1       6       3       H
-X       17487527        G       A       19      28      0       0       29      M
+I       27950   A       T       9       31      0       0       17      M
+I       892680  C       G       1       8       0       5       3       H
+I       1196268 T       A       1       9       0       8       4       H
+I       1380502 A       T       9       22      0       0       13      M
+I       1728826 T       G       1       8       0       6       3       H
+I       3203676 T       G       3       16      1       11      5       H
+I       3407954 C       A       16      28      0       0       12      M
+I       3656814 A       C       3       8       1       8       4       H
+I       5001132 T       G       1       8       1       6       3       H
+I       6324213 G       T       9       24      0       0       21      M
+I       7249395 T       G       3       19      1       7       4       H
+I       7263091 T       G       4       14      1       9       6       H
+I       9136539 T       A       11      20      0       0       16      M
+I       10137843        T       G       3       6       0       9       4       H
+I       14097862        A       T       6       17      1       9       13      H
+II      86891   A       G       2       7       0       8       4       H
+II      271122  C       A       1       16      0       6       3       H
+II      1179320 C       A       9       11      0       0       17      M
+II      2500482 C       A       13      15      0       0       17      M
+II      3552886 A       C       3       15      1       5       3       H
+II      3624396 A       C       2       12      1       9       5       H
+II      3648966 C       T       17      9       0       0       17      M
+II      3771956 G       C       11      19      0       0       16      M
+II      3935824 A       C       1       7       0       6       3       H
+II      8284226 C       A       16      19      0       0       20      M
+II      8553707 T       A       6       21      0       0       6       M
+II      9410187 C       T       9       23      0       0       18      M
+II      9937543 T       G       11      21      0       0       18      M
+II      10629519        A       C       6       17      1       12      8       H
+II      10685303        T       A       13      21      0       0       16      M
+II      12732768        A       C       2       13      1       6       3       H
+II      14096056        T       G       2       6       0       5       4       H
+III     198231  T       A       9       16      0       0       18      M
+III     3091906 T       G       3       19      0       9       4       H
+III     3643248 G       C       1       6       0       6       3       H
+III     4824486 C       G       15      33      0       0       23      M
+III     7532164 T       G       1       8       1       6       3       H
+III     9723566 G       A       17      25      0       0       23      M
+III     11532166        C       T       6       15      0       1       18      M
+III     13092063        C       T       5       13      0       6       6       H
+III     13273147        A       T       1       15      1       6       4       H
+III     13350315        A       C       3       14      0       7       4       H
+IV      554740  A       C       5       11      1       9       4       H
+IV      876681  A       G       1       20      0       7       4       H
+IV      1159003 A       C       6       13      0       7       6       H
+IV      2417073 G       A       17      32      0       0       21      M
+IV      2858610 C       T       7       21      0       0       14      M
+IV      3931877 G       A       8       13      0       0       20      M
+IV      4298928 A       C       3       11      1       9       4       H
+IV      5200355 G       T       13      27      0       0       23      M
+IV      6481216 C       G       2       17      0       0       8       M
+IV      6796145 C       T       11      16      0       0       19      M
+IV      6967218 G       A       14      25      0       0       25      M
+IV      8053747 T       A       14      23      0       0       19      M
+IV      8951120 T       G       9       10      1       13      6       H
+IV      9709645 C       A       17      22      0       0       27      M
+IV      10195034        T       G       1       14      1       8       4       H
+IV      13672183        C       T       10      18      0       0       18      M
+IV      14217812        A       C       1       9       0       6       3       H
+IV      14760376        T       G       3       9       0       5       3       H
+IV      16870604        A       C       4       12      1       8       4       H
+V       7011    T       G       3       10      1       11      5       H
+V       974819  A       C       2       6       0       9       4       H
+V       3052728 A       C       1       9       1       10      5       H
+V       3277678 G       A       2       22      0       1       19      M
+V       3786240 T       A       9       23      0       0       17      M
+V       4261370 T       G       4       14      0       9       4       H
+V       5134172 C       T       6       19      0       17      10      H
+V       7816318 A       C       5       20      1       8       4       H
+V       9771516 A       T       7       25      0       18      12      H
+V       10513400        A       C       3       11      0       9       4       H
+V       11310419        G       T       9       15      0       0       18      M
+V       15880652        T       C       1       20      1       6       3       H
+V       19657843        T       A       10      25      0       0       24      M
+V       19718778        G       A       2       11      0       0       11      M
+V       19733914        A       C       1       6       0       6       3       H
+V       20413571        T       G       4       13      1       6       3       H
+X       2843588 A       C       4       13      0       9       4       H
+X       4194330 T       C       15      23      0       0       22      M
+X       4247242 T       G       2       7       1       6       3       H
+X       5446454 C       T       4       21      0       0       7       M
+X       6994561 A       T       20      29      0       0       29      M
+X       7299494 A       G       2       7       0       6       3       H
+X       7586849 T       G       1       8       1       8       4       H
+X       10486673        A       T       12      31      0       0       23      M
+X       14544549        A       G       21      13      0       0       30      M
+X       14632040        T       A       13      21      0       0       21      M
+X       15395882        A       G       3       17      0       13      6       H
+X       15815152        T       G       3       13      1       5       3       H
+X       16861146        C       T       6       9       0       0       11      M
+X       16964164        T       G       3       14      0       5       3       H
 ```
-indels between ERR3063488 and ERR3063489  
+indels between ERR3063487 and ERR3063486  
 ```
-I       1411098 I       1411130 f       deletion        -33     18      0       0       13      M       
-I       1946171 I       1944320 f       insertion       1858    5       0       5       8       H       TAAAATTC
-I       1968845 X       15237407        f       deletion        -13268601       7       1       6       4       H       GCCTACTTTCTGGCGCGAAAATAGCGGCAACAGAGAGA
-I       10376611        I       10376593        f       deletion        -2      5       1       7       4       H       ATATATATATATATATATA
-I       11506461        I       11506451        f       deletion        -1      13      0       8       4       H       TTTTTTTTTT
-I       13101741        I       13101724        f       deletion        -1      8       1       5       3       H       TTTTTTTTTTTTTTTTT
-I       13110447        I       13110435        f       deletion        -1      8       1       6       3       H       AAAAAAAAAAAA
-II      2567493 II      2568128 f       deletion        -679    11      1       11      5       H       AAATGCAATTTTTAACGAAAATTTGTCAATTTTTCGATTAAAA
-II      4780838 II      4780830 f       deletion        -3      6       0       6       4       H       TTTTTTTTTT
-II      4895056 V       18778607        r       inversion               7       1       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
-II      5403699 IV      16418046        r       inversion               5       0       5       3       H       AAAAAAACGAAAAAAAAA
-II      10031763        II      10031748        f       deletion        -2      6       1       6       4       H       TTTTTTTTTTTTTTTT
-II      13002251        V       1414357 r       inversion               8       1       8       8       H       AATTTTTTTTGTTCGACTTCCAAAA
-II      13223262        V       3742448 r       inversion               9       1       9       4       H       ATTTGCCCATTTGCCGAAAAAAAAA
-II      15200675        II      15200789        f       deletion        -109    22      0       0       21      M       CCCCCC
-III     1753031 III     1753017 f       insertion       1       5       1       6       4       H       TTTTTTTTTTTT
-III     3115212 III     3115193 f       insertion       2       6       1       5       3       H       AAAAAAAAAAAAAAAA
-III     3145001 III     3144991 f       deletion        -2      6       0       5       3       H       TTTTTTTTTTT
-III     7157630 V       20500233        f       deletion        -13342624       11      0       5       3       H       ATATATTTCTCAAAAAAAAA
-III     8500712 III     8500689 f       insertion       2       5       0       6       3       H       GAGAGAGAGAGAGAGAGAGA
-III     9066341 III     9066324 f       deletion        -2      7       1       7       4       H       ATATATATATATATATAT
-III     11530173        IV      13391387        r       inversion               10      1       5       3       H       TTTTCAAAAATCTAATTTTGTTC
-III     11839745        III     11839727        f       deletion        -2      10      1       8       4       H       TATATATATATATATATAT
-III     11943870        III     11943862        f       insertion       2       9       1       7       8       H       AAAAA
-III     12473776        II      1240280 f       insertion       11233463        8       1       6       3       H       CTAGGCCTAAGAATAAGCCTAAGCCTAAGCCT
-IV      197758  IV      197740  f       insertion       1       23      0       5       10      H       AAAAAAATTTTTTTTT
-IV      1015325 IV      1015310 f       deletion        -1      5       1       10      5       H       AAAAAAAAAAAAAAA
-IV      3170651 IV      3170636 f       insertion       1       7       0       8       4       H       AAAAAAAAAAAAA
-IV      3182386 IV      3182367 f       deletion        -19     17      0       10      11      H       ATAGCTAGGTGCCTATCTCATACCTAGGTGCCTACCT
-IV      3225586 IV      3225570 f       deletion        -1      5       1       5       7       H       AAAAAAAAAAAAAAAA
-IV      12045733        IV      12045717        f       insertion       1       11      1       9       4       H       AAAAAAAAAAAAAA
-IV      14749269        IV      14749252        f       deletion        -2      13      0       12      6       H       ATATATATATATATATAT
-IV      16927209        IV      16927194        f       insertion       1       11      0       8       4       H       TTTTTTTTTTTTT
-V       1348255 V       20002829        r       inversion               7       0       8       4       H       TAAGCCTAAGCCTAAGCCTGAGCC
-V       1646502 X       2286086 f       deletion        -639610 6       0       9       4       H       AATTGTCTGAAAACATCGAATTTCA
-V       5181873 V       5181871 f       insertion       9       29      0       24      21      H       TTTTTCGT
-V       5956837 V       5957448 f       deletion        -614    22      0       0       23      M       AA
-V       6499662 IV      2007203 f       insertion       4492438 5       1       5       4       H       TTATTGTAAAATATCTAAAA
-V       7592908 V       7592888 f       deletion        -2      7       1       6       3       H       TATATATATATATATATATAT
-V       14946423        V       14946612        f       deletion        -191    20      0       0       20      M       T
-V       15842476        V       15855565        f       deletion        -13178  10      0       6       4       H       TTTTTTTAATCTATAAACCACACATTTTGAGCAATCAATTTTGCGTCTTTTTGATCAGGAAGATTCACAAA
-TGCAGGAGCAGGGAACG
-V       17966942        V       17966926        f       deletion        -1      6       0       5       3       H       AAAAAAAAAAAAAAAA
-V       19879865        V       19792905        r       inversion               5       1       9       4       H       TGTCAAAGATTCCTGATGTCAAAATGAATGCAAGTGAGAAATCCAAAGTGATTGAGGAG
-X       1058707 IV      5697577 r       inversion               8       1       5       3       H       TTTATCAAAAACTTTTTTTTTT
-X       2335393 X       2335378 f       deletion        -1      5       1       8       8       H       TTTTTTTTTTTTTTT
-X       7069115 IV      6306975 r       inversion               10      0       6       6       H       CTCTATGCAAAAAGCGATCAATGTCGTCACTGATTGGTGTGCAAAGTG
-X       7738629 X       1734175 r       inversion               8       1       6       4       H       GTTCAAATCAGATTTTAAGAACACGACTTGCGGTCCGC
-X       9034324 IV      199585  f       insertion       8834720 5       0       7       4       H       TAAAATACGTTTTTTTTT
-X       14381618        IV      14919917        r       inversion               5       0       7       4       H       AGCTCATCTACACTGTGAGCAAATTTGCATTGCTCCC
-X       14719283        V       18041043        r       inversion               8       0       6       3       H       GGAAAATTGCCTTTTTTCCGGCAACTTCGGC
-X       14934806        I       710368  f       insertion       14224394        9       0       6       3       H       ATTAGACTCAAAATTGTCTGAAAACACCAAATTTCATAATGAA
-X       16825915        X       16825903        f       deletion        -2      5       0       5       3       H       AAAAAAAAAAAAA
-X       16872379        X       16872368        f       insertion       1       8       0       1       16      M       TTTTTTTTT
+I       834776  I       834746  f       deletion        -12     6       0       7       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
+I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
+I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTAATCTACAGTAATCCTACAGTGCCCCTACA
+I       1560682 I       1560674 f       deletion        -1      17      0       0       19      M       TTTTTTTT
+I       1560682 I       1561254 r       inversion               13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
+I       2160919 I       2160898 f       deletion        -1      9       0       8       4       H       TTTTTTTTCAAAAAAAAAAAA
+I       2384261 I       2384244 f       insertion       1       14      1       8       4       H       CAAAAAAAAAAAAAA
+I       2715230 III     12981863        r       translocation           5       1       5       3       H       CGTATTGCACAGCACATTTGACGCGCAAAAT
+I       5081495 I       5081478 f       deletion        -2      7       1       6       4       H       TTTTTTTTTTTTTTTTTT
+I       8028077 I       8028066 f       deletion        -1      6       0       6       3       H       TTTTTTTTTTT
+I       8028078 I       8028065 f       insertion       1       6       0       6       3       H       TTTTTTTTTTT
+I       9825014 I       9825007 f       insertion       1       23      0       8       13      H       AAAAA
+I       10622455        IV      9192034 f       translocation           5       1       6       3       H       GTTCAAATAAAAATATTTTTTT
+I       10887954        I       10887958        f       deletion        -6      11      0       1       10      M       A
+I       11005509        I       11005489        f       deletion        -1      5       1       0       5       M       AAATTTTTTTTTTTTTTTTT
+I       12856424        I       12856415        f       deletion        -1      14      0       8       5       H       TTTTTTTTT
+I       13734806        I       13734788        f       deletion        -1      5       0       6       4       H       TTTTTTTTTTTTTTTTTT
+II      191614  II      191601  f       insertion       1       11      0       9       4       H       AAAAAAAAAAA
+II      948033  II      948099  f       deletion        -69     20      0       1       15      M       AT
+II      1777672 II      1770125 f       insertion       7506    8       1       9       4       H       ATGGTGAGTAGCCGGTAATTTCATAGTTATTGAAATTTGA
+II      2361947 II      2361931 f       deletion        -1      10      1       0       15      M       TTTTTCTTTTTTTTTT
+II      4463297 V       1000739 r       translocation           6       0       6       4       H       TTTCGATTTTCCAGAAAATCAAAAAAAAA
+II      4895056 V       18778607        r       translocation           5       0       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
+II      5473562 II      3675168 r       inversion               8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
+II      12746320        III     4520340 f       translocation           6       1       5       3       H       TGTAAAATTGTTTTTTTTT
+II      13112130        V       20740040        f       translocation           6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
+II      13327324        II      13327697        r       inversion               6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAA
+AACTAAGAGAAAAAAT
+III     1663181 III     1663357 f       deletion        -209    6       1       7       5       H       TTTTTTCCAGAAATTAATATTTCTAGAAAAAT
+III     2300741 X       15839886        r       translocation           19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
+III     2520715 X       97782   f       translocation           7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
+III     2985966 IV      876821  f       translocation           5       1       6       3       H       AAAAAAATTTTTTTTTT
+III     3566956 III     3566962 f       deletion        -48     8       1       6       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
+III     6231151 III     6231140 f       deletion        -1      14      0       6       3       H       AAAAAAAAAAA
+III     10402397        III     10402387        f       deletion        -2      5       1       7       4       H       TTTTTTTTTTT
+III     11280814        X       2272016 r       translocation           12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
+III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTCCGGCAAAT
+III     13419473        III     13419443        f       insertion       6       5       1       10      5       H       TGTGTGTGTGTGTGTGTGTGTGT
+IV      1786345 IV      1786337 f       deletion        -1      15      0       0       12      M       AAAAAAAA
+IV      2112309 IV      2112287 f       deletion        -1      7       1       5       3       H       TTTTTTGTTTTTTTTTTTTTTT
+IV      2314588 IV      2314573 f       deletion        -1      10      1       8       4       H       TTTTTTTTTTTTTTT
+IV      2445289 IV      2445276 f       deletion        -1      15      0       5       3       H       TTTTTTTTTTTTT
+IV      3192017 IV      3192001 f       deletion        -1      10      1       8       5       H       AAAAAAAAAAAAAAAA
+IV      3192018 IV      3192000 f       insertion       1       10      0       7       4       H       AAAAAAAAAAAAAAAA
+IV      3336297 IV      3336328 f       deletion        -31     21      1       0       23      M       A
+IV      3867139 IV      3867116 f       deletion        -2      11      1       6       3       H       ATATATATATATATATATATATAT
+IV      4399486 IV      4399441 f       insertion       2       8       0       10      6       H       GAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGA
+IV      4489131 IV      4489122 f       deletion        -1      16      0       1       17      M       TTTTTTTTT
+V       1027708 V       1027700 f       deletion        -39     9       1       10      5       H       GCCTATGGCCTACGCCTATGGCCTACGCCTATGGCCTACGCCTATG
+V       1989616 V       1989642 f       deletion        -3      6       1       6       3       H       GATAAAAACTACTTGGATAAATGA
+V       9026732 V       9026728 f       deletion        -3      6       1       7       4       H       ATTATT
+V       11884926        II      3151004 r       translocation           5       1       6       5       H       GTGCCGAGTGCCGATCGGCACAATGTG
+V       18672436        IV      2681633 r       translocation           7       1       5       3       H       GGGAAAATTGCTTTAAAACATGCCTATGGTACTACAA
+V       18890234        V       18892184        r       inversion               6       1       6       3       H       TTTTTATTGAAAACTAGTATAAAAATATA
+V       20123760        V       20123893        f       deletion        -150    12      0       7       4       H       GGGGTTCGAACCCCGG
+X       99547   X       99523   f       deletion        -1      8       1       9       5       H       AAAAAAAATTTTTTTTTTTTTTTT
+X       438457  X       438446  f       insertion       1       12      0       5       5       H       TTTTTTTTT
+X       562164  X       562155  f       insertion       1       22      0       0       22      M       AAAAAAA
+X       1522918 X       1522902 f       deletion        -1      6       1       5       3       H       AAAAAAAAAAAAAAAA
+X       2498483 X       2498466 f       deletion        -1      6       1       5       3       H       TTTTTTTTTTTTTTTTT
+X       3823840 X       3823828 f       deletion        -1      10      0       8       4       H       AAAAAAAAAAAA
+X       5885390 X       5885377 f       deletion        -1      11      0       10      5       H       TTTTTTTTTTTTT
+X       7312229 X       11435923        r       inversion               6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAATCAAAGAATCGACGACCGCCTCCTGAA
+X       10023790        III     7850798 r       translocation           5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
+X       14258766        III     303520  f       translocation           6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
 ```
 
 ## Author
