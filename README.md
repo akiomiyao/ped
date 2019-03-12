@@ -206,7 +206,7 @@ ERR3063489 is read data of Caenorhabditis elegans wild-type.
 % perl bidirectional.pl ERR3063488 ERR3063489 WBcel235  
 retruns 'M' or 'H' marked SNPs and indels of ERR3063488 which are absent in ERR3063489.  
 
-I appreciate short read release to SRA by ENS Lyon.  
+I appreciate the release of short reads to SRA by ENS Lyon.  
   
 SNPs between ERR3063488 and ERR3063489  
 ```
