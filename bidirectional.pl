@@ -73,9 +73,9 @@ system("perl align.pl $target $ref 5");
 #system("perl align.pl $target $ref 10");
 #system("perl align.pl $target $ref 15");
 
-report("Splitting alignment of Indel.");
+report("Splitting of Indel alignment.");
 system("perl split_indel.pl $target $ref");
-report("Splitting alignment of SNP.");
+report("Splitting of SNP alignment.");
 system("perl split_snp.pl $target $ref");
 
 opendir(DIR, $target);
