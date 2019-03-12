@@ -179,7 +179,7 @@ sub analysis{
 	if ($head_direction eq "f"){
 	    $head_seq = substr($chr{$hchr}, $head_pos - $margin -1, $length);
 	    next if $head_seq eq $seq;
-	    if ($hchr == $tchr and $tail_direction eq "f"){
+	    if ($hchr eq $tchr and $tail_direction eq "f"){
 		$distance = $tail_pos - $head_pos;
 		if ($distance == $tpos - $hpos){
 		    &snp;
