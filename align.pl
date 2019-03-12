@@ -287,7 +287,7 @@ sub analysis{
 			$type = "deletion";
 		    }
 		}else{
-		    if ($hchr != $tchr){
+		    if ($hchr ne $tchr){
 			$type = "translocation";
 		    }elsif ($tail_direction eq "r"){
 			$type = "inversion";
