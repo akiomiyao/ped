@@ -50,6 +50,25 @@ $ref     = $ARGV[2];
 
 $control = $ref if $control eq "default";
 
+open(IN, "config");
+while(<IN>){
+    chomp;
+    @row = split;
+    if($row[0] eq $ref && $row[1] eq "chromosome"){
+        if ($row[2] != 0){
+            for ($i = $row[2]; $i <= $row[3]; $i++){
+                push(@chr, $i);
+            }
+        }
+        if ($row[4] ne ""){
+            foreach ($i = 4; $i <= $#row; $i++){
+                push(@chr, $row[$i]);
+            }
+        }
+    }
+}
+close(IN);
+
 report("kmer.pl start.");
 
 if (! -e "$target/$target.sort_uniq"){
@@ -68,6 +87,8 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     system("gzip $control/$control.lbc.*");
 }
 
+
+
 report("Making kmer count of $target.");
 system("perl count.pl $target");
 report("Making snp");
@@ -76,8 +97,35 @@ report("Making map");
 system("perl map.pl $target $ref");
 report("Verifying");
 system("perl verify_snp.pl $target $control $ref AAA kmer");
+
+open(IN, "cat $target/$target.kmer.verify.*| sort -T $target |");
+while(<IN>){
+    @row = split;
+    if ($row[0] ne $prev){
+        close(OUT);
+        open(OUT, "| sort -T $target -k 2 -n > $target/$target.kmer_chr.$row[0]");
+    }
+    print OUT;
+    $prev = $row[0];
+}
+close(IN);
+close(OUT);
+
+open(OUT, "> $target/$target.kmer.snp");
+foreach $chr (@chr){
+    open(IN, "$target/$target.kmer_chr.$chr");
+    while(<IN>){
+        print OUT;
+    }
+    close(IN);
+}
+close(OUT);
+
 report("Convert to vcf");
 system("perl snp2vcf.pl $target kmer");
+
+system("cat $target/$target.snp.* > $target/$target.kmer && rm $target/$target.snp.*");
+system("rm $target/$target.count.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 report("kmer.pl done.");
 
 sub report{
