@@ -65,13 +65,18 @@ if (! -e "$control/$control.sort_uniq"){
     system("perl sort_uniq.pl $control");
 }
 
-report("Aligning of $target sequence to $ref genome.");
+report("Aligning of $target sequence to $ref genome. margin = 5");
 system("perl align.pl $target $ref 5");
 
-## If you want more sensitivity, remove #s below.
-#system("perl align.pl $target $ref 0");
-#system("perl align.pl $target $ref 10");
-#system("perl align.pl $target $ref 15");
+## If you want speed up rather than sensitivity, comment out with '#'
+## system command for perl align.pl.
+
+report("Aligning of $target sequence to $ref genome. margin = 0");
+system("perl align.pl $target $ref 0");
+report("Aligning of $target sequence to $ref genome. margin = 10");
+system("perl align.pl $target $ref 10");
+report("Aligning of $target sequence to $ref genome. margin = 15");
+system("perl align.pl $target $ref 15");
 
 report("Splitting of Indel alignment.");
 system("perl split_indel.pl $target $ref");
