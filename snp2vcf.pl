@@ -43,9 +43,9 @@ while(<IN>){
     $dp = $row[$#row] -1;
     if ($type eq "kmer"){
  	if (/M/){
-	    print OUT "chr$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[8];GT=1/1\tDP:GT\t$row[8]:1/1\n";
+	    print OUT "chr$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[18];GT=1/1\tDP:GT\t$row[18]:1/1\n";
 	}elsif(/H/){
-	    print OUT "chr$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[8];GT=0/1\tDP:GT\t$row[8]:1/0\n";
+	    print OUT "chr$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[18];GT=0/1\tDP:GT\t$row[18]:1/0\n";
 	}
    }else{
 	if (/M/){
