@@ -200,10 +200,8 @@ Column 19: Number of reads in the target sort_uniq file with target type base
 Column 20: Genotype (M: homozygous, H: heterozygous)
 ```
 
-## Detection of polymorphisms between target and control
-
-  
-SNPs between ERR3063487 and ERR3063486  
+## Detection of polymorphisms between control and target
+-SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
 I       27950   A       T       9       31      0       0       17      M
 I       892680  C       G       1       8       0       5       3       H
@@ -297,7 +295,7 @@ X       15815152        T       G       3       13      1       5       3       
 X       16861146        C       T       6       9       0       0       11      M
 X       16964164        T       G       3       14      0       5       3       H
 ```
-indels between ERR3063487 and ERR3063486  
+- indels between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
 I       834776  I       834746  f       deletion        -12     6       0       7       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
