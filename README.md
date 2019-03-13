@@ -323,8 +323,7 @@ II      4895056 V       18778607        r       translocation           5       
 II      5473562 II      3675168 r       inversion               8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
 II      12746320        III     4520340 f       translocation           6       1       5       3       H       TGTAAAATTGTTTTTTTTT
 II      13112130        V       20740040        f       translocation           6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
-II      13327324        II      13327697        r       inversion               6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAA
-AACTAAGAGAAAAAAT
+II      13327324        II      13327697        r       inversion               6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
 III     1663181 III     1663357 f       deletion        -209    6       1       7       5       H       TTTTTTCCAGAAATTAATATTTCTAGAAAAAT
 III     2300741 X       15839886        r       translocation           19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
 III     2520715 X       97782   f       translocation           7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
