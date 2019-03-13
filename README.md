@@ -201,7 +201,7 @@ Column 20: Genotype (M: homozygous, H: heterozygous)
 ```
 
 ## Detection of polymorphisms between control and target
--SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
+- SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
 I       27950   A       T       9       31      0       0       17      M
 I       892680  C       G       1       8       0       5       3       H
