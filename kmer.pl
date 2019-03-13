@@ -62,10 +62,10 @@ if (! -e "$control/$control.sort_uniq"){
     system("perl sort_uniq.pl $control");
 }
 
-if (! -e "$ref/$ref.lbc.AAA.gz"){
-    report("Making kmer count of $ref.");
-    system("perl count.pl $ref");
-    system("gzip $ref/$ref.lbc.*");
+if (! -e "$control/$control.lbc.AAA.gz"){
+    report("Making kmer count of $control.");
+    system("perl count.pl $control");
+    system("gzip $control/$control.lbc.*");
 }
 
 report("Making kmer count of $target.");

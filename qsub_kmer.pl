@@ -86,15 +86,15 @@ if (! -e "$control/$control.sort_uniq"){
 }
 &holdUntilJobEnd;
 
-if (! -e "$ref/$ref.lbc.AAA.gz"){
-    report("Making kmer count of $ref.");
-    $qsub = "-v target=$ref split_sort_uniq.pl";
+if (! -e "$control/$control.lbc.AAA.gz"){
+    report("Making kmer count of $control.");
+    $qsub = "-v target=$control split_sort_uniq.pl";
     &doQsub($qsub);
     &holdUntilJobEnd;
     @job = ();
-    opendir(DIR, "$ref/tmp");
+    opendir(DIR, "$control/tmp");
     foreach (sort readdir(DIR)){
-	next if !/$ref/;
+	next if !/$control/;
 	@row = split('\.', $_);
 	if ($tmpdir ne ""){
 	    $qsub = "-v target=$row[0],number=$row[2],tmpdir=$tmpdir count.pl";
@@ -106,7 +106,7 @@ if (! -e "$ref/$ref.lbc.AAA.gz"){
     &holdUntilJobEnd;
     @job = ();
 
-    opendir(DIR, "$ref");
+    opendir(DIR, "$control");
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
 	if ($row[1] eq "count"){
@@ -115,9 +115,9 @@ if (! -e "$ref/$ref.lbc.AAA.gz"){
     }
     foreach $tag (sort keys %tag){
 	if ($tmpdir ne ""){
-	    $qsub = "-v target=$ref,tag=$tag,tmpdir=$tmpdir merge.pl";
+	    $qsub = "-v target=$control,tag=$tag,tmpdir=$tmpdir merge.pl";
 	}else{
-	    $qsub = "-v target=$ref,tag=$tag merge.pl";
+	    $qsub = "-v target=$control,tag=$tag merge.pl";
 	}
 	&doQsub($qsub);
     }
@@ -125,9 +125,9 @@ if (! -e "$ref/$ref.lbc.AAA.gz"){
     @job = ();
     foreach $tag (sort keys %tag){
 	if ($tmpdir ne ""){
-	    $qsub = "-v target=$ref,tag=$tag,tmpdir=$tmpdir last_base_count.pl";
+	    $qsub = "-v target=$control,tag=$tag,tmpdir=$tmpdir last_base_count.pl";
 	}else{
-	    $qsub = "-v target=$ref,tag=$tag last_base_count.pl";
+	    $qsub = "-v target=$control,tag=$tag last_base_count.pl";
 	}
 	&doQsub($qsub);
     }
