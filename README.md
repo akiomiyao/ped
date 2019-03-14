@@ -52,9 +52,10 @@ or
   % perl download.pl ERR3063486  
   % perl download.pl ERR3063487   
   Data directory of ERR3063486 and ERR3063487 will be created.  
-  Fastq data will be downloaded in read subdirectory.  
+  Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
   ERR3063486 is read data of Caenorhabditis elegans mutant.  
   ERR3063487 is read data of Caenorhabditis elegans wild-type.  
+  BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze local file,  
   % mkdir mydata1  
   % mkdir mydata1/read  
@@ -83,7 +84,7 @@ or
 - Run without arguments, help for script will be shown.  
 - I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
   I found data set of Caenorhabditis elegans.
-  But, I could not contact to uploaded scientist because of no email or contact address was descirbed.  
+  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
 ## Simple instruction for kmer method
