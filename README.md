@@ -35,6 +35,8 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git  
+If you get scripts from github, update to newest version is very easy using pull command of git.  
+% git pull  
 
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
