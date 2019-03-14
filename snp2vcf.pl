@@ -28,7 +28,7 @@ if ($type eq "kmer"){
     open(OUT, "> $target/$target.kmer.vcf");
 }else{
     open(IN, "cat $target/$target.snp.verify.*|");
-    open(OUT, "> $target/$target.snp.vcf");
+    open(OUT, "> $target/$target.bi.vcf");
 }
 print OUT "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
