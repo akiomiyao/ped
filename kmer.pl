@@ -125,7 +125,7 @@ report("Convert to vcf");
 system("perl snp2vcf.pl $target kmer");
 
 system("cat $target/$target.snp.* > $target/$target.kmer && rm $target/$target.snp.*");
-system("rm $target/$target.count.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
+system("rm $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 report("kmer.pl done.");
 
 sub report{
