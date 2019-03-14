@@ -83,8 +83,8 @@ or
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
 - Run without arguments, help for script will be shown.  
 - I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
-  I found data set of Caenorhabditis elegans.
-  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822
+  I found data set of Caenorhabditis elegans.  
+  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
 ## Simple instruction for kmer method
