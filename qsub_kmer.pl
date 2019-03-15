@@ -198,6 +198,9 @@ foreach $tag (sort keys %tag){
     &doQsub($qsub);
 }
 &holdUntilJobEnd;
+
+system("cat $target.snp.??? > $target.kmer");
+
 report("Making map");
 @job = ();
 opendir(DIR, $target);
@@ -247,8 +250,7 @@ foreach $chr (@chr){
 close(OUT);
 
 report("Convert to vcf");
-system("cat $target/$target.snp.* > $target/$target.kmer.snp && rm $target/$target.snp.*");
-system("rm $target/$target.count.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
+system("rm $target/$target.count.* $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");
 
