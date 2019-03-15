@@ -92,7 +92,11 @@ if (! -e "$control/$control.lbc.AAA.gz"){
 report("Making kmer count of $target.");
 system("perl count.pl $target");
 report("Making snp");
-system("perl snp.pl $target $ref");
+system("perl snp.pl $target $control");
+if ($ref eq ""){
+     system("cat $target.snp.* >$target.kmer");
+     exit;
+}
 report("Making map");
 system("perl map.pl $target $ref");
 report("Verifying");
@@ -122,7 +126,6 @@ foreach $chr (@chr){
 close(OUT);
 
 report("Convert to vcf");
-system("cat $target/$target.snp.* > $target/$target.kmer && rm $target/$target.snp.*");
 system("rm $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");
