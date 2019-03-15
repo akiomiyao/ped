@@ -27,7 +27,7 @@ if ($type eq "kmer"){
     open(IN, "cat $target/$target.kmer.snp|");
     open(OUT, "> $target/$target.kmer.vcf");
 }else{
-    open(IN, "cat $target/$target.snp.verify.*|");
+    open(IN, "cat $target/$target.bi.snp|");
     open(OUT, "> $target/$target.bi.vcf");
 }
 print OUT "##fileformat=VCFv4.2
