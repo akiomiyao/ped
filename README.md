@@ -35,7 +35,7 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git  
-If you get scripts from github, update to newest version is very easy using pull command of git.  
+If you got scripts from github, update to newest version is very easy using pull command of git.  
 % git pull  
 
 - To download sequence data, fastq-dump from NCBI is required.  
@@ -68,8 +68,8 @@ If you get scripts from github, update to newest version is very easy using pull
   % perl bidirectional.pl ERR3063487 default WBcel235  
    After two hours, you will find results in ERR3063487 directory.  
    ERR3063487.indel is list of structural variation.  
-   ERR3063487.snp is list of SNPs.  
-   ERR3063487.snp.vcf is the vcf file for SNPs.  
+   ERR3063487.bi.snp is list of SNPs.  
+   ERR3063487.bi.snp.vcf is the vcf file for SNPs.  
     
 - Our verify process counts reads containing polymorphic region.  
   Basically, counts are from target and reference.  
@@ -96,7 +96,12 @@ If you get scripts from github, update to newest version is very easy using pull
   % perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235
   ERR3063487 specific SNPs will be detected.  
 - if you want to detect SNPs against reference genome,  
-  % perl kmer.pl ERR3063487 default WBcel235
+  % perl kmer.pl ERR3063487 default WBcel235  
+-  ERR3063487.kmer.snp is list of SNPs.  
+   ERR3063487.kmer.vcf is the vcf file for SNPs.  
+   Because our methods do not use aligner software, *e.g.* bwa, quality score can not be calculated.  
+   Quality score in vcf file is fixed to 1000. 
+
 
 ## Making reference data sets
 - % perl mkref.pl  
