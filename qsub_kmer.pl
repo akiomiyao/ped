@@ -199,7 +199,7 @@ foreach $tag (sort keys %tag){
 }
 &holdUntilJobEnd;
 
-system("cat $target.snp.??? > $target.kmer");
+system("cat $target/$target.snp.??? > $target/$target.kmer");
 
 report("Making map");
 @job = ();
