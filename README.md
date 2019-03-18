@@ -45,11 +45,14 @@ If you got scripts from github, update to newest version is very easy using pull
     If your machine do not have wget program, install wget from package.
     
 ## Simple instruction for bidirectional method  
-- % perl mkref.pl reference  
+- At first, set up reference data is required.  
+  % perl mkref.pl reference  
   For example,  
   % perl mkref.pl WBcel235  
   Directory WBcel235 for reference of Caenorhabditis elegans WBcel235 will be created.  
-- % perl download.pl accession  
+  If run without argument, suported reference will be listed.  
+- If you want to analyze public data in SRA.  
+  % perl download.pl accession  
   For example,  
   % perl download.pl ERR3063486  
   % perl download.pl ERR3063487   
