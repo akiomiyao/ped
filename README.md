@@ -32,7 +32,7 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 ## Installation
 
 - Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
-  PED requires sorting for huge numbers of sequence data. In the case of high load, sometimes, sort command may hung up. If you encounter the problem, consider the operating system to FreeBSD. https://www.freebsd.org/   
+  PED requires sorting for huge numbers of sequence data. In the case of high load, sometimes, sort command may hung up. If you encounter the problem, consider the operating system to [FreeBSD](https://www.freebsd.org/).   
   FreeBSD is more stable for the problem than Linux. 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
@@ -44,7 +44,12 @@ If you got scripts from github, update to newest version is very easy using pull
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
 - To download reference date, wget is required.  
-    If your machine do not have wget program, install wget from package.
+    If your machine do not have wget program, install wget from package.  
+- For FreeBSD users, install perl from the package.  
+\# pkg install perl5  
+perl will be installed to /usr/local/bin/  
+\# ln -s /usr/local/bin/perl5 /usr/bin/perl  
+will be required, if you run the PED script on computer cluster with FreeBSD.
     
 ## Simple instruction for bidirectional method  
 - At first, set up reference data is required.  
