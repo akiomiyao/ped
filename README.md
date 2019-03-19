@@ -32,7 +32,8 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 ## Installation
 
 - Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
-  PED requires sorting for huge numbers of sequence data. In the case of high load, sometimes, sort command may hung up. If you encounter the problem, consider the operating system to FreeBSD. FreeBSD is more stable for the problem than Linux. 
+  PED requires sorting for huge numbers of sequence data. In the case of high load, sometimes, sort command may hung up. If you encounter the problem, consider the operating system to FreeBSD. https://www.freebsd.org/   
+  FreeBSD is more stable for the problem than Linux. 
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 % git clone https://github.com/akiomiyao/ped.git  
