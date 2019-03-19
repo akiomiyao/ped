@@ -96,7 +96,6 @@ sub mkChr{
 	chomp;
 	if (/^>/){
 	    close(OUT);
-	    close(FA);
 	    $ref = (split)[0];
 	    $ref =~ s/>//;
 	    if ($ref =~ /\_/){
@@ -107,18 +106,14 @@ sub mkChr{
 		$ref += 0 if $ref =~ /^[0-9]*$/;
 		$ref = "chr$ref";
 		open(OUT, "> $ref");
-		open(FA, "> $ref.fa");
-		print FA ">$ref\n";
 	    }
 	}elsif(! $flag){
 	    y/a-z/A-Z/;
 	    print OUT;
-	    print FA "$_\n";
 	}
     }
     close(IN);
     close(OUT);
-    close(FA);
 }
 
 
@@ -163,8 +158,7 @@ sub mk20{
 		&mkUniq($tag);
 	    }
 	}
-    }
-    
+    }    
 }
 
 sub mkControlRead{
@@ -207,6 +201,7 @@ sub mkUniq{
     }
     close(IN);
     close(OUT);
+    sleep 1;
     system("rm ref20.$tag ref20_sort.$tag");
 }
 
