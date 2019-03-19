@@ -87,8 +87,6 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     system("gzip $control/$control.lbc.*");
 }
 
-
-
 report("Making kmer count of $target.");
 system("perl count.pl $target");
 report("Making snp");
@@ -126,7 +124,7 @@ foreach $chr (@chr){
 close(OUT);
 
 report("Convert to vcf");
-system("rm $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
+system("rm $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");
 
