@@ -93,6 +93,14 @@ foreach $chr (@chr){
 }
 system("rm $workdir/$target.indel.tmp");
 
+while(1){
+    $mtime = (stat("$workdir/$target.indel.sort"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
 $fcount = "01";
 open(IN, "$workdir/$target.indel.sort");
 open(OUT, "> $workdir/$target.indel.$fcount");

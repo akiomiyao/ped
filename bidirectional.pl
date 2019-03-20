@@ -60,9 +60,25 @@ if (! -e "$target/$target.sort_uniq"){
     system("perl sort_uniq.pl $target");
 }
 
+while(1){
+    $mtime = (stat("$target/$target.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
 if (! -e "$control/$control.sort_uniq"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
+}
+
+while(1){
+    $mtime = (stat("$control/$control.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
 }
 
 report("Aligning of $target sequence to $ref genome. margin = 5");

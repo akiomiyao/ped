@@ -78,6 +78,14 @@ while(<IN>){
 close(IN);
 close(OUT);
 
+while(1){
+    $mtime = (stat("$workdir/$target.aln.sort"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
 open(IN, "$workdir/$target.aln.sort");
 open(OUT, "|sort -T $workdir |uniq -c |awk '{print \$2, \$3, \$4, \$5, \$1}' >$workdir/$target.snp.tmp");
 while(<IN>){
@@ -103,6 +111,14 @@ foreach $chr (@chr){
     close(OUT);
 }
 system("rm $workdir/$target.snp.tmp");
+
+while(1){
+    $mtime = (stat("$workdir/$target.snp"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
 
 $fcount = "01";
 open(IN, "$workdir/$target.snp");

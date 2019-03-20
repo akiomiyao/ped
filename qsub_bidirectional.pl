@@ -72,6 +72,22 @@ if (! -e "$control/$control.sort_uniq"){
 }
 &holdUntilJobEnd;
 
+while(1){
+    $mtime = (stat("$target/$target.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
+while(1){
+    $mtime = (stat("$control/$control.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
 report("Aligning of $target sequence to $ref genome.");
 @job = ();
 foreach $margin (0, 5, 10, 15){

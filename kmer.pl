@@ -76,15 +76,39 @@ if (! -e "$target/$target.sort_uniq"){
     system("perl sort_uniq.pl $target");
 }
 
+while(1){
+    $mtime = (stat("$target/$target.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
+}
+
 if (! -e "$control/$control.sort_uniq"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
+}
+
+while(1){
+    $mtime = (stat("$control/$control.sort_uniq"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
 }
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
     system("perl count.pl $control");
     system("gzip $control/$control.lbc.*");
+}
+
+while(1){
+    $mtime = (stat("$control/$control.lbc.TTT.gz"))[9];
+    if (time > $mtime + 10){
+	last;
+    }
+    sleep 1;
 }
 
 report("Making kmer count of $target.");
