@@ -138,67 +138,78 @@ while(<IN>){
 close(IN);
 
 &openTag;
-if ($type eq "vcf"){
-    open(IN,  "$cwd/$target/$target.vcf");
-}elsif ($type eq "bi"){
-    open(IN, "$cwd/$target/$target.snp.$number");
- }elsif ($type eq "kmer"){
-    open(IN, "$cwd/$target/$target.map.$number");
-}
-while(<IN>){
-    chomp;
-    @row = split;
+foreach $chr (@chr){
+    my @dat = ();
     if ($type eq "vcf"){
-	next if  length($row[3]) != 1 or length($row[4]) != 1;
-	$row[0] =~ s/chr//g;
-	$row[0] += 0;
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[3];
-	$alt = $row[4];
-	$count = 20;
-    }elsif ($type eq "bi"){
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[2];
-	$alt = $row[3];
-	$count = $row[4];
-    }elsif ($type eq "kmer"){
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[4];
-	$alt = $row[5];
-	$alt =~ s/$rf//;
-	$count = 5;
-    }
-
-    $ref_seq = substr($chr{$chr}, $pos - $length, $length * 2 -1);
-    next if length($ref_seq) != $length * 2 -1;
-    $head = substr($ref_seq, 0, $length-1);
-    $tail = substr($ref_seq, $length, $length);
-    $mut_seq = $head . $alt . $tail;
-    for($h = 0; $h < 10; $h++){
-	$k = $j + $h -5;
-	if ($k >= 0 and $k <= $#dat){
-	    ($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
-	    if ($icount > 2 and abs($pos - $ipos) < $length and $pos != $ipos){
-		$i = $length - ($pos - $ipos) -1;
-		$head = substr($mut_seq, 0, $i);
-		$tail = substr($mut_seq, $i +1);
-		$mut_seq = $head . $ialt . $tail;
+	open(IN,  "$cwd/$target/$target.vcf");
+	while(<IN>){
+	    chomp;
+	    @row = split;
+	    $row[0] =~ s/chr//g;
+	    $row[0] += 0;
+	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
+		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
 	    }
 	}
+	close(IN);
+    }elsif ($type eq "bi"){
+	open(IN, "$cwd/$target/$target.snp.$number");
+	while(<IN>){
+	    chomp;
+	    @row = split; 
+	    if($row[0] eq $chr){
+		push (@dat, $_);
+	    }
+	}
+	close(IN);
+    }elsif ($type eq "kmer"){
+	open(IN, "$cwd/$target/$target.map.$number");
+	while(<IN>){
+	    chomp;
+	    @row = split; 
+	    if($row[0] eq $chr){
+		push (@dat, $_);
+	    }
+	}
+	close(IN);
     }
-    for($i = 0; $i < $length; $i++){
-	$tw = substr($ref_seq, $i, $length);
-	$tm = substr($mut_seq, $i, $length);
-	$tag = substr($tw, 0, 3);
-	print $tag "$tw\t$chr $pos $rf $alt tw\n";
-	$tag = substr($tm, 0, 3);
-	print $tag "$tm\t$chr $pos $rf $alt tm\n";
-    }		
+    for ($j = 0; $j < $#dat; $j++){
+	if ($type eq "vcf"){
+	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
+	}elsif ($type eq "bi"){
+	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
+	}elsif ($type eq "kmer"){
+	    ($chr, $pos, $rf, $alt) = (split(' ', $dat[$j]))[0, 1, 4, 5];
+	    $alt =~ s/$rf//;
+	    $count = 5;
+	}
+	$ref_seq = substr($chr{$chr}, $pos - $length, $length * 2 -1);
+	next if length($ref_seq) != $length * 2 -1;
+	$head = substr($ref_seq, 0, $length-1);
+	$tail = substr($ref_seq, $length, $length);
+	$mut_seq = $head . $alt . $tail;
+	for($h = 0; $h < 10; $h++){
+	    $k = $j + $h -5;
+	    if ($k >= 0 and $k <= $#dat){
+		($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
+		if ($icount > 2 and abs($pos - $ipos) < $length and $pos != $ipos){
+		    $i = $length - ($pos - $ipos) -1;
+		    $head = substr($mut_seq, 0, $i);
+		    $tail = substr($mut_seq, $i +1);
+		    $mut_seq = $head . $ialt . $tail;
+		}
+	    }
+	}
+	for($i = 0; $i < $length; $i++){
+	    $tw = substr($ref_seq, $i, $length);
+	    $tm = substr($mut_seq, $i, $length);
+	    $tag = substr($tw, 0, 3);
+	    print $tag "$tw\t$chr $pos $rf $alt tw\n";
+	    $tag = substr($tm, 0, 3);
+	    print $tag "$tm\t$chr $pos $rf $alt tm\n";
+	}		
+    }
 }
-close(IN);
 &closeTag;
 &sortTag;
 
@@ -211,66 +222,78 @@ if ($file_type eq "gz"){
 system("sort -T $tmpdir target.snp.$number| uniq -c > target.snp.count.$number && rm target.snp.$number");
     
 &openTag;
-if ($type eq "vcf"){
-    open(IN,  "$cwd/$target/$target.vcf");
-}elsif ($type eq "bi"){
-    open(IN, "$cwd/$target/$target.snp.$number");
- }elsif ($type eq "kmer"){
-    open(IN, "$cwd/$target/$target.map.$number");
-}
-while(<IN>){
-    chomp;
-    @row = split;
+foreach $chr (@chr){
+    my @dat = ();
     if ($type eq "vcf"){
-	next if  length($row[3]) != 1 or length($row[4]) != 1;
-	$row[0] =~ s/chr//g;
-	$row[0] += 0;
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[3];
-	$alt = $row[4];
-	$count = 20;
-    }elsif ($type eq "bi"){
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[2];
-	$alt = $row[3];
-	$count = $row[4];
-    }elsif ($type eq "kmer"){
-	$chr = $row[0];
-	$pos = $row[1];
-	$rf = $row[4];
-	$alt = $row[5];
-	$alt =~ s/$rf//;
-	$count = 5;
-    }
-    $ref_seq = substr($chr{$chr}, $pos - $clength, $clength * 2 -1);
-    next if length($ref_seq) != $clength * 2 -1;
-    $head = substr($ref_seq, 0, $clength-1);
-    $tail = substr($ref_seq, $clength, $clength);
-    $mut_seq = $head . $alt . $tail;
-    for($h = 0; $h < 10; $h++){
-	$k = $j + $h -5;
-	if ($k >= 0 and $k <= $#dat){
-	    ($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
-	    if ($icount > 2 and abs($pos - $ipos) < $clength and $pos != $ipos){
-		$i = $clength - ($pos - $ipos) -1;
-		$head = substr($mut_seq, 0, $i);
-		$tail = substr($mut_seq, $i +1);
-		$mut_seq = $head . $ialt . $tail;
+	open(IN,  "$cwd/$target/$target.vcf");
+	while(<IN>){
+	    chomp;
+	    @row = split;
+	    $row[0] =~ s/chr//g;
+	    $row[0] += 0;
+	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
+		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
 	    }
 	}
+	close(IN);
+    }elsif($type eq "bi"){
+	open(IN,  "$cwd/$target/$target.snp.$number");
+	while(<IN>){
+	    chomp;
+	    @row = split; 
+	    if($row[0] eq $chr){
+		push (@dat, $_);
+	    }
+	}
+	close(IN);
+    }elsif ($type eq "kmer"){
+	open(IN, "$cwd/$target/$target.map.$number");
+	while(<IN>){
+	    chomp;
+	    @row = split; 
+	    if($row[0] eq $chr){
+		push (@dat, $_);
+	    }
+	}
+	close(IN);
     }
-    for($i = 0; $i < $clength; $i++){
-	$cw = substr($ref_seq, $i, $clength);
-	$cm = substr($mut_seq, $i, $clength);
-	$tag = substr($cw, 0, 3);
-	print $tag "$cw\t$chr $pos $rf $alt cw\n";
-	$tag = substr($cm, 0, 3);
-	print $tag "$cm\t$chr $pos $rf $alt cm\n";
-    }		
+    for ($j = 0; $j < $#dat; $j++){
+	if ($type eq "vcf"){
+	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
+	}elsif ($type eq "bi"){
+	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
+	}elsif ($type eq "kmer"){
+	    ($chr, $pos, $rf, $alt) = (split(' ', $dat[$j]))[0, 1, 4, 5];
+	    $alt =~ s/$rf//;
+	    $count = 5;
+	}
+	$ref_seq = substr($chr{$chr}, $pos - $clength, $clength * 2 -1);
+	next if length($ref_seq) != $clength * 2 -1;
+	$head = substr($ref_seq, 0, $clength-1);
+	$tail = substr($ref_seq, $clength, $clength);
+	$mut_seq = $head . $alt . $tail;
+	for($h = 0; $h < 10; $h++){
+	    $k = $j + $h -5;
+	    if ($k >= 0 and $k <= $#dat){
+		($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
+		if ($icount > 2 and abs($pos - $ipos) < $clength and $pos != $ipos){
+		    $i = $clength - ($pos - $ipos) -1;
+		    $head = substr($mut_seq, 0, $i);
+		    $tail = substr($mut_seq, $i +1);
+		    $mut_seq = $head . $ialt . $tail;
+		}
+	    }
+	}
+	for($i = 0; $i < $clength; $i++){
+	    $cw = substr($ref_seq, $i, $clength);
+	    $cm = substr($mut_seq, $i, $clength);
+	    $tag = substr($cw, 0, 3);
+	    print $tag "$cw\t$chr $pos $rf $alt cw\n";
+	    $tag = substr($cm, 0, 3);
+	    print $tag "$cm\t$chr $pos $rf $alt cm\n";
+	}		
+    }
 }
-close(IN);
 &closeTag;
 &sortTag;
 
