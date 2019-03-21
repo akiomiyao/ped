@@ -126,7 +126,7 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
 	if (/\.count\./){
-	    $tag{$row[$#row]} = 1;
+	    $tag{$row[$#row -1]} = 1;
 	}
     }
     foreach $tag (sort keys %tag){
@@ -184,7 +184,7 @@ opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
     if (/\.count\./){
-	$tag{$row[$#row]} = 1;
+	$tag{$row[$#row -1]} = 1;
     }
 }
 close(DIR);
