@@ -113,9 +113,9 @@ if (! -e "$control/$control.lbc.AAA.gz"){
 	next if !/$control/;
 	@row = split('\.', $_);
 	if ($tmpdir ne ""){
-	    $qsub = "-v target=$row[0],number=$row[2],tmpdir=$tmpdir count.pl";
+	    $qsub = "-v target=$control,number=$#row,tmpdir=$tmpdir count.pl";
 	}else{
-	    $qsub = "-v target=$row[0],number=$row[2] count.pl";
+	    $qsub = "-v target=$control,number=$#row count.pl";
 	}
 	&doQsub($qsub);
     }
@@ -125,8 +125,8 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     opendir(DIR, "$control");
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
-	if ($row[1] eq "count"){
-	    $tag{$row[2]} = 1;
+	if (/\.count\./){
+	    $tag{$#row} = 1;
 	}
     }
     foreach $tag (sort keys %tag){
@@ -170,9 +170,9 @@ foreach (sort readdir(DIR)){
     next if ! /$target/;
     @row = split('\.', $_);
     if ($tmpdir ne ""){
-	$qsub = "-v target=$target,number=$row[2],tmpdir=$tmpdir count.pl";
+	$qsub = "-v target=$target,number=$#row,tmpdir=$tmpdir count.pl";
     }else{
-	$qsub = "-v target=$target,number=$row[2] count.pl";
+	$qsub = "-v target=$target,number=$#row count.pl";
     }
     &doQsub($qsub);
 }
@@ -183,8 +183,8 @@ report("Marge of kmer count.");
 opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
-    if ($row[1] eq "count"){
-	$tag{$row[2]} = 1;
+    if (//.count/./){
+	$tag{$#row} = 1;
     }
 }
 close(DIR);
