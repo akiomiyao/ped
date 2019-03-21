@@ -113,9 +113,9 @@ if (! -e "$control/$control.lbc.AAA.gz"){
 	next if !/$control/;
 	@row = split('\.', $_);
 	if ($tmpdir ne ""){
-	    $qsub = "-v target=$control,number=$#row,tmpdir=$tmpdir count.pl";
+	    $qsub = "-v target=$control,number=$row[$#row],tmpdir=$tmpdir count.pl";
 	}else{
-	    $qsub = "-v target=$control,number=$#row count.pl";
+	    $qsub = "-v target=$control,number=$row[$#row] count.pl";
 	}
 	&doQsub($qsub);
     }
@@ -126,7 +126,7 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
 	if (/\.count\./){
-	    $tag{$#row} = 1;
+	    $tag{$row[$#row]} = 1;
 	}
     }
     foreach $tag (sort keys %tag){
@@ -170,9 +170,9 @@ foreach (sort readdir(DIR)){
     next if ! /$target/;
     @row = split('\.', $_);
     if ($tmpdir ne ""){
-	$qsub = "-v target=$target,number=$#row,tmpdir=$tmpdir count.pl";
+	$qsub = "-v target=$target,number=$row[$#row],tmpdir=$tmpdir count.pl";
     }else{
-	$qsub = "-v target=$target,number=$#row count.pl";
+	$qsub = "-v target=$target,number=$row[$#row] count.pl";
     }
     &doQsub($qsub);
 }
@@ -184,7 +184,7 @@ opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
     if (/\.count\./){
-	$tag{$#row} = 1;
+	$tag{$row[$#row]} = 1;
     }
 }
 close(DIR);
