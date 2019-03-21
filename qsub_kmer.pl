@@ -183,7 +183,7 @@ report("Marge of kmer count.");
 opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
-    if (//.count/./){
+    if (/\.count\./){
 	$tag{$#row} = 1;
     }
 }
