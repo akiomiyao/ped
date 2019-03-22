@@ -54,7 +54,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl mkref.pl reference  
   For example,  
   % perl mkref.pl WBcel235  
-  Directory WBcel235 for reference of Caenorhabditis elegans WBcel235 will be created.  
+  Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
   If run without argument, suported reference will be listed.  
 - If you want to analyze public data in SRA.  
   % perl download.pl accession  
@@ -63,8 +63,8 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl download.pl ERR3063487   
   Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
-  ERR3063486 is read data of Caenorhabditis elegans mutant.  
-  ERR3063487 is read data of Caenorhabditis elegans wild-type.  
+  ERR3063486 is read data of *Caenorhabditis elegans* mutant.  
+  ERR3063487 is read data of *Caenorhabditis elegans* wild-type.  
   BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze local file,  
   % mkdir mydata1  
@@ -93,7 +93,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
 - Run without arguments, help for script will be shown.  
 - I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
-  I found data set of Caenorhabditis elegans.  
+  I found data set of *Caenorhabditis elegans.*  
   https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
@@ -121,11 +121,11 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl mkref.pl GRCm38  
     Data set of mouse genome GRCm38 will be made. It takes about two days.  
   % perl mkref.pl dmel626  
-    Data set of Drosophila melanogaster r6.26 will be made. It takes one hour.  
+    Data set of *Drosophila melanogaster* r6.26 will be made. It takes one hour.  
   % perl mkref.pl IRGSP1.0  
-    Data set of rice (Olyza sativa L. cv. Nipponbare) will be made.  
+    Data set of rice (*Olyza sativa* L. cv. Nipponbare) will be made.  
   % perl mkref.pl TAIR10  
-    Data set of Arabidopsis thaliana will be made.  
+    Data set of *Arabidopsis thaliana* will be made.  
 - To run by computer cluster,  
   % qsub -v target=target mkref.pl  
   For example,    
