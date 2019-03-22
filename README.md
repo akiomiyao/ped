@@ -74,7 +74,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
 - % perl bidirectional.pl target control reference  
   For example,  
   % perl bidirectional.pl ERR3063487 default WBcel235  
-   After two hours, you will find results in ERR3063487 directory.  
+   After  hours, you will find results in ERR3063487 directory.  
    ERR3063487.indel is list of structural variation.  
    ERR3063487.bi.snp is list of SNPs.  
    ERR3063487.bi.snp.vcf is the vcf file for SNPs.  
