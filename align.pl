@@ -157,8 +157,10 @@ sub map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
-		system("sort -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin && rm $tmpdir/$tag.tmp.$margin");
-		system("zcat $ref_path/ref20_uniq.$tag.gz | join $tmpdir/$tag.$margin - |cut -c 22- > $tmpdir/$tag.map.$margin && rm $tmpdir/$tag.$margin");
+		system("sort -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin");
+		system("zcat $ref_path/ref20_uniq.$tag.gz | join $tmpdir/$tag.$margin - |cut -c 22- > $tmpdir/$tag.map.$margin");
+		sleep 5;
+		system("rm $tmpdir/$tag.tmp.$margin $tmpdir/$tag.$margin");
 	    }
 	}
     }
