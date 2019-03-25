@@ -60,26 +60,14 @@ if (! -e "$target/$target.sort_uniq"){
     system("perl sort_uniq.pl $target");
 }
 
-while(1){
-    $mtime = (stat("$target/$target.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$target/$target.sort_uniq");
 
 if (! -e "$control/$control.sort_uniq"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
 
-while(1){
-    $mtime = (stat("$control/$control.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$control/$control.sort_uniq");
 
 report("Aligning of $target sequence to $ref genome. margin = 5");
 system("perl align.pl $target $ref 5");
@@ -124,4 +112,15 @@ sub report{
     my $now = `date`;
     chomp($now);
     print "$now $message\n";
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+	$mtime = (stat($file))[9];
+	if (time > $mtime + 5){
+	    return;
+	}
+	sleep 1;
+    }
 }

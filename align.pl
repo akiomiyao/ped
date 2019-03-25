@@ -53,6 +53,12 @@ $usage";
 
 $margin = 0 if $margin eq "";
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($tmpdir ne ""){
     system("/usr/bin/rsync -a $cwd/$ref $tmpdir");
     $ref_path = "$tmpdir/$ref";
@@ -157,9 +163,10 @@ sub map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
-		system("sort -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin");
+		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin");
+		&sortWait("$tmpdir/$tag.$margin");
 		system("zcat $ref_path/ref20_uniq.$tag.gz | join $tmpdir/$tag.$margin - |cut -c 22- > $tmpdir/$tag.map.$margin");
-		sleep 5;
+		&sortWait("$tmpdir/$tag.map.$margin");
 		system("rm $tmpdir/$tag.tmp.$margin $tmpdir/$tag.$margin");
 	    }
 	}
@@ -365,4 +372,15 @@ sub complement{
         }
     }
     return $out;
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+	$mtime = (stat($file))[9];
+	if (time > $mtime + 5){
+	    return;
+	}
+	sleep 1;
+    }
 }

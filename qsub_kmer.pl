@@ -39,6 +39,12 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[1] eq ""){
     print $usage;
     exit;
@@ -86,21 +92,9 @@ if (! -e "$control/$control.sort_uniq"){
 }
 &holdUntilJobEnd;
 
-while(1){
-    $mtime = (stat("$target/$target.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$target/$target.sort_uniq");
 
-while(1){
-    $mtime = (stat("$control/$control.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$control/$control.sort_uniq");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
@@ -151,13 +145,7 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     @job = ();
 }
 
-while(1){
-    $mtime = (stat("$control/$control.lbc.TTT.gz"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$control/$control.lbc.TTT.gz");
 
 report("Making kmer count of $target.");
 $qsub = "-v target=$target split_sort_uniq.pl";
@@ -250,12 +238,12 @@ foreach $tag (sort keys %tag){
 }
 &holdUntilJobEnd;
 
-open(IN, "cat $target/$target.kmer.verify.*| sort -T $target |");
+open(IN, "cat $target/$target.kmer.verify.*| sort $sort_opt -T $target |");
 while(<IN>){
     @row = split;
     if ($row[0] ne $prev){
 	close(OUT);
-	open(OUT, "| sort -T $target -k 2 -n > $target/$target.kmer_chr.$row[0]");
+	open(OUT, "| sort $sort_opt -T $target -k 2 -n > $target/$target.kmer_chr.$row[0]");
     }
     print OUT;
     $prev = $row[0];
@@ -314,5 +302,16 @@ sub holdUntilJobEnd{
 	}
 	last if ! $flag;
 	sleep 10;
+    }
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+	$mtime = (stat($file))[9];
+	if (time > $mtime + 5){
+	    return;
+	}
+	sleep 1;
     }
 }

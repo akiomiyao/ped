@@ -24,6 +24,11 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
 
 if($ENV{target} ne ""){
     $target    = $ENV{target};
@@ -57,7 +62,7 @@ sub cluster{
 	system("cp $workdir/tmp/$input_file $tmpdir");
     }
     open(IN, "$input_file");
-    open(OUT, "|sort -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
+    open(OUT, "|sort $sort_opt -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
     while(<IN>){
 	chomp;
 	$length = length($_);
@@ -99,7 +104,7 @@ sub standalone{
 	$number = substr($number, length($number) -4, 4);
 	print "$input_file.$j / $file_count is processing.\n";
 	$reads = 0;
-	open(OUT, "|sort -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
+	open(OUT, "|sort $sort_opt -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
 	while(<IN>){
 	    $reads++;
 	    chomp;

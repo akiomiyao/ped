@@ -19,6 +19,12 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $ref = $ARGV[1];
@@ -55,7 +61,7 @@ while(<IN>){
 close(IN);
 
 open(IN, "cat $workdir/$target.aln.*|");
-open(OUT, "|sort -T $workdir |uniq > $workdir/$target.aln.sort");
+open(OUT, "|sort $sort_opt -T $workdir |uniq > $workdir/$target.aln.sort");
 while(<IN>){
     chomp;
     if (/snp/){
@@ -87,7 +93,7 @@ while(1){
 }
 
 open(IN, "$workdir/$target.aln.sort");
-open(OUT, "|sort -T $workdir |uniq -c |awk '{print \$2, \$3, \$4, \$5, \$1}' >$workdir/$target.snp.tmp");
+open(OUT, "|sort $sort_opt -T $workdir |uniq -c |awk '{print \$2, \$3, \$4, \$5, \$1}' >$workdir/$target.snp.tmp");
 while(<IN>){
     foreach $dat(split('\t', $_)){
 	if ($dat =~/^#/){
@@ -100,7 +106,7 @@ while(<IN>){
 system("rm $workdir/$target.snp") if -e "$workdir/$target.snp";
 foreach $chr (@chr){
     open(IN, "$workdir/$target.snp.tmp");
-    open(OUT, "|sort -k 2 -n -T $workdir >> $workdir/$target.snp");
+    open(OUT, "|sort -k 2 -n $sort_opt -T $workdir >> $workdir/$target.snp");
     while(<IN>){
 	@row = split;
 	if ($row[0] eq $chr){

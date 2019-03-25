@@ -29,6 +29,12 @@ tmpdir  : specify temporary directofy on local disk (can be ommited)
 Author  : Akio Miyao <miyao@affrc.go.jp>
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[0] ne ""){
     $target  = $ARGV[0];
     $control = $ARGV[1];
@@ -55,6 +61,7 @@ if($tmpdir eq ""){
     $tmpdir = ".";
     $ref_path = "$cwd/$ref";
     $workdir = "$cwd/$target";
+    $target_sort_uniq = "$workdir/$target.sort_uniq";
 }else{
     if (! -d $tmpdir){
 	print "$tmpdir is not directory.
@@ -72,17 +79,8 @@ $usage";
 	system("rm -r $workdir");
     }
     system("mkdir $workdir");
-}
-
-if ($control eq "default" or $control eq ""){
-    $control = "$ref_path/$ref.sort_uniq";
-}else{
-    $control = "$cwd/$control/$control.sort_uniq";
-}
-
-if (-e "$cwd/$target/$target.sort_uniq.gz"){
-    $file_type = "gz";
-    $target_sort_uniq = "$cwd/$target/$target.sort_uniq.gz";
+    system("/usr/bin/rsync -a $cwd/$target/$target.sort_uniq $workdir");
+    $target_sort_uniq = "$workdir/$target.sort_uniq";
 }
 
 $number = "01" if $number eq "";
@@ -117,22 +115,10 @@ foreach $i (@chr){
     close(IN);
 }
 
-if ($file_type eq "gz"){
-    open(IN, "zcat $target_sort_uniq 2> /dev/null |");
-}else{
-    open(IN, "$cwd/$target/$target.sort_uniq");
-}
+open(IN, "$target_sort_uniq");
 while(<IN>){
     chomp;
     $length = length($_);
-    last;
-}
-close(IN);
-
-open(IN, $control);
-while(<IN>){
-    chomp;
-    $clength = length($_);
     last;
 }
 close(IN);
@@ -214,13 +200,37 @@ foreach $chr (@chr){
 &sortTag;
 
 system("cat *.snp.sort.$number > target.snp.st.$number");
-if ($file_type eq "gz"){    
-    system("zcat $target_sort_uniq 2> /dev/null | join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number && rm *.snp.sort.$number target.snp.st.$number");
-}else{
-    system("join $cwd/$target/$target.sort_uniq target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number && rm *.snp.sort.$number target.snp.st.$number");
+&sortWait("target.snp.st.$number");
+system("rm *.snp.sort.$number");
+system("join $target_sort_uniq target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
+&sortWait("target.snp.$number");
+system("rm target.snp.st.$number");
+if ($tmpdir ne ""){
+   system("rm $target.sort_uniq");
 }
-system("sort -T $tmpdir target.snp.$number| uniq -c > target.snp.count.$number && rm target.snp.$number");
-    
+system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
+&sortWait("target.snp.count.$number");
+system("rm target.snp.$number");
+
+if ($control eq "default" or $control eq "" or $control eq $ref){
+    $control = "$ref_path/$ref.sort_uniq";
+}else{
+    if ($tmpdir eq ""){
+	$control = "$cwd/$control/$control.sort_uniq";
+    }else{
+	system("/usr/bin/rsync -a $cwd/$control/$control.sort_uniq $workdir");
+	$control = "$workdir/$control.sort_uniq";
+    }
+}
+
+open(IN, $control);
+while(<IN>){
+    chomp;
+    $clength = length($_);
+    last;
+}
+close(IN);
+
 &openTag;
 foreach $chr (@chr){
     my @dat = ();
@@ -298,7 +308,11 @@ foreach $chr (@chr){
 &sortTag;
 
 system("cat *.snp.sort.$number | join $control - | cut -d ' ' -f 2- > control.snp.$number");
-system("sort -T $tmpdir control.snp.$number| uniq -c > control.snp.count.$number && rm *.snp.sort.$number control.snp.$number");
+&sortWait("control.snp.$number");
+system("rm *.snp.sort.$number");
+system("sort -T . $sort_opt control.snp.$number| uniq -c > control.snp.count.$number");
+&sortWait("control.snp.count.$number");
+system("rm control.snp.$number");
 
 open(IN, "target.snp.count.$number");
 while(<IN>){
@@ -427,7 +441,9 @@ sub sortTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		system("sort -T $tmpdir $workdir/$tag.snp.tmp.$number > $workdir/$tag.snp.sort.$number && rm $workdir/$tag.snp.tmp.$number");
+		system("sort -T . $sort_opt $tag.snp.tmp.$number > $tag.snp.sort.$number");
+		&sortWait("$tag.snp.sort.$number");
+		system("rm $tag.snp.tmp.$number");
 	    }
 	}
     }
@@ -453,6 +469,17 @@ sub complement{
         }
     }
     return $out;
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+	$mtime = (stat($file))[9];
+	if (time > $mtime + 5){
+	    return;
+	}
+	sleep 1;
+    }
 }
 
 sub bynumber{

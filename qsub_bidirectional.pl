@@ -72,21 +72,8 @@ if (! -e "$control/$control.sort_uniq"){
 }
 &holdUntilJobEnd;
 
-while(1){
-    $mtime = (stat("$target/$target.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
-
-while(1){
-    $mtime = (stat("$control/$control.sort_uniq"))[9];
-    if (time > $mtime + 10){
-	last;
-    }
-    sleep 1;
-}
+&sortWait("$target/$target.sort_uniq");
+&sortWait("$control/$control.sort_uniq");
 
 report("Aligning of $target sequence to $ref genome.");
 @job = ();
@@ -176,5 +163,16 @@ sub holdUntilJobEnd{
 	}
 	last if ! $flag;
 	sleep 10;
+    }
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+	$mtime = (stat($file))[9];
+	if (time > $mtime + 5){
+	    return;
+	}
+	sleep 1;
     }
 }

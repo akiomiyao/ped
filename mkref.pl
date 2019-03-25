@@ -30,6 +30,12 @@ Name\tDescription
 $cwd = `pwd`;
 chomp($cwd);
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
 }elsif ($ENV{target} ne ""){
@@ -163,7 +169,7 @@ sub mk20{
 
 sub mkControlRead{
     print "Making Control Read.\n";
-    open(OUT, "|sort -T . |uniq > $target.sort_uniq");
+    open(OUT, "|sort -T . $sort_opt |uniq > $target.sort_uniq");
     for(@chr){
 	print "Processing Chr$_\n";
 	open(IN, "chr$_");
@@ -185,7 +191,7 @@ sub mkControlRead{
 sub mkUniq{
     my $tag = shift;
     print "Making ref20_uniq.$tag.gz\n";
-    system("sort -T . ref20.$tag > ref20_sort.$tag");
+    system("sort -T . $sort_opt ref20.$tag > ref20_sort.$tag");
     open(OUT, "|gzip -f > ref20_uniq.$tag.gz");
     open(IN, "ref20_sort.$tag");
     while(<IN>){

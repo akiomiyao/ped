@@ -20,6 +20,12 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[0] ne ""){
     $target  = $ARGV[0];
     $ref     = $ARGV[1];
@@ -56,7 +62,7 @@ while(<IN>){
 close(IN);
 
 open(IN, "cat $workdir/$target.aln.*|");
-open(OUT, "|sort -T $workdir |uniq > $workdir/$target.indel.tmp");
+open(OUT, "|sort $sort_opt -T $workdir |uniq > $workdir/$target.indel.tmp");
 while(<IN>){
     chomp;
     if (/ion/){
@@ -81,7 +87,7 @@ system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
 foreach $chr (@chr){
     print ERR "$chr\n";
     open(IN, "$workdir/$target.indel.tmp");
-    open(OUT, "|sort -k 2 -n -T $workdir >> $workdir/$target.indel.sort");
+    open(OUT, "|sort $sort_opt -k 2 -n -T $workdir >> $workdir/$target.indel.sort");
     while(<IN>){
 	@row = split;
 	if ($row[1] eq $chr){

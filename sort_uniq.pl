@@ -22,6 +22,12 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+}
+
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $workdir = $target;
@@ -70,7 +76,7 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 closedir(DIR);
 
 open(IN, $cmd);
-open(OUT, "|sort -T $tmpdir |uniq > $workdir/$target.sort_uniq");
+open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $workdir/$target.sort_uniq");
 while(<IN>){
     if ($count == 1 and !/N/){
 	chomp;
