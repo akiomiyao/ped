@@ -13,8 +13,9 @@ $usage = '
 e.g. perl split_indel.pl target reference
      perl split_indel ERR194147 hg38
 
-     qsub -v target=ERR194147,ref=hg38 split_indel.pl
+     qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_indel.pl
 
+     tmpdir is optional.
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
@@ -29,11 +30,13 @@ if ($uname eq "FreeBSD"){
 if ($ARGV[0] ne ""){
     $target  = $ARGV[0];
     $ref     = $ARGV[1];
+    $tmpdir  = $ARGV[2];
     $cwd = `pwd`;
     chomp($cwd);
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $ref       = $ENV{ref};
+    $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
 }else{
     print $usage;
@@ -41,6 +44,13 @@ if ($ARGV[0] ne ""){
 }
 
 $workdir = "$cwd/$target";
+
+if ($tmpdir ne ""){
+    $tmpdir = $tmpdir . "/$target";
+    system("mkdir $tmpdir");
+}else{
+    $tmpdir = $workdir;
+}
 
 open(IN, "$cwd/config");
 while(<IN>){
@@ -62,7 +72,7 @@ while(<IN>){
 close(IN);
 
 open(IN, "cat $workdir/$target.aln.*|");
-open(OUT, "|sort $sort_opt -T $workdir |uniq > $workdir/$target.indel.tmp");
+open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $tmpdir/$target.indel.tmp");
 while(<IN>){
     chomp;
     if (/ion/){
@@ -86,8 +96,8 @@ close(OUT);
 system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
 foreach $chr (@chr){
     print ERR "$chr\n";
-    open(IN, "$workdir/$target.indel.tmp");
-    open(OUT, "|sort $sort_opt -k 2 -n -T $workdir >> $workdir/$target.indel.sort");
+    open(IN, "$tmpdir/$target.indel.tmp");
+    open(OUT, "|sort $sort_opt -k 2 -n -T $tmpdir >> $tmpdir/$target.indel.sort");
     while(<IN>){
 	@row = split;
 	if ($row[1] eq $chr){
@@ -97,10 +107,10 @@ foreach $chr (@chr){
     close(IN);
     close(OUT);
 }
-system("rm $workdir/$target.indel.tmp");
+system("rm $tmpdir/$target.indel.tmp");
 
 while(1){
-    $mtime = (stat("$workdir/$target.indel.sort"))[9];
+    $mtime = (stat("$tmpdir/$target.indel.sort"))[9];
     if (time > $mtime + 10){
 	last;
     }
@@ -108,7 +118,7 @@ while(1){
 }
 
 $fcount = "01";
-open(IN, "$workdir/$target.indel.sort");
+open(IN, "$tmpdir/$target.indel.sort");
 open(OUT, "> $workdir/$target.indel.$fcount");
 while(<IN>){
     if ($count == 10000000){
@@ -122,3 +132,8 @@ while(<IN>){
 }
 close(IN);
 close(OUT);
+
+if ($tmpdir ne $workdir){
+    system("mv $tmpdir/$target.indel.sort $workdir");
+    system("rm -r $tmpdir");
+}

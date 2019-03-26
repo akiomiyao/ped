@@ -89,11 +89,19 @@ foreach $margin (0, 5, 10, 15){
 
 @job = ();
 report("Splitting of Indel alignment. ");
-$qsub = "-v target=$target,ref=$ref split_indel.pl";
+if ($tmpdir ne ""){
+    $qsub = "-v target=$target,ref=$ref,tmpdir=$tmpdir split_indel.pl";
+}else{
+    $qsub = "-v target=$target,ref=$ref split_indel.pl";
+}
 &doQsub($qsub);
 
 report("Splitting of SNP alignment.");
-$qsub = "-v target=$target,ref=$ref split_snp.pl";
+if($tmpdir ne ""){
+    $qsub = "-v target=$target,ref=$ref,tmpdir=$tmpdir split_snp.pl";
+}else{
+    $qsub = "-v target=$target,ref=$ref split_snp.pl";
+}
 &doQsub($qsub);
 &holdUntilJobEnd;
 
