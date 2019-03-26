@@ -33,6 +33,9 @@ $uname = `uname`;
 chomp($uname);
 if ($uname eq "FreeBSD"){
     $sort_opt = "-S 100M";
+    $rsync = "/usr/local/bin/rsync";
+}else{
+    $rsync = "/usr/bin/rsync";
 }
 
 if ($ARGV[0] ne ""){
@@ -73,13 +76,13 @@ $usage";
     if (! -e $ref_path){
 	system("mkdir $ref_path");
     }
-    system("/usr/bin/rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
+    system("$rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
     $workdir = "$tmpdir/$target";
     if (-d $workdir){
 	system("rm -r $workdir");
     }
     system("mkdir $workdir");
-    system("/usr/bin/rsync -a $cwd/$target/$target.sort_uniq $workdir");
+    system("$rsync -a $cwd/$target/$target.sort_uniq $workdir");
     $target_sort_uniq = "$workdir/$target.sort_uniq";
 }
 
@@ -218,7 +221,7 @@ if ($control eq "default" or $control eq "" or $control eq $ref){
     if ($tmpdir eq ""){
 	$control = "$cwd/$control/$control.sort_uniq";
     }else{
-	system("/usr/bin/rsync -a $cwd/$control/$control.sort_uniq $workdir");
+	system("$rsync -a $cwd/$control/$control.sort_uniq $workdir");
 	$control = "$workdir/$control.sort_uniq";
     }
 }

@@ -25,6 +25,15 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $sort_opt = "-S 100M";
+    $rsync = "/usr/local/bin/rsync";
+}else{
+    $rsync = "/usr/bin/rsync";
+}
+
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $ref = $ARGV[1];
@@ -53,14 +62,8 @@ $usage";
 
 $margin = 0 if $margin eq "";
 
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-}
-
 if ($tmpdir ne ""){
-    system("/usr/bin/rsync -a $cwd/$ref $tmpdir");
+    system("$rsync -a $cwd/$ref $tmpdir");
     $ref_path = "$tmpdir/$ref";
     $tmpdir = "$tmpdir/$target";
     if (-d $tmpdir){

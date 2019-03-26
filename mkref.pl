@@ -34,6 +34,9 @@ $uname = `uname`;
 chomp($uname);
 if ($uname eq "FreeBSD"){
     $sort_opt = "-S 100M";
+    $wget = "/usr/local/bin/wget";
+}else{
+    $wget = "/usr/bin/wget";
 }
 
 if ($ARGV[0] ne ""){
@@ -86,7 +89,7 @@ chdir "$cwd/$target";
 @row = split('/', $wget{$target});
 $remote_file = $row[$#row];
 if (! -e $remote_file){
-    system("wget -o wget-log $wget{$target}");
+    system("$wget -o wget-log $wget{$target}");
 }
 
 &mkChr;
