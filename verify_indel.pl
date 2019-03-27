@@ -233,7 +233,7 @@ system("rm *.indel_sort.$number");
 system("join $target_sort_uniq indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
 &sortWait("indel_target.$number");
 system("rm indel_target.st.$number");
-if ($tmpdir ne ""){
+if ($tmpdir ne "."){
    system("rm $target.sort_uniq");
 }
 system("sort -T . $sort_opt indel_target.$number| uniq -c > indel_target.count.$number");
@@ -243,7 +243,7 @@ system("rm indel_target.$number");
 if ($control eq "default" or $control eq "" or $control eq $ref){
     $control = "$ref_path/$ref.sort_uniq";
 }else{
-    if ($tmpdir eq ""){
+    if ($tmpdir eq "."){
 	$control = "$cwd/$control/$control.sort_uniq";
     }else{
 	system("$rsync -a $cwd/$control/$control.sort_uniq $workdir");
