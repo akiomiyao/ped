@@ -208,7 +208,7 @@ system("rm *.snp.sort.$number");
 system("join $target_sort_uniq target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
 &sortWait("target.snp.$number");
 system("rm target.snp.st.$number");
-if ($tmpdir ne ""){
+if ($tmpdir ne "."){
    system("rm $target.sort_uniq");
 }
 system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
@@ -218,7 +218,7 @@ system("rm target.snp.$number");
 if ($control eq "default" or $control eq "" or $control eq $ref){
     $control = "$ref_path/$ref.sort_uniq";
 }else{
-    if ($tmpdir eq ""){
+    if ($tmpdir eq "."){
 	$control = "$cwd/$control/$control.sort_uniq";
     }else{
 	system("$rsync -a $cwd/$control/$control.sort_uniq $workdir");
