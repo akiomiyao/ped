@@ -150,6 +150,31 @@ sub merge{
 	    closedir(DIR);
 	    $total = @file;
 	    if ($total == 1){
+		$tag = "";
+		$prev = "";
+		$final = "$target.lbc.$head";
+		open(IN, $output);
+		open(OUT, "> $final");
+		while(<IN>){
+		    chomp;
+		    ($seq, $count) = split;
+		    $tag = substr($seq, 0, 19);
+		    $nuc = substr($seq, 19, 1);
+		    
+		    if ($tag ne $prev and $prev ne ""){
+			print OUT "$prev\t$A\t$C\t$G\t$T\n";
+			$A = 0;
+			$C = 0;
+			$G = 0;
+			$T = 0;
+		    }
+		    $$nuc = $count;
+		    $prev = $tag;
+		}
+		close(IN);
+		print OUT "$prev\t$A\t$C\t$G\t$T\n";
+		close(OUT);
+		system("rm $target.count.$head.*");
 		last;
 	    }
 	    @last = split('\.', $file[$#file]);
@@ -160,33 +185,9 @@ sub merge{
 	    $last[$#last] = "";
 	    
 	    $output = join('.', @last) . $last;
-	    $cmd = "join -a 1 -a 2 $file[0] $file[1] | awk '{print \$1 \"\t\" \$2 + \$3}' > $output && rm $file[0] $file[1]";
+	    $cmd = "join -a 1 -a 2 $file[0] $file[1] | awk '{print \$1 \"\t\" \$2 + \$3}' > $output";
 	    system($cmd);
+	    system("rm $file[0] $file[1]");
 	}
-	$tag = "";
-	$prev = "";
-	$final = "$target.lbc.$head";
-	open(IN, $output);
-	open(OUT, "> $final");
-	while(<IN>){
-	    chomp;
-	    ($seq, $count) = split;
-	    $tag = substr($seq, 0, 19);
-	    $nuc = substr($seq, 19, 1);
-	    
-	    if ($tag ne $prev and $prev ne ""){
-		print OUT "$prev\t$A\t$C\t$G\t$T\n";
-		$A = 0;
-		$C = 0;
-		$G = 0;
-		$T = 0;
-	    }
-	    $$nuc = $count;
-	    
-	    $prev = $tag;
-	}
-	print OUT "$prev\t$A\t$C\t$G\t$T\n";
-	close(OUT);
-	system("rm $output");
     }
 }
