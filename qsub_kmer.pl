@@ -172,7 +172,7 @@ opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
     if (/\.count\./){
-	$tag{$row[$#row -2]} = 1;
+	$tag{$row[$#row -1]} = 1;
     }
 }
 close(DIR);
