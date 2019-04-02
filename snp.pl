@@ -57,6 +57,9 @@ $cutoff = 10 if $cutoff eq "";
 if($ENV{target} ne ""){
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
+	chdir $tmpdir;
+	system("zcat $controldir/$control.lbc.$tag.gz > $control.lbc.$tag");
+	system("zcat $target.lbc.$tag.gz > $target.lbc.$tag");
     }else{
 	$tmpdir = "$tmpdir/$target";
 	if (-e $tmpdir){
@@ -68,13 +71,14 @@ if($ENV{target} ne ""){
     }
     
     chdir $tmpdir;
-    
      
     open(OUT, "> $output_file");
     open(IN, "join $control_file $target_file |");
     &snp;
     if ($tmpdir ne $workdir){
 	system("cp $output_file $workdir && rm -r $tmpdir");
+    }else{
+	system("rm $control.lbc.$tag $target.lbc.$tag");
     }
 }elsif($ARGV[0] ne ""){
     foreach $a (sort @nuc){

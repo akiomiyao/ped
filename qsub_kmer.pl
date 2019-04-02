@@ -75,7 +75,7 @@ while(<IN>){
 }
 close(IN);
 
-report("kmer.pl start.");
+report("qsub_kmer.pl start.");
 
 if (! -e "$target/$target.sort_uniq"){
     report("Making $target.sort_uniq.");
@@ -172,7 +172,11 @@ opendir(DIR, "$target");
 foreach (sort readdir(DIR)){
     @row = split('\.', $_);
     if (/\.count\./){
-	$tag{$row[$#row -1]} = 1;
+	if ($row[$#row -1] =~ /^[ACGT][ACGT][ACGT]$/){
+	    $tag{$row[$#row -1]} = 1;
+	}elsif($row[$#row -2] =~ /^[ACGT][ACGT][ACGT]$/){
+	    $tag{$row[$#row -2]} = 1;
+	}
     }
 }
 close(DIR);
@@ -225,6 +229,7 @@ foreach $tag (sort keys %tag){
     &doQsub($qsub);
 }
 &holdUntilJobEnd;
+
 report("Verifying");
 @job = ();
 opendir(DIR, $target);
@@ -262,7 +267,9 @@ foreach $chr (@chr){
 close(OUT);
 
 report("Convert to vcf");
-system("rm $control/$control.count.*") if -e "$control/$control.count.AAA.gz";
+if ($ref ne $control and -e "$control/$control.count.AAA.gz"){
+    system("rm $control/$control.count.*");
+}
 system("rm $target/$target.count.* $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 system("perl snp2vcf.pl $target kmer");
 system("rm $target/$target.snp") if -e "$target/$target.snp";

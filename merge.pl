@@ -32,7 +32,6 @@ if($ENV{target} ne ""){
 
 if ($tmpdir eq ""){
     $tmpdir = $workdir;
-    system("gzip -d $tmpdir/*.count.$tag.*.gz");
 }else{
     system("mkdir $tmpdir/$target");
     $tmpdir = "$tmpdir/$target";
@@ -55,8 +54,8 @@ while(1){
     $last = "000" . $last;
     $last = substr($last, length($last) - 4, 4);
     $last[$#last] = "";
-    
     $output = join('.', @last) . $last;
+    
     $cmd = "join -a 1 -a 2 $file[0] $file[1] | awk '{print \$1 \"\t\" \$2 + \$3}' > $output && rm $file[0] $file[1]";
     system($cmd);
 }
@@ -65,7 +64,7 @@ $final = join('.', @last);
 chop($final);
 
 if ($tmpdir eq $workdir){
-    system("mv $output $final && gzip $final && rm *.count.$tag.*.gz");
+    system("mv $output $final && gzip $final");
 }else{
     system("mv $output $final && gzip $final && mv $final.gz $workdir && cd .. && rm -r $target && rm $workdir/*.$tag.*.gz");
 }

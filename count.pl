@@ -46,21 +46,19 @@ if($ENV{target} ne ""){
 sub cluster{
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
+	$input_file = "$workdir/tmp/$target.sort_uniq.$number";
     }else{
 	if (-e "$tmpdir/$target"){
 	    system("rm -r $tmpdir/$target");
 	}
 	system("mkdir $tmpdir/$target");
 	$tmpdir = "$tmpdir/$target";
+	system("cp $workdir/tmp/$target.sort_uniq.$number $tmpdir");
+	$input_file = "$target.sort_uniq.$number";
     }
 
     chdir $tmpdir;
     
-    $input_file = "$target.sort_uniq.$number";
-    
-    if ($tmpdir ne $workdir){
-	system("cp $workdir/tmp/$input_file $tmpdir");
-    }
     open(IN, "$input_file");
     open(OUT, "|sort $sort_opt -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
     while(<IN>){

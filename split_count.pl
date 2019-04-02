@@ -30,8 +30,13 @@ if ($target eq ""){
 while(<>){
     $head = substr($_, 0, 3);
     if ($prev ne $head){
-	$output_file = "$target.count.$head.$number.gz";
-	open(OUT, "|gzip > $output_file");
+	if ($tmpdir eq ""){
+	    $output_file = "$target.count.$head.$number";
+	    open(OUT, "> $output_file");
+	}else{
+	    $output_file = "$target.count.$head.$number.gz";
+	    open(OUT, "|gzip > $output_file");
+	}
     }
     print OUT "$_";
     $prev = $head;

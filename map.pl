@@ -52,6 +52,7 @@ if($ENV{target} ne ""){
 
 if ($tmpdir eq ""){
     $tmpdir = $workdir;
+    $ref_file    = "zcat $refdir/ref20_uniq.*.gz|";
 }else{
     $tmpdir = "$tmpdir/$target";
     if (-e $tmpdir){
