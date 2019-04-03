@@ -5,7 +5,20 @@
 #
 # License: refer to https://github.com/akiomiyao/ped
 #
-
+#
+# Structure of config file
+#
+# Name	data_type	values
+# Items are separated by tab.
+#
+# data_type	values
+# description short note of reference genome.
+# wget	URL of reference genome data with fasta format   
+# chromosome	start end non-numerical names
+#
+# If all names of chromosome are not numerical, start and end are set to 0, 
+# and names should be set at fifth or more columns. 
+#
 
 hg38	description	Genome Reference Consortium Human Build 38
 hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
