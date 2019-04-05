@@ -99,24 +99,18 @@ if (! -e $remote_file){
 sub mkChr{
     my @file = split('/', $wget{$target});
     my $file = $file[$#file];
+    my $i = 0;
     print "Making chromosome file\n";
     open(IN, "zcat $file|");
     while(<IN>){
 	chomp;
 	if (/^>/){
 	    close(OUT);
-	    $ref = (split)[0];
-	    $ref =~ s/>//;
-	    if ($ref =~ /\_/){
-		$flag = 1;
-	    }else{
-		$flag = 0;
-		$ref =~ s/chr//i;
-		$ref += 0 if $ref =~ /^[0-9]*$/;
-		$ref = "chr$ref";
-		open(OUT, "> $ref");
-	    }
-	}elsif(! $flag){
+	    $ref = "chr" . $chr[$i];
+	    last if $chr[$i] eq "";
+	    $i++;
+	    open(OUT, "> $ref");
+	}else{
 	    y/a-z/A-Z/;
 	    print OUT;
 	}
@@ -124,7 +118,6 @@ sub mkChr{
     close(IN);
     close(OUT);
 }
-
 
 sub mk20{
     print "Making 20mer position file.\n";
