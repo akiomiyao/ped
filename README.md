@@ -56,6 +56,8 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl mkref.pl WBcel235  
   Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
   If run without argument, suported reference will be listed.  
+  If you want to new reference, add the reference information to config file.  
+  Format is described in the comment in config file.  
 - If you want to analyze public data in SRA.  
   % perl download.pl accession  
   For example,  
