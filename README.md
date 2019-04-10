@@ -53,11 +53,24 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
 - At first, set up reference data is required.  
   % perl mkref.pl reference  
   For example,  
-  % perl mkref.pl WBcel235  
+  % perl mkref.pl WBcel235
+  or
+  % qsub -v target=WBcel235 mkref.pl
   Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
-  If run without argument, suported reference will be listed.  
+  If run without argument, help and suported reference will be listed.  
   If you want to new reference, add the reference information to config file.  
-  Format is described in the comment in config file.  
+  Format is described in the comment in config file.
+  To make reference of human,
+  % perl mkref.pl hg38
+  It takes two days, because hg38 is huge.  
+- Otherwize,  
+  % perl mkref.pl reference fasta_file_name  
+  For example,  
+  % mkdir IRGSP1.0  
+  % cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
+  % perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
+  or  
+  % qsub -v target=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz mkref.pl  
 - If you want to analyze public data in SRA.  
   % perl download.pl accession  
   For example,  
@@ -65,8 +78,8 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl download.pl ERR3063487   
   Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
-  ERR3063486 is read data of *Caenorhabditis elegans* mutant.  
-  ERR3063487 is read data of *Caenorhabditis elegans* wild-type.  
+  ERR3063486 is read data of *Caenorhabditis elegans* wild-type.  
+  ERR3063487 is read data of *Caenorhabditis elegans* mutant.  
   BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze local file,  
   % mkdir mydata1  
@@ -75,7 +88,9 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl bidirectional.pl mydata1 control reference  
 - % perl bidirectional.pl target control reference  
   For example,  
-  % perl bidirectional.pl ERR3063487 default WBcel235  
+  % perl bidirectional.pl ERR3063487 default WBcel235
+  or
+  % qsub target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
    After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.indel is list of structural variation.  
    ERR3063487.bi.snp is list of SNPs.  
@@ -88,50 +103,39 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
   retruns 'M' or 'H' marked SNPs and indels of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
-  % perl search.pl target chr position  
-  e.g. % perl search.pl ERR3063487 II 948033  
+  % perl search.pl target chr position
+  For example,  
+  % perl search.pl ERR3063487 II 948033  
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
 - Run without arguments, help for script will be shown.  
+- ERR3063487.indel is list of structural variations.  
+  ERR3063487.bi.snp is list of SNPs.  
+  ERR3063487.bi.vcf is the vcf file for SNPs.  
+  Quality score in vcf file is fixed to 1000.  
+  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
+  Please check quarity of polymorphism with depth (DP) in vcf file.  
 - I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
   I found data set of *Caenorhabditis elegans.*  
   https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
 ## Simple instruction for kmer method
-- % perl kmer.pl target control reference  
-- % perl kmer.pl ERR3063487 ERR3063486 WBcel235  
+- Making reference data is same as the bidirectional method.  
+- % perl kmer.pl target control reference
+  For example,  
+  % perl kmer.pl ERR3063487 ERR3063486 WBcel235  
 - if you want to run with computer cluster,  
-  % perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235
+  % perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235   
   ERR3063487 specific SNPs will be detected.  
 - if you want to detect SNPs against reference genome,  
   % perl kmer.pl ERR3063487 default WBcel235  
--  ERR3063487.kmer.snp is list of SNPs.  
-   ERR3063487.kmer.vcf is the vcf file for SNPs.  
-   Because our methods do not use aligner software, *e.g.* bwa, quality score can not be calculated.  
-   Quality score in vcf file is fixed to 1000. 
-
-
-## Making reference data sets
-- % perl mkref.pl  
-  Without specify reference, reference name and description are listed.  
-  If you want to make new reference, add the information about the reference to 'config' file.  
-  For example,  
-  % perl mkref.pl hg38  
-    Data set of human genome hg38 will be made. It takes about two days.  
-  % perl mkref.pl GRCm38  
-    Data set of mouse genome GRCm38 will be made. It takes about two days.  
-  % perl mkref.pl dmel626  
-    Data set of *Drosophila melanogaster* r6.26 will be made. It takes one hour.  
-  % perl mkref.pl IRGSP1.0  
-    Data set of rice (*Olyza sativa* L. cv. Nipponbare) will be made.  
-  % perl mkref.pl TAIR10  
-    Data set of *Arabidopsis thaliana* will be made.  
-- To run by computer cluster,  
-  % qsub -v target=target mkref.pl  
-  For example,    
-  % qsub -v target=hg38 mkref.pl  
+- ERR3063487.kmer.snp is list of SNPs.  
+  ERR3063487.kmer.vcf is the vcf file for SNPs.   
+  Quality score in vcf file is fixed to 1000.  
+  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
+  Please check quarity of polymorphism with depth (DP) in vcf file.  
 
 ## Examples of result
 A part of SNP list of bidirectional method is  

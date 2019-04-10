@@ -13,11 +13,17 @@ $usage = '
      run  perl qsub_bidirectional.pl target control reference tmpdir
      e.g. perl qsub_bidirectional.pl SRR8181712 default TAIR10 /mnt/ssd
 
-     if you want to compare between target and control samples,
+     If you want to compare between target and control samples,
      specify control, e.g., SRR1581142.
+     e.g. perl qsub_bidirectional.pl SRR8181712 SRR1581142 TAIR10 /mnt/ssd
      Otherwise, set default for control, reference data will be used as contol.
 
      This script is for coumputer cluster.
+
+     If each computer node have a local disk, specify the tmpdir to the local
+     disk is recommended. High speed disk like as SSD for local disk is prefered.
+     The size of local disk should be 1TB or more for analysis of human genome.
+     If tmpdir is not specified, target dir will be used for tmpdir.
 
      Before run the script, downloading target reads and reference genome data
      are required.
@@ -41,7 +47,7 @@ $usage = '
      and then run perl qsub_bidirectional.pl mydata deault reference
                or perl qsub_bidirectional.pl mydata mycontrol reference
 
-Author: Akio Miyao <miyao@affrc.go.jp>
+     Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 

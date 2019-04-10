@@ -76,7 +76,7 @@ $usage";
     if (! -e $ref_path){
 	system("mkdir $ref_path");
     }
-    system("$rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
+    system("$rsync -a $cwd/$ref/ $ref_path");
     $workdir = "$tmpdir/$target";
     if (-d $workdir){
 	system("rm -r $workdir");
@@ -111,6 +111,18 @@ while(<IN>){
 }
 close(IN);
 
+if ($chr[0] eq ""){
+    opendir(REF, $ref_path);
+    foreach(sort readdir(REF)){
+	if (/^chr/){
+	    chomp;
+	    ($chr = $_) =~ s/^chr//;
+	    push(@chr, $chr);
+	}
+    }
+    closedir(REF);
+}
+
 foreach $i (@chr){
     my $chr_file = "$ref_path/chr$i";
     open (IN, $chr_file);
@@ -125,43 +137,47 @@ while(<IN>){
     last;
 }
 close(IN);
+system("mkdir tmpdata");
+
+if ($type eq "vcf"){
+    open(IN,  "$cwd/$target/$target.vcf");
+}elsif ($type eq "bi"){
+    open(IN, "$cwd/$target/$target.snp.$number");
+}elsif ($type eq "kmer"){
+    open(IN, "$cwd/$target/$target.map.$number");
+}
+while(<IN>){
+    @row = split;
+    $row[0] =~ s/^chr//i;
+    $row[0] += 0 if $row[0] =~ /^[0-9]+$/;
+    if ($pre ne $row[0]){
+	open(OUT, "> tmpdata/$row[0]");
+	$detected{$row[0]} = 1;
+    }
+    print OUT;
+    $pre = $row[0];
+}
+close(IN);
+close(OUT);
 
 &openTag;
-foreach $chr (@chr){
+foreach $chr (sort keys %detected){
     my @dat = ();
-    if ($type eq "vcf"){
-	open(IN,  "$cwd/$target/$target.vcf");
-	while(<IN>){
-	    chomp;
-	    @row = split;
-	    $row[0] =~ s/chr//g;
-	    $row[0] += 0;
+    open(IN,  "tmpdata/$chr");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($type eq "vcf"){
 	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
 		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
 	    }
-	}
-	close(IN);
-    }elsif ($type eq "bi"){
-	open(IN, "$cwd/$target/$target.snp.$number");
-	while(<IN>){
-	    chomp;
-	    @row = split; 
+	}elsif ($type eq "bi" or $type eq "kmer"){
 	    if($row[0] eq $chr){
 		push (@dat, $_);
 	    }
 	}
-	close(IN);
-    }elsif ($type eq "kmer"){
-	open(IN, "$cwd/$target/$target.map.$number");
-	while(<IN>){
-	    chomp;
-	    @row = split; 
-	    if($row[0] eq $chr){
-		push (@dat, $_);
-	    }
-	}
-	close(IN);
     }
+    close(IN);
     for ($j = 0; $j < $#dat; $j++){
 	if ($type eq "vcf"){
 	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
@@ -235,41 +251,23 @@ while(<IN>){
 close(IN);
 
 &openTag;
-foreach $chr (@chr){
+foreach $chr (sort keys %detected){
     my @dat = ();
-    if ($type eq "vcf"){
-	open(IN,  "$cwd/$target/$target.vcf");
-	while(<IN>){
-	    chomp;
-	    @row = split;
-	    $row[0] =~ s/chr//g;
-	    $row[0] += 0;
+    open(IN,  "tmpdata/$chr");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($type eq "vcf"){
 	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
 		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
 	    }
-	}
-	close(IN);
-    }elsif($type eq "bi"){
-	open(IN,  "$cwd/$target/$target.snp.$number");
-	while(<IN>){
-	    chomp;
-	    @row = split; 
+	}elsif ($type eq "bi" or $type eq "kmer"){
 	    if($row[0] eq $chr){
 		push (@dat, $_);
 	    }
 	}
-	close(IN);
-    }elsif ($type eq "kmer"){
-	open(IN, "$cwd/$target/$target.map.$number");
-	while(<IN>){
-	    chomp;
-	    @row = split; 
-	    if($row[0] eq $chr){
-		push (@dat, $_);
-	    }
-	}
-	close(IN);
     }
+    close(IN);
     for ($j = 0; $j < $#dat; $j++){
 	if ($type eq "vcf"){
 	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
@@ -309,6 +307,8 @@ foreach $chr (@chr){
 }
 &closeTag;
 &sortTag;
+
+system("rm -r tmpdata");
 
 system("cat *.snp.sort.$number | join $control - | cut -d ' ' -f 2- > control.snp.$number");
 &sortWait("control.snp.$number");
@@ -405,7 +405,7 @@ while(<IN>){
     }
 }
 close(OUT);
-
+exit;
 if ($tmpdir ne "."){
     if ($type eq "vcf"){
 	system("cp $target.vcf.verify $cwd/$target");

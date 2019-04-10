@@ -10,14 +10,17 @@
 $usage = '
      split_indel.pl - split data of align.pl output. 
 
-e.g. perl split_indel.pl target reference
+     For example,
+     perl split_indel.pl target reference
      perl split_indel ERR194147 hg38
 
      qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_indel.pl
-
+ 
      tmpdir is optional.
+     tmpdir should be specified to a fast local disk (e.g. SSD) in each node.
+     If tmpdir is not specified, target dir will be used for tmpdir.
 
-Author: Akio Miyao <miyao@affrc.go.jp>
+     Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
@@ -71,6 +74,18 @@ while(<IN>){
 }
 close(IN);
 
+if ($chr[0] eq ""){
+    opendir(REF, "$cwd/$ref");
+    foreach(sort readdir(REF)){
+	chomp;
+	if (/^chr/){
+	    ($chr = $_) =~ s/^chr//; 
+	    push(@chr, $chr);
+	}
+    }
+    closedir(REF);
+}
+
 open(IN, "cat $workdir/$target.aln.*|");
 open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $tmpdir/$target.indel.tmp");
 while(<IN>){
@@ -93,21 +108,25 @@ while(<IN>){
 close(IN);
 close(OUT);
 
-system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
-foreach $chr (@chr){
-    print ERR "$chr\n";
-    open(IN, "$tmpdir/$target.indel.tmp");
-    open(OUT, "|sort $sort_opt -k 2 -n -T $tmpdir >> $tmpdir/$target.indel.sort");
-    while(<IN>){
-	@row = split;
-	if ($row[1] eq $chr){
-	    print OUT;
-	}
+system("mkdir $tmpdir/indel.tmp");
+open(IN, "$tmpdir/$target.indel.tmp");
+while(<IN>){
+    @row = split;
+    if ($prev ne $row[1]){
+	open(OUT, "> $tmpdir/indel.tmp/$row[1]");
     }
-    close(IN);
-    close(OUT);
+    print OUT;
+    $prev = $row[1];
+    $detected{$row[1]} =1
 }
-system("rm $tmpdir/$target.indel.tmp");
+close(IN);
+close(OUT);
+
+system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
+foreach $chr (sort keys %detected){
+    system("sort $sort_opt -k 2 -n -T $tmpdir $tmpdir/indel.tmp/$chr >> $tmpdir/$target.indel.sort");
+}
+system("rm -r $tmpdir/indel.tmp $tmpdir/$target.indel.tmp");
 
 while(1){
     $mtime = (stat("$tmpdir/$target.indel.sort"))[9];

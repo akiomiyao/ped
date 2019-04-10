@@ -10,21 +10,17 @@
 $usage = "
      mkref.pl - script for making reference data. 
 
-e.g. perl mkref.pl target
+     For example,
+     perl mkref.pl target
      perl mkref.pl TAIR10
 
-For computer cluster,
+     For computer cluster,
      qsub -v target=target mkref.pl
      qsub -v target=hg38 mkref.pl
 
-Author: Akio Miyao <miyao\@affrc.go.jp>
+     Currently, target listed below are available.
 
-Currently, target listed below are available.
-
-Customized reference can be made by adding or
-modifiing the config file.
-
-Name\tDescription
+     Target Name   Description
 ";
 
 $cwd = `pwd`;
@@ -41,8 +37,10 @@ if ($uname eq "FreeBSD"){
 
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
+    $file   = $ARGV[1];
 }elsif ($ENV{target} ne ""){
     $target    = $ENV{target};
+    $file      = $ENV{file};
     $cwd       = $ENV{PBS_O_WORKDIR};
 }
 
@@ -75,8 +73,29 @@ close(IN);
 if ($target eq ""){
     print $usage;
     foreach (sort keys %desc){
-	print "$_\t$desc{$_}\n"
+	$name = $_ . "          ";
+	$name = substr($name, 0, 14);
+	print "     " . $name . "$desc{$_}\n";
     }
+    print "
+     Customized reference can be made by adding or modifiing the config file.
+
+     If you want to make reference data which is not listed in config file,
+     perl mkref.pl taget file_name
+     qsub -v target=RefBeet12,file=RefBeet-1.2.fna
+
+     Before run the script,
+     mkdir ./target
+     cp fasta_file ./target
+
+     For example,
+     mkdir ./RefBeet12
+     cp somewhere/RefBeet-1.2.fna ./RefBeet12
+     perl mkref.pl RefBeet12 RefBeet-1.2.fna
+
+     Author: Akio Miyao <miyao\@affrc.go.jp>
+
+";
     exit;
 }
 
@@ -86,21 +105,25 @@ if (! -d "$cwd/$target"){
 
 chdir "$cwd/$target";
 
-@row = split('/', $wget{$target});
-$remote_file = $row[$#row];
-if (! -e $remote_file){
-    system("$wget -o wget-log $wget{$target}");
+if ($file eq ""){
+    @row = split('/', $wget{$target});
+    $remote_file = $row[$#row];
+    if (! -e $remote_file){
+	system("$wget -o wget-log $wget{$target}");
+    }
+    &mkChr;
+}else{
+    &mkChrFromFile($file);
 }
 
-&mkChr;
 &mk20;
 &mkControlRead;
 
 sub mkChr{
     my @file = split('/', $wget{$target});
-    my $file = $file[$#file];
+    my$file = $file[$#file];
     my $i = 0;
-    print "Making chromosome file\n";
+    print "Making chromosome file from $file.\n";
     if ($target eq "hg38"){
 	open(IN, "zcat $file|");
 	while(<IN>){
@@ -125,8 +148,12 @@ sub mkChr{
 	}
 	close(IN);
 	close(OUT);
-    }else{	
-	open(IN, "zcat $file|");
+    }else{
+	if ($file =~ /gz$|bz2$/){
+	    open(IN, "zcat $file|");
+	}else{
+	    open(IN, $file);
+	}
 	while(<IN>){
 	    chomp;
 	    if (/^>/){
@@ -143,6 +170,38 @@ sub mkChr{
 	close(IN);
 	close(OUT);
     }
+}
+
+sub mkChrFromFile{
+    my $file = shift;
+    if ($file eq ""){
+	my @file = split('/', $wget{$target});
+	$file = $file[$#file];
+    }
+    print "Making chromosome file\n";
+    if ($file =~ /gz$|bz2$/){
+	open(IN, "zcat $file|");
+    }else{
+	open(IN, $file);
+    }
+    while(<IN>){
+	chomp;
+	if (/^>/){
+	    close(OUT);
+	    $ref = (split)[0];
+	    $ref =~ s/>//;
+	    $ref =~ s/^chr//i;
+	    $ref += 0 if $ref =~ /^[0-9]*$/;
+	    push(@chr, $ref) if ! $chr_flag;
+	    $ref = "chr$ref";
+	    open(OUT, "> $ref");
+	}else{
+	    y/a-z/A-Z/;
+	    print OUT;
+	}
+    }
+    close(IN);
+    close(OUT);
 }
 
 sub mk20{

@@ -73,7 +73,7 @@ $usage";
     if (! -e $ref_path){
 	system("mkdir $ref_path");
     }
-    system("$rsync -a $cwd/$ref/$ref.sort_uniq $cwd/$ref/chr* $ref_path");
+    system("$rsync -a $cwd/$ref/ $ref_path");
     $workdir = "$tmpdir/$target";
     if (-d $workdir){
 	system("rm -r $workdir");
@@ -107,6 +107,18 @@ while(<IN>){
     }
 }
 close(IN);
+
+if ($chr[0] eq ""){
+    opendir(REF, $ref_path);
+    foreach(sort readdir(REF)){
+	if (/^chr/){
+	    chomp;
+	    ($chr = $_) =~ s/^chr//;
+	    push(@chr, $chr);
+	}
+    }
+    closedir(REF);
+}
 
 foreach $i (@chr){
     my $chr_file = "$ref_path/chr$i";
@@ -449,25 +461,31 @@ if ( -e "$cwd/$target/$target.indel.verify.$number"){
     system("rm $cwd/$target/$target.indel.verify.$number");
 }
 
-foreach $chr (@chr){
-    next if ! $chr_exist{$chr};
-    open(IN, "$target.indel_result.$number");
+system("mkdir indel_result.$number");
+
+open(IN, "$target.indel_result.$number");
+while(<IN>){
+    @row = split;
+    if($pre ne $row[0]){
+	open(OUT, "> indel_result.$number/$row[0]");
+	$detected{$row[0]} = 1;
+    }
+    print OUT;
+    $pre = $row[0];
+}
+close(IN);
+close(OUT);
+
+system("rm $cwd/$target/$target.indel.verify.$number") if -e "$cwd/$target/$target.indel.verify.$number";
+foreach $chr (sort keys %detected){
     if ($ftype eq "vcf"){
-	open(OUT, "|sort -T . $sort_opt -k 2 -n >> $cwd/$target/$target.indel_vcf.verify.$number");
+	system( "sort -T . $sort_opt -k 2 -n indel_result.$number/$chr >> $cwd/$target/$target.indel_vcf.verify.$number");
     }else{
-	open(OUT, "|sort -T . $sort_opt -k 2 -n >> $cwd/$target/$target.indel.verify.$number");
+	system("sort -T . $sort_opt -k 2 -n indel_result.$number/$chr >> $cwd/$target/$target.indel.verify.$number");
     }
-    while(<IN>){
-	@row = split;
-	if ($row[0] eq $chr){
-	    print OUT;
-	}
-    }
-    close(IN);
-    close(OUT);
 }
 
-system("rm $target.indel_result.$number");
+system("rm -r indel_result.$number $target.indel_result.$number");
 
 if ($tmpdir ne "."){
     system("rm -r $workdir");

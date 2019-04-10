@@ -10,18 +10,19 @@
 $usage = '
      align.pl - bi-directional alignment program. 
 
-e.g. perl align.pl target reference margin tmpdir
+     For example,
+     perl align.pl target reference margin tmpdir
 
      qsub -v target=ERR194147,ref=hg38,margin=5,tmpdir=/mnt/ssd align.pl
 
-     margin and tmpdir can be ommitted.
+     margin and tmpdir is optional, can be ommitted.
 
-If each computer node have a local disk, specify the tmpdir to the local
-disk is recommended. High speed disk like as SSD for local disk is prefered.
-The size of local disk should be 1TB or more for analysis of human genome.
-Use of local disk for temporary working directory in each node is recommended. 
+     If each computer node have a local disk, specify the tmpdir to the local
+     disk is recommended.
+     High speed disk like as SSD for local disk is prefered.
+     The size of local disk should be 1TB or more for analysis of human genome.
 
-Author: Akio Miyao <miyao@affrc.go.jp>
+     Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
@@ -97,6 +98,18 @@ while(<IN>){
     }
 }
 close(IN);
+
+if ($chr[0] eq ""){
+    opendir(REF, $ref_path);
+    foreach(readdir(REF)){
+	chomp;
+	if (/^chr/){
+	    ($chr = $_) =~ s/^chr//; 
+	    push(@chr, $chr);
+	}
+    }
+    closedir(REF);
+}
 
 foreach $i (@chr){
     my $chr_file = "$ref_path/chr$i";

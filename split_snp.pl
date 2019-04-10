@@ -10,14 +10,16 @@
 $usage = '
      split_snp.pl - split data of align.pl output. 
 
-e.g. perl split_snp.pl target ref
+     For example,
+     perl split_snp.pl target ref
      perl split_snp ERR194147 hg38
 
      qsub -v target=ERR194147,ref=hg38,tmpdir=/mnt/ssd split_snp.pl
 
-     tmpdir is optional.
+     tmpdir is fast local disk, e.g. SSD, in nodes.
+     If tmpdir is not specified, target dir will be used for tmpdir.
 
-Author: Akio Miyao <miyao@affrc.go.jp>
+     Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
@@ -71,6 +73,18 @@ while(<IN>){
 }
 close(IN);
 
+if ($chr[0] eq ""){
+    opendir(REF, "$cwd/$ref");
+    foreach(sort readdir(REF)){
+	chomp;
+	if (/^chr/){
+	    ($chr = $_) =~ s/^chr//; 
+	    push(@chr, $chr);
+	}
+    }
+    closedir(REF);
+}
+
 open(IN, "cat $workdir/$target.aln.*|");
 open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $tmpdir/$target.aln.sort");
 while(<IN>){
@@ -113,21 +127,28 @@ while(<IN>){
 	}
     }
 }
+close(IN);
+close(OUT);
+
+system("mkdir $tmpdir/snp.tmp");
+open(IN, "$tmpdir/$target.snp.tmp");
+while(<IN>){
+    @row = split;
+    if ($prev ne $row[0]){
+	open(OUT, "> $tmpdir/snp.tmp/$row[0]");
+	$detected{$row[0]} = 1;
+    }
+    print OUT;
+    $prev = $row[0];
+}
+close(IN);
+close(OUT);
 
 system("rm $workdir/$target.snp") if -e "$workdir/$target.snp";
-foreach $chr (@chr){
-    open(IN, "$tmpdir/$target.snp.tmp");
-    open(OUT, "|sort -k 2 -n $sort_opt -T $tmpdir >> $tmpdir/$target.snp");
-    while(<IN>){
-	@row = split;
-	if ($row[0] eq $chr){
-	    print OUT;
-	}
-    }
-    close(IN);
-    close(OUT);
+foreach $chr (sort keys %detected){
+    system("sort -k 2 -n $sort_opt -T $tmpdir $tmpdir/snp.tmp/$chr>> $tmpdir/$target.snp");
 }
-system("rm $tmpdir/$target.snp.tmp");
+system("rm -r $tmpdir/snp.tmp/ $tmpdir/$target.snp.tmp");
 
 while(1){
     $mtime = (stat("$tmpdir/$target.snp"))[9];
