@@ -203,19 +203,19 @@ X       154687353       AAAAAAAAAAGTGTTAGGC     C       C       CT      f       
 
 Column 1: Chromosome number
 Column 2: Position of SNP
-Column 3: (*k*-1)-mer (*k* = 20)
+Column 3: (k-1)-mer (k = 20)
 Column 4: Base of reference at the position of SNP
 Column 5: Base of control
 Column 6: Base of target
-Column 7: Direction of *k*-mer sequence on the reference
-Column 8: Number of *k*-mer with A at the end of *k*-mer in the control
-Column 9: Number of *k*-mer with C at the end of *k*-mer in the control
-Column 10: Number of *k*-mer with G at the end of *k*-mer in the control
-Column 11: Number of *k*-mer with T at the end of *k*-mer in the control
-Column 12: Number of *k*-mer with A at the end of *k*-mer in the target
-Column 13: Number of *k*-mer with C at the end of *k*-mer in the target
-Column 14: Number of *k*-mer with G at the end of *k*-mer in the target
-Column 15: Number of *k*-mer with T at the end of *k*-mer in the target
+Column 7: Direction of k-mer sequence on the reference
+Column 8: Number of k-mer with A at the end of k-mer in the control
+Column 9: Number of k-mer with C at the end of k-mer in the control
+Column 10: Number of k-mer with G at the end of k-mer in the control
+Column 11: Number of k-mer with T at the end of k-mer in the control
+Column 12: Number of k-mer with A at the end of k-mer in the target
+Column 13: Number of k-mer with C at the end of k-mer in the target
+Column 14: Number of k-mer with G at the end of k-mer in the target
+Column 15: Number of k-mer with T at the end of k-mer in the target
 Column 16: Number of reads in the control sort_uniq file with control type base
 Column 17: Number of reads in the control sort_uniq file with target type base
 Column 18: Number of reads in the target sort_uniq file with control type base
