@@ -51,15 +51,15 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
 - At first, set up reference data is required.  
   % perl mkref.pl reference  
   For example,  
-  % perl mkref.pl WBcel235
-  or
-  % qsub -v target=WBcel235 mkref.pl
+  % perl mkref.pl WBcel235  
+  or  
+  % qsub -v target=WBcel235 mkref.pl  
   Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
   If run without argument, help and suported reference will be listed.  
-  If you want to new reference, add the reference information to config file.  
-  Format is described in the comment in config file.
-  To make reference of human,
-  % perl mkref.pl hg38
+  If you want to new reference, add the reference information to config file.    
+  Format is described in the comment in config file.  
+  To make reference of human,  
+  % perl mkref.pl hg38  
   It takes two days, because hg38 is huge.  
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
@@ -86,8 +86,8 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl bidirectional.pl mydata1 control reference  
 - % perl bidirectional.pl target control reference  
   For example,  
-  % perl bidirectional.pl ERR3063487 default WBcel235
-  or
+  % perl bidirectional.pl ERR3063487 default WBcel235  
+  or  
   % qsub target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
    After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.indel is list of structural variation.  
