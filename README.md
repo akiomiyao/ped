@@ -107,10 +107,10 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
-  qsub_bidirectional.pl will work with Torque installed default settings.
+  qsub_bidirectional.pl will work with Torque installed default settings. 
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
-- Run without arguments, help for script will be shown.  
+  Run without arguments, help for script will be shown.  
 - ERR3063487.indel is list of structural variations.  
   ERR3063487.bi.snp is list of SNPs.  
   ERR3063487.bi.vcf is the vcf file for SNPs.  
@@ -122,7 +122,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
-## Simple instruction for kmer method
+## Simple instruction for *k*-mer method
 - Making reference data is same as the bidirectional method.  
 - % perl kmer.pl target control reference
   For example,  
@@ -187,7 +187,7 @@ Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
 
-- A part of SNP result by kmer method is
+- A part of SNP result by *k*-mer method is
 ```
 X       54009891        AAAAAAAAAAGTGGCTCTT     T       T       GT      f       0       0       0       40      1       1       17      21      50      0       12      0       
 6       112904084       AAACGACACTTTTTTTTTT     C       C       AC      r       0       0       40      0       0       1       31      22      50      0       30      0       
@@ -203,19 +203,19 @@ X       154687353       AAAAAAAAAAGTGTTAGGC     C       C       CT      f       
 
 Column 1: Chromosome number
 Column 2: Position of SNP
-Column 3: (k-1)-mer (k = 20)
+Column 3: (*k*-1)-mer (*k* = 20)
 Column 4: Base of reference at the position of SNP
 Column 5: Base of control
 Column 6: Base of target
-Column 7: Direction of k-mer sequence on the reference
-Column 8: Number of k-mer with A at the end of k-mer in the control
-Column 9: Number of k-mer with C at the end of k-mer in the control
-Column 10: Number of k-mer with G at the end of k-mer in the control
-Column 11: Number of k-mer with T at the end of k-mer in the control
-Column 12: Number of k-mer with A at the end of k-mer in the target
-Column 13: Number of k-mer with C at the end of k-mer in the target
-Column 14: Number of k-mer with G at the end of k-mer in the target
-Column 15: Number of k-mer with T at the end of k-mer in the target
+Column 7: Direction of *k*-mer sequence on the reference
+Column 8: Number of *k*-mer with A at the end of *k*-mer in the control
+Column 9: Number of *k*-mer with C at the end of *k*-mer in the control
+Column 10: Number of *k*-mer with G at the end of *k*-mer in the control
+Column 11: Number of *k*-mer with T at the end of *k*-mer in the control
+Column 12: Number of *k*-mer with A at the end of *k*-mer in the target
+Column 13: Number of *k*-mer with C at the end of *k*-mer in the target
+Column 14: Number of *k*-mer with G at the end of *k*-mer in the target
+Column 15: Number of *k*-mer with T at the end of *k*-mer in the target
 Column 16: Number of reads in the control sort_uniq file with control type base
 Column 17: Number of reads in the control sort_uniq file with target type base
 Column 18: Number of reads in the target sort_uniq file with control type base
