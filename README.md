@@ -101,12 +101,15 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
   retruns 'M' or 'H' marked SNPs and indels of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
-  % perl search.pl target chr position
+  % perl search.pl target chr position  
   For example,  
   % perl search.pl ERR3063487 II 948033  
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
+  qsub_bidirectional.pl will work with Torque installed default settings.
+  If output format of qsub and qstat are customized, modification of the
+  script will be required.  
 - Run without arguments, help for script will be shown.  
 - ERR3063487.indel is list of structural variations.  
   ERR3063487.bi.snp is list of SNPs.  
