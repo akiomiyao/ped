@@ -63,6 +63,10 @@ $tmpdir  = $ARGV[3];
 
 $control = $ref if $control eq "default";
 
+$target  =~ s/\/$//;
+$control =~ s/\/$//;
+$ref     =~ s/\/$//;
+
 if (! -e "$target/$target.sort_uniq"){
     report("Making $target.sort_uniq.");
     $qsub = "-v target=$target sort_uniq.pl";
@@ -70,12 +74,13 @@ if (! -e "$target/$target.sort_uniq"){
     &doQsub($qsub);
 }
 
-if (! -e "$control/$control.sort_uniq"){
+if (! -e "$control/$control.sort_uniq" and $ARGV[1] ne "default"){
     report("Making $control.sort_uniq.");
     $qsub = "-v target=$control sort_uniq.pl";
     @job = ();
     &doQsub($qsub);
 }
+sleep 2;
 &holdUntilJobEnd;
 
 &sortWait("$target/$target.sort_uniq");

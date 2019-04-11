@@ -55,6 +55,10 @@ $ref     = $ARGV[2];
 
 $control = $ref if $control eq "default";
 
+$target  =~ s/\/$//;
+$control =~ s/\/$//;
+$ref     =~ s/\/$//;
+
 if (! -e "$target/$target.sort_uniq"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
@@ -62,11 +66,11 @@ if (! -e "$target/$target.sort_uniq"){
 
 &sortWait("$target/$target.sort_uniq");
 
-if (! -e "$control/$control.sort_uniq"){
+if (! -e "$control/$control.sort_uniq" and $ARGV[1] ne "default"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
-
+sleep 2;
 &sortWait("$control/$control.sort_uniq");
 
 report("Aligning of $target sequence to $ref genome. margin = 5");
