@@ -109,6 +109,7 @@ if ($file eq ""){
     @row = split('/', $wget{$target});
     $remote_file = $row[$#row];
     if (! -e $remote_file){
+	&report("Downloading $wget{$target}");
 	system("$wget -o wget-log $wget{$target}");
     }
     &mkChr;
@@ -123,7 +124,7 @@ sub mkChr{
     my @file = split('/', $wget{$target});
     my$file = $file[$#file];
     my $i = 0;
-    print "Making chromosome file from $file.\n";
+    &report("Making chromosome file from $file.");
     if ($target eq "hg38"){
 	open(IN, "zcat $file|");
 	while(<IN>){
@@ -178,7 +179,7 @@ sub mkChrFromFile{
 	my @file = split('/', $wget{$target});
 	$file = $file[$#file];
     }
-    print "Making chromosome file\n";
+    &report("Making chromosome file.");
     if ($file =~ /gz$|bz2$/){
 	open(IN, "zcat $file|");
     }else{
@@ -205,7 +206,7 @@ sub mkChrFromFile{
 }
 
 sub mk20{
-    print "Making 20mer position file.\n";
+    &report("Making 20mer position file.");
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -219,7 +220,7 @@ sub mk20{
     }
     
     foreach $i (@chr){
-	print "Processing Chr$i\n";
+	&report("Processing Chr$i");
 	&mk20mer($i);
     }
     
@@ -249,10 +250,10 @@ sub mk20{
 }
 
 sub mkControlRead{
-    print "Making Control Read.\n";
+    &report("Making Control Read.");
     open(OUT, "|sort -T . $sort_opt |uniq > $target.sort_uniq");
     for(@chr){
-	print "Processing Chr$_\n";
+	&report("Processing Chr$_");
 	open(IN, "chr$_");
 	$data = <IN>;
 	close(IN);
@@ -267,12 +268,15 @@ sub mkControlRead{
 	    $i += 2;
 	}
     }
+    close(OUT);
+    &sortWait("$target.sort_uniq");
 }
 
 sub mkUniq{
     my $tag = shift;
-    print "Making ref20_uniq.$tag.gz\n";
+    &report("Making ref20_uniq.$tag.gz");
     system("sort -T . $sort_opt ref20.$tag > ref20_sort.$tag");
+    &sortWait("ref20_uniq.$tag");
     open(OUT, "|gzip -f > ref20_uniq.$tag.gz");
     open(IN, "ref20_sort.$tag");
     while(<IN>){
@@ -288,7 +292,7 @@ sub mkUniq{
     }
     close(IN);
     close(OUT);
-    sleep 1;
+    &sortWait("ref20_uniq.$tag.gz");
     system("rm ref20.$tag ref20_sort.$tag");
 }
 
@@ -333,4 +337,22 @@ sub complement{
         }
     }
     return $out;
+}
+
+sub report{
+    my $message = shift;
+    my $now = `date`;
+    chomp($now);
+    print "$now $message\n";
+}
+
+sub sortWait{
+    my $file = shift;
+    while(1){
+        $mtime = (stat($file))[9];
+        if (time > $mtime + 2){
+            return;
+        }
+        sleep 1;
+    }
 }
