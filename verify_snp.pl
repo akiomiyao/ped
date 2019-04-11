@@ -405,7 +405,7 @@ while(<IN>){
     }
 }
 close(OUT);
-exit;
+
 if ($tmpdir ne "."){
     if ($type eq "vcf"){
 	system("cp $target.vcf.verify $cwd/$target");
