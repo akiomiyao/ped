@@ -144,7 +144,7 @@ if ($type eq "vcf"){
 }elsif ($type eq "bi"){
     open(IN, "$cwd/$target/$target.snp.$number");
 }elsif ($type eq "kmer"){
-    open(IN, "$cwd/$target/$target.map.$number");
+    open(IN, "sort $cwd/$target/$target.map.$number |");
 }
 while(<IN>){
     @row = split;
