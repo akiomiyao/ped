@@ -100,7 +100,7 @@ sub standalone{
 	open(IN, "tmp/$input_file.$j");
 	$number = "000$j";
 	$number = substr($number, length($number) -4, 4);
-	print "$input_file.$j / $file_count is processing.\n";
+	&report("$input_file.$j / $file_count is processing.");
 	$reads = 0;
 	open(OUT, "|sort $sort_opt -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
 	while(<IN>){
@@ -188,4 +188,11 @@ sub merge{
 	    system("rm $file[0] $file[1]");
 	}
     }
+}
+
+sub report{
+    my $message = shift;
+    my $now = `date`;
+    chomp($now);
+    print "$now $message\n";
 }

@@ -107,7 +107,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
-  qsub_bidirectional.pl will work with Torque installed default settings. 
+  qsub_bidirectional.pl will work with Torque installed default settings.  
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
   Run without arguments, help for script will be shown.  
