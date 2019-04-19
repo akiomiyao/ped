@@ -47,7 +47,7 @@ perl will be installed to /usr/local/bin/
 \# ln -s /usr/local/bin/perl5 /usr/bin/perl  
 will be required, if you run the PED script on computer cluster with FreeBSD.
     
-## Simple instruction for bidirectional method  
+## Instruction for bidirectional method  
 - At first, set up reference data is required.  
   % perl mkref.pl reference  
   For example,  
@@ -56,7 +56,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   % qsub -v target=WBcel235 mkref.pl  
   Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
   If run without argument, help and suported reference will be listed.  
-  If you want to new reference, add the reference information to config file.    
+  If you want to new reference, add the reference information to the config file.    
   Format is described in the comment in config file.  
   To make reference of human,  
   % perl mkref.pl hg38  
@@ -107,7 +107,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
-  qsub_bidirectional.pl will work with Torque installed default settings.  
+  qsub_bidirectional.pl will work with Torque installed with default settings.  
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
   Run without arguments, help for script will be shown.  
@@ -122,7 +122,7 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
-## Simple instruction for *k*-mer method
+## Instruction for *k*-mer method
 - Making reference data is same as the bidirectional method.  
 - % perl kmer.pl target control reference
   For example,  
@@ -137,6 +137,17 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
   Please check quarity of polymorphism with depth (DP) in vcf file.  
+- The *k*-mer method is able to detect polymorphisms by direct comparison between two short read data.  
+  If you want to SNP detection between target and control without reference data,  
+  run script without reference specification.  
+  For example,  
+  % kmer.pl ERR3063487 ERR3063486  
+  or  
+  % perl qsub_kmer.pl ERR3063487 ERR3063486  
+  ERR3063487.kmer is list of polymorphic edge.  
+  SNPs tagged with first 19-mer will be used for genetic analysis,  
+  such as segregation analysis.  
+  The 19-mer can be used for identifire (name) for analysis.  
 
 ## Examples of result
 A part of SNP list of bidirectional method is  
