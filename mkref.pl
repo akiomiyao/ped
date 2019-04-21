@@ -123,6 +123,7 @@ if ($file eq ""){
 sub mkChr{
     my @file = split('/', $wget{$target});
     my$file = $file[$#file];
+    $file =~ s/\ +$//g;
     my $i = 0;
     &report("Making chromosome file from $file.");
     if ($target eq "hg38"){

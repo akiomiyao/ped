@@ -33,7 +33,7 @@ TAIR10	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-41/fasta/arabidopsis
 TAIR10	chromosome	1	5
 
 GRCm38	description	Genome Reference Consortium Mouse Build 38
-GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna.toplevel.fa.gz  
+GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna.toplevel.fa.gz
 GRCm38	chromosome	1	19	X	Y
 
 Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2
