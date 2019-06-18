@@ -277,7 +277,7 @@ sub mkUniq{
     my $tag = shift;
     &report("Making ref20_uniq.$tag.gz");
     system("sort -T . $sort_opt ref20.$tag > ref20_sort.$tag");
-    &sortWait("ref20_uniq.$tag");
+    &sortWait("ref20_sort.$tag");
     open(OUT, "|gzip -f > ref20_uniq.$tag.gz");
     open(IN, "ref20_sort.$tag");
     while(<IN>){
