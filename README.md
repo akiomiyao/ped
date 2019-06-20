@@ -425,7 +425,9 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 Version 1.0
 
 ## Citing PED
-Cite this article as: TBA
+Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data  
+Akio Miyao, Ph.D.; Jianyu Song Kiyomiya; Keiko Iida; Koji Doi; Hiroshi Yasue  
+BMC Bioinformatics (forthcoming).
 
 ## License
 NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0
