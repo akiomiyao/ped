@@ -435,7 +435,7 @@ NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0
 This license is for 'Non-Commercial' use of software for polymorphic edge detection (PED)
 
 1. Scientific use of PED is permitted free of charge.
-1. Modification of PED is only permitted to the person of downloaded and his colleagues.
+1. Modification of PED is only permitted to the person of downloaded and his/her colleagues.
 1. The National Agriculture and Food Research Organization (hereinafter referred to as NARO) does not guarantee that defects, errors or malfunction will not occur with respect to PED.
 1. NARO shall not be responsible or liable for any damage or loss caused or be alleged to be caused, directly or indirectly, by the download and use of PED.
 1. NARO shall not be obligated to correct or repair the program regardless of the extent, even if there are any defects of malfunctions in PED.
