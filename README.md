@@ -426,8 +426,10 @@ Version 1.0
 
 ## Citing PED
 Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data  
-Akio Miyao, Ph.D.; Jianyu Song Kiyomiya; Keiko Iida; Koji Doi; Hiroshi Yasue  
-BMC Bioinformatics (forthcoming).
+Akio Miyao, Jianyu Song Kiyomiya, Keiko Iida, Koji Doi, Hiroshi Yasue  
+BMC Bioinformatics. 2019 20(1):362.  
+URL https://doi.org/10.1186/s12859-019-2955-6  
+PDF https://rdcu.be/bH7e8  
 
 ## License
 NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0
