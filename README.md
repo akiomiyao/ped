@@ -45,8 +45,10 @@ If you got scripts from github, update to newest version is very easy using pull
 \# pkg install perl5  
 perl will be installed to /usr/local/bin/  
 \# ln -s /usr/local/bin/perl5 /usr/bin/perl  
-will be required, if you run the PED script on computer cluster with FreeBSD.
-    
+will be required, if you run the PED script on computer cluster with FreeBSD. 
+- If you want to run on computer cluster, Torque job scheduler is required.  
+Torque with default setting works fine.  For the customized Torque, modification of script may be required.
+
 ## Instruction for bidirectional method  
 - At first, set up reference data is required.  
   % perl mkref.pl reference  
