@@ -54,7 +54,9 @@ while(<IN>){
 	$desc{$row[0]} = $row[2];
     }elsif($row[1] eq "wget"){
 	$wget{$row[0]} = $row[2];
-    }elsif($row[0] eq $target && $row[1] eq "chromosome"){
+     }elsif($row[1] eq "file"){
+	$file{$row[0]} = $row[2];
+   }elsif($row[0] eq $target && $row[1] eq "chromosome"){
 	@row = split;
 	if ($row[3] != 0){
 	    for ($i = $row[2]; $i <= $row[3]; $i++){
@@ -151,9 +153,14 @@ sub mkChr{
 	close(IN);
 	close(OUT);
     }else{
+	if ($target eq "IWGSC1.0"){
+	    system("unzip iwgsc_refseqv1.0_all_chromosomes.zip && mv iwgsc_refseqv1.0_all_chromosomes/$file{$target} .");
+	}
+
 	if ($file =~ /gz$|bz2$/){
 	    open(IN, "zcat $file|");
 	}else{
+	    $file = $file{$target} if $file{$target} ne "";
 	    open(IN, $file);
 	}
 	while(<IN>){

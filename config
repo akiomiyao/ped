@@ -51,3 +51,8 @@ dmel626	chromosome	0	0	2L	2R	3L	3R	4	X	Y
 danRer11	description	Genome Reference Consortium Zebrafish Build 11
 danRer11	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/035/GCF_000002035.6_GRCz11/GCF_000002035.6_GRCz11_genomic.fna.gz
 danRer11	chromosome	1	25
+
+IWGSC1.0	description	Reference Genome of Wheat (Triticum aestivum L. cv. Chinese Spring)
+IWGSC1.0	wget	https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Assemblies/v1.0/iwgsc_refseqv1.0_all_chromosomes.zip
+IWGSC1.0	file	161010_Chinese_Spring_v1.0_pseudomolecules.fasta
+IWGSC1.0	chromosome	0	0	1A	1B	1D	2A	2B	2D	3A	3B	3D	4A	4B	4D	5A	5B	5D	6A	6B	6D	7A	7B	7D
