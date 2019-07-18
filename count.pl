@@ -71,6 +71,8 @@ sub cluster{
 	    }
 	}
     }
+    close(IN);
+    close(OUT);
 }
 
 sub standalone{
