@@ -137,7 +137,7 @@ while(<IN>){
     last;
 }
 close(IN);
-system("mkdir tmpdata");
+system("mkdir tmpdata.snp.$number");
 
 if ($type eq "vcf"){
     open(IN,  "$cwd/$target/$target.vcf");
@@ -151,7 +151,7 @@ while(<IN>){
     $row[0] =~ s/^chr//i;
     $row[0] += 0 if $row[0] =~ /^[0-9]+$/;
     if ($pre ne $row[0]){
-	open(OUT, "> tmpdata/$row[0]");
+	open(OUT, "> tmpdata.snp.$number/$row[0]");
 	$detected{$row[0]} = 1;
     }
     print OUT;
@@ -163,7 +163,7 @@ close(OUT);
 &openTag;
 foreach $chr (sort keys %detected){
     my @dat = ();
-    open(IN,  "tmpdata/$chr");
+    open(IN,  "tmpdata.snp.$number/$chr");
     while(<IN>){
 	chomp;
 	@row = split;
@@ -253,7 +253,7 @@ close(IN);
 &openTag;
 foreach $chr (sort keys %detected){
     my @dat = ();
-    open(IN,  "tmpdata/$chr");
+    open(IN,  "tmpdata.snp.$number/$chr");
     while(<IN>){
 	chomp;
 	@row = split;
@@ -308,7 +308,7 @@ foreach $chr (sort keys %detected){
 &closeTag;
 &sortTag;
 
-system("rm -r tmpdata");
+system("rm -r tmpdata.snp.$number");
 
 system("cat *.snp.sort.$number | join $control - | cut -d ' ' -f 2- > control.snp.$number");
 &sortWait("control.snp.$number");
