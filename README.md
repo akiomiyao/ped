@@ -39,7 +39,7 @@ If you got scripts from github, update to newest version is very easy using pull
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
-- To download reference date, wget is required.  
+- To download reference data, wget is required.  
     If your machine do not have wget program, install wget from package.  
 - For FreeBSD users, install perl from the package.  
 \# pkg install perl5  
