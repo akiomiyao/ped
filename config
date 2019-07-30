@@ -56,3 +56,7 @@ IWGSC1.0	description	Reference Genome of Wheat (Triticum aestivum L. cv. Chinese
 IWGSC1.0	wget	https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Assemblies/v1.0/iwgsc_refseqv1.0_all_chromosomes.zip
 IWGSC1.0	file	161010_Chinese_Spring_v1.0_pseudomolecules.fasta
 IWGSC1.0	chromosome	0	0	1A	1B	1D	2A	2B	2D	3A	3B	3D	4A	4B	4D	5A	5B	5D	6A	6B	6D	7A	7B	7D
+
+IBSC2	description	Reference Genome of Barley (Hordeum vulgare L. cv. Molex)
+IBSC2	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-44/fasta/hordeum_vulgare/dna/Hordeum_vulgare.IBSC_v2.dna.toplevel.fa.gz
+IBSC2	chromosome	0	0	1H	NOP	2H	3H	4H	5H	6H	7H

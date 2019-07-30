@@ -228,6 +228,7 @@ sub mk20{
     }
     
     foreach $i (@chr){
+	next if $i eq "NOP";
 	&report("Processing Chr$i");
 	&mk20mer($i);
     }
@@ -261,6 +262,7 @@ sub mkControlRead{
     &report("Making Control Read.");
     open(OUT, "|sort -T . $sort_opt |uniq > $target.sort_uniq");
     for(@chr){
+	next if $_ eq "NOP";
 	&report("Processing Chr$_");
 	open(IN, "chr$_");
 	$data = <IN>;
