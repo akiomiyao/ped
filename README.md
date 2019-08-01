@@ -63,6 +63,20 @@ Torque with default setting works fine.  For the customized Torque, modification
   To make reference of human,  
   % perl mkref.pl hg38  
   It takes two days, because hg38 is huge.  
+- Currently, supporting reference genomes are  
+```
+  Reference Name  Description  
+  GRCm38          Genome Reference Consortium Mouse Build 38  
+  Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2  
+  IBSC2           Reference Genome of Barley (Hordeum vulgare L. cv. Molex)  
+  IRGSP1.0        Reference Genome of Rice (Olyza sativa L. cv. Nipponbare)  
+  IWGSC1.0        Reference Genome of Wheat (Triticum aestivum L. cv. Chinese Spring)  
+  TAIR10          Reference Genome of Arabidopsis thaliana  
+  WBcel235        Caenorhabditis elegans WBcel235  
+  danRer11        Genome Reference Consortium Zebrafish Build 11  
+  dmel626         Drosophila melanogaster  
+  hg38            Genome Reference Consortium Human Build 38  
+``` 
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
   For example,  
