@@ -66,17 +66,19 @@ Torque with default setting works fine.  For the customized Torque, modification
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
-  GRCm38          Genome Reference Consortium Mouse Build 38  
-  Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2  
-  IBSC2           Reference Genome of Barley (Hordeum vulgare L. cv. Molex)  
-  IRGSP1.0        Reference Genome of Rice (Olyza sativa L. cv. Nipponbare)  
-  IWGSC1.0        Reference Genome of Wheat (Triticum aestivum L. cv. Chinese Spring)  
-  TAIR10          Reference Genome of Arabidopsis thaliana  
-  WBcel235        Caenorhabditis elegans WBcel235  
-  danRer11        Genome Reference Consortium Zebrafish Build 11  
-  dmel626         Drosophila melanogaster  
-  hg38            Genome Reference Consortium Human Build 38  
-``` 
+  GRCm38          Genome Reference Consortium Mouse Build 38
+  Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2
+  IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
+  IRGSP1.0        Rice (Olyza sativa L. cv. Nipponbare) version 1.0
+  IWGSC1.0        Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  TAIR10          Arabidopsis thaliana version TAIR10
+  WBcel235        Caenorhabditis elegans WBcel235
+  danRer11        Genome Reference Consortium Zebrafish Build 11
+  dmel626         Drosophila melanogaster
+  hg38            Genome Reference Consortium Human Build 38
+```
+  For building wheat data, it takes more than one week, and 32GB memory and 3TB disk space are required.  
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
   For example,  

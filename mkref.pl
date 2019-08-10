@@ -20,7 +20,7 @@ $usage = "
 
      Currently, target listed below are available.
 
-     Target Name   Description
+     Target Name    Description
 ";
 
 $cwd = `pwd`;
@@ -75,9 +75,9 @@ close(IN);
 if ($target eq ""){
     print $usage;
     foreach (sort keys %desc){
-	$name = $_ . "          ";
+	$name = $_ . "            ";
 	$name = substr($name, 0, 14);
-	print "     " . $name . "$desc{$_}\n";
+	print "      " . $name . "$desc{$_}\n";
     }
     print "
      Customized reference can be made by adding or modifiing the config file.
@@ -155,7 +155,10 @@ sub mkChr{
     }else{
 	if ($target eq "IWGSC1.0"){
 	    system("unzip iwgsc_refseqv1.0_all_chromosomes.zip && mv iwgsc_refseqv1.0_all_chromosomes/$file{$target} .");
-	}
+	}elsif($target eq "SL3"){
+	    system("tar xvfz $file && rm $file");
+	    $file =~ s/\.tar\.gz//;
+ 	}
 
 	if ($file =~ /gz$|bz2$/){
 	    open(IN, "zcat $file|");
@@ -169,8 +172,8 @@ sub mkChr{
 		close(OUT);
 		$ref = "chr" . $chr[$i];
 		last if $chr[$i] eq "";
-		$i++;
 		open(OUT, "> $ref");
+		$i++;
 	    }else{
 		y/a-z/A-Z/;
 		print OUT;

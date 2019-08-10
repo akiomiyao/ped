@@ -24,11 +24,11 @@ hg38	description	Genome Reference Consortium Human Build 38
 hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
 hg38	chromosome	1	22	X	Y
 
-IRGSP1.0	description	Reference Genome of Rice (Olyza sativa L. cv. Nipponbare)	
+IRGSP1.0	description	Rice (Olyza sativa L. cv. Nipponbare) version 1.0	
 IRGSP1.0	wget	https://rapdb.dna.affrc.go.jp/download/archive/irgsp1/IRGSP-1.0_genome.fasta.gz
 IRGSP1.0	chromosome	1	12
 
-TAIR10	description	Reference Genome of Arabidopsis thaliana
+TAIR10	description	Arabidopsis thaliana version TAIR10
 TAIR10	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-41/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
 TAIR10	chromosome	1	5
 
@@ -52,11 +52,16 @@ danRer11	description	Genome Reference Consortium Zebrafish Build 11
 danRer11	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/035/GCF_000002035.6_GRCz11/GCF_000002035.6_GRCz11_genomic.fna.gz
 danRer11	chromosome	1	25
 
-IWGSC1.0	description	Reference Genome of Wheat (Triticum aestivum L. cv. Chinese Spring)
+IWGSC1.0	description	Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
 IWGSC1.0	wget	https://urgi.versailles.inra.fr/download/iwgsc/IWGSC_RefSeq_Assemblies/v1.0/iwgsc_refseqv1.0_all_chromosomes.zip
 IWGSC1.0	file	161010_Chinese_Spring_v1.0_pseudomolecules.fasta
 IWGSC1.0	chromosome	0	0	1A	1B	1D	2A	2B	2D	3A	3B	3D	4A	4B	4D	5A	5B	5D	6A	6B	6D	7A	7B	7D
 
-IBSC2	description	Reference Genome of Barley (Hordeum vulgare L. cv. Molex)
+IBSC2	description	Barley (Hordeum vulgare L. cv. Molex) Release 44
 IBSC2	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-44/fasta/hordeum_vulgare/dna/Hordeum_vulgare.IBSC_v2.dna.toplevel.fa.gz
 IBSC2	chromosome	0	0	1H	NOP	2H	3H	4H	5H	6H	7H
+
+SL3	description	Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+SL3	wget	ftp://ftp.solgenomics.net/tomato_genome/assembly/build_3.00/S_lycopersicum_chromosomes.3.00.fa.tar.gz
+SL3	chromosome	0	0	NOP	1	2	3	4	5	6	7	8	9	10	11	12
+
