@@ -65,3 +65,6 @@ SL3	description	Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
 SL3	wget	ftp://ftp.solgenomics.net/tomato_genome/assembly/build_3.00/S_lycopersicum_chromosomes.3.00.fa.tar.gz
 SL3	chromosome	0	0	NOP	1	2	3	4	5	6	7	8	9	10	11	12
 
+LJ3	description	Lotus joponicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+LJ3	file	Lotusjaponicus_MG20_v3.0_genome.fa
+LJ3	chromosome	0	0	0	1	2	3	4	5	6

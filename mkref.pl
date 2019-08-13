@@ -110,7 +110,7 @@ chdir "$cwd/$target";
 if ($file eq ""){
     @row = split('/', $wget{$target});
     $remote_file = $row[$#row];
-    if (! -e $remote_file){
+    if (! -e $remote_file and $wget{$target} ne ""){
 	&report("Downloading $wget{$target}");
 	system("$wget -o wget-log $wget{$target}");
     }

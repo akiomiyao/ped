@@ -71,6 +71,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
   IRGSP1.0        Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0        Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  LJ3             Lotus joponicus MG20 v3.0
   SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   TAIR10          Arabidopsis thaliana version TAIR10
   WBcel235        Caenorhabditis elegans WBcel235
@@ -78,7 +79,8 @@ Torque with default setting works fine.  For the customized Torque, modification
   dmel626         Drosophila melanogaster
   hg38            Genome Reference Consortium Human Build 38
 ```
-  For building wheat data, it takes more than one week, and 32GB memory and 3TB disk space are required.  
+  For building wheat data, it takes more than one week, and 32GB memory and 3TB disk space are required.
+  For building Lotus Japonicus data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.   
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
   For example,  
