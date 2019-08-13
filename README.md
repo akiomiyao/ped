@@ -71,7 +71,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
   IRGSP1.0        Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0        Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
-  LJ3             Lotus joponicus MG20 v3.0
+  LJ3             Lotus japonicus MG20 v3.0
   SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   TAIR10          Arabidopsis thaliana version TAIR10
   WBcel235        Caenorhabditis elegans WBcel235
