@@ -452,7 +452,7 @@ URL https://doi.org/10.1186/s12859-019-2955-6
 PDF https://rdcu.be/bH7e8  
 
 ## License
-NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0
+NARO NON-COMMERCIAL LICENSE AGREEMENT Version 1.0  
 
 This license is for 'Non-Commercial' use of software for polymorphic edge detection (PED)
 
@@ -466,5 +466,4 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
 1. In case the result obtained using PED in used for publication in academic journals *etc.,* please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
-Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved.
-![logo](https://tos.nias.affrc.go.jp/naro-ped.jpg)
+Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved.  
