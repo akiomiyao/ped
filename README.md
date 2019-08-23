@@ -466,4 +466,5 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
 1. In case the result obtained using PED in used for publication in academic journals *etc.,* please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
-Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved. 
+Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved.
+![logo](https://tos.nias.affrc.go.jp/naro-ped.jpg)
