@@ -68,3 +68,7 @@ SL3	chromosome	0	0	NOP	1	2	3	4	5	6	7	8	9	10	11	12
 LJ3	description	Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
 LJ3	file	Lotusjaponicus_MG20_v3.0_genome.fa
 LJ3	chromosome	0	0	0	1	2	3	4	5	6
+
+B73v4	description	Corn (Zea mays B73) RefGen v4
+B73v4	wget	 ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/latest_assembly_versions/GCA_000005005.6_B73_RefGen_v4/GCA_000005005.6_B73_RefGen_v4_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/
+B73v4	chromosome	1	10

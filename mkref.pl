@@ -158,7 +158,26 @@ sub mkChr{
 	}elsif($target eq "SL3"){
 	    system("tar xvfz $file && rm $file");
 	    $file =~ s/\.tar\.gz//;
- 	}
+ 	}elsif($target =~ /^B73/){
+	    for ($i = 1; $i <= 10; $i++){
+		$file = $wget{$target} . "chr$i.fna.gz";
+		&report("Downloading $file");
+		system("$wget -o wget-log $file");
+		$file = "chr$i.fna.gz";
+		open(IN, "zcat $file|");
+		open(OUT, "> chr$i");
+		while(<IN>){
+		    chomp;
+		    if (! /^>/){
+			y/a-z/A-Z/;
+			print OUT;
+		    }
+		}
+		close(IN);
+		close(OUT);
+	    }
+	    return;
+	}
 
 	if ($file =~ /gz$|bz2$/){
 	    open(IN, "zcat $file|");
