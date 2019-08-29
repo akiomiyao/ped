@@ -66,6 +66,7 @@ Torque with default setting works fine.  For the customized Torque, modification
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
+  B73v4           Corn (Zea mays B73) RefGen v4  
   GRCm38          Genome Reference Consortium Mouse Build 38
   Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2
   IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
