@@ -72,3 +72,12 @@ LJ3	chromosome	0	0	0	1	2	3	4	5	6
 B73v4	description	Corn (Zea mays B73) RefGen v4
 B73v4	wget	 ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/plant/Zea_mays/latest_assembly_versions/GCA_000005005.6_B73_RefGen_v4/GCA_000005005.6_B73_RefGen_v4_assembly_structure/Primary_Assembly/assembled_chromosomes/FASTA/
 B73v4	chromosome	1	10
+
+Bomo	description	Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+Bomo	wget	http://silkbase.ab.a.u-tokyo.ac.jp/pub/Bomo_genome_assembly.fa.gz
+Bomo	chromosome	1	28
+
+UMD3.1	description	Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+UMD3.1	wget	http://128.206.12.216/drupal/sites/bovinegenome.org/files/data/umd3.1/UMD3.1_chromosomes.fa.gz
+UMD3.1	chromosome	0	0	10	11	12	13	14	15	16	17	18	19	1	20	21	22	23	24	25	26	27	28	29	2	3	4	5	6	7	8	9	NOP	X
+

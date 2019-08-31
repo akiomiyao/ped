@@ -66,7 +66,8 @@ Torque with default setting works fine.  For the customized Torque, modification
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
-  B73v4           Corn (Zea mays B73) RefGen v4  
+  B73v4           Corn (Zea mays B73) RefGen v4
+  Bomo            Silkworm (Bombyx mori) Genome assembly (Nov.2016)
   GRCm38          Genome Reference Consortium Mouse Build 38
   Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2
   IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
@@ -75,6 +76,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   LJ3             Lotus japonicus MG20 v3.0
   SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   TAIR10          Arabidopsis thaliana version TAIR10
+  UMD3.1          Cow (Bos taurus L1 Dominette 01449) UMD 3.1
   WBcel235        Caenorhabditis elegans WBcel235
   danRer11        Genome Reference Consortium Zebrafish Build 11
   dmel626         Drosophila melanogaster
