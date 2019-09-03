@@ -20,7 +20,7 @@
 # and names should be set at fifth or more columns. 
 #
 
-hg38	description	Genome Reference Consortium Human Build 38
+hg38	description	Human (Homo sapiens) Genome Reference Consortium Human Build 38
 hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
 hg38	chromosome	1	22	X	Y
 
@@ -32,7 +32,7 @@ TAIR10	description	Arabidopsis thaliana version TAIR10
 TAIR10	wget	ftp://ftp.ensemblgenomes.org/pub/plants/release-41/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
 TAIR10	chromosome	1	5
 
-GRCm38	description	Genome Reference Consortium Mouse Build 38
+GRCm38	description	Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
 GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musculus.GRCm38.dna.toplevel.fa.gz
 GRCm38	chromosome	1	19	X	Y
 
@@ -48,7 +48,7 @@ dmel626	description	Drosophila melanogaster	release 6.26
 dmel626	wget	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.26_FB2019_01/fasta/dmel-all-chromosome-r6.26.fasta.gz
 dmel626	chromosome	0	0	2L	2R	3L	3R	4	X	Y
 
-danRer11	description	Genome Reference Consortium Zebrafish Build 11
+danRer11	description	Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
 danRer11	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/035/GCF_000002035.6_GRCz11/GCF_000002035.6_GRCz11_genomic.fna.gz
 danRer11	chromosome	1	25
 
@@ -81,3 +81,6 @@ UMD3.1	description	Cow (Bos taurus L1 Dominette 01449) UMD 3.1
 UMD3.1	wget	http://128.206.12.216/drupal/sites/bovinegenome.org/files/data/umd3.1/UMD3.1_chromosomes.fa.gz
 UMD3.1	chromosome	0	0	10	11	12	13	14	15	16	17	18	19	1	20	21	22	23	24	25	26	27	28	29	2	3	4	5	6	7	8	9	NOP	X
 
+SScrofa11.1	description	Pig (Sus scrofa) Release-97
+SScrofa11.1	wget	ftp://ftp.ensembl.org/pub/release-97/fasta/sus_scrofa/dna/Sus_scrofa.Sscrofa11.1.dna.toplevel.fa.gz
+SScrofa11.1	chromosome	1	18	X	Y

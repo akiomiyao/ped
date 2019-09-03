@@ -62,28 +62,29 @@ Torque with default setting works fine.  For the customized Torque, modification
   Format is described in the comment in config file.  
   To make reference of human,  
   % perl mkref.pl hg38  
-  It takes two days, because hg38 is huge.  
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
   B73v4           Corn (Zea mays B73) RefGen v4
   Bomo            Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  GRCm38          Genome Reference Consortium Mouse Build 38
+  GRCm38          Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2
   IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
   IRGSP1.0        Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0        Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
   LJ3             Lotus japonicus MG20 v3.0
   SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  SScrofa11.1     Pig (Sus scrofa) Release-97
   TAIR10          Arabidopsis thaliana version TAIR10
   UMD3.1          Cow (Bos taurus L1 Dominette 01449) UMD 3.1
   WBcel235        Caenorhabditis elegans WBcel235
-  danRer11        Genome Reference Consortium Zebrafish Build 11
+  danRer11        Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
   dmel626         Drosophila melanogaster
-  hg38            Genome Reference Consortium Human Build 38
+  hg38            Human (Homo sapiens) Genome Reference Consortium Human Build 38
 ```
-  For building wheat data, it takes more than one week, and 32GB memory and 3TB disk space are required.
-  For building Lotus Japonicus data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.   
+  For building human reference data, it takes about two days.  
+  For building wheat reference data, it takes more than one week, and 32GB memory and 3TB disk space are required for detection of polymorphism.  
+  For building *Lotus japonicus* data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.  
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
   For example,  
