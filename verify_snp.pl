@@ -161,7 +161,8 @@ close(IN);
 close(OUT);
 
 &openTag;
-foreach $chr (sort keys %detected){
+foreach $chr (@chr){
+    next if $detected{$chr} != 1;
     my @dat = ();
     open(IN,  "tmpdata.snp.$number/$chr");
     while(<IN>){

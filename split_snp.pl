@@ -145,7 +145,8 @@ close(IN);
 close(OUT);
 
 system("rm $workdir/$target.snp") if -e "$workdir/$target.snp";
-foreach $chr (sort keys %detected){
+foreach $chr (@chr){
+    next if $detected{$chr} != 1 or $chr eq "NOP";
     system("sort -k 2 -n $sort_opt -T $tmpdir $tmpdir/snp.tmp/$chr>> $tmpdir/$target.snp");
 }
 system("rm -r $tmpdir/snp.tmp/ $tmpdir/$target.snp.tmp");
