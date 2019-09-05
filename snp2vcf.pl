@@ -32,10 +32,12 @@ if ($type eq "kmer"){
 }
 print OUT "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
-##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
 ##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
-##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
+##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
+##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
 while(<IN>){
     chomp;
@@ -45,16 +47,22 @@ while(<IN>){
 	$row[0] = "chr" . $row[0];
     }
     if ($type eq "kmer"){
+	$dp = $row[17] + $row[18];
+	next if $dp == 0;
+	$af = int(1000 * $row[18]/$dp)/1000;
  	if (/M/){
-	    print OUT "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[18];GT=1/1\tDP:GT\t$row[18]:1/1\n";
+	    print OUT "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
 	}elsif(/H/){
-	    print OUT "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tDP=$row[18];GT=0/1\tDP:GT\t$row[18]:1/0\n";
+	    print OUT "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
 	}
-   }else{
+    }else{
+	$dp = $row[7] + $row[8];
+	next if $dp == 0;
+	$af = int(1000 * $row[8]/$dp)/1000;
 	if (/M/){
-	    print OUT "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tDP=$row[8];GT=1/1\tDP:GT\t$row[8]:1/1\n";
+	    print OUT "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[7],$row[8]:$dp\n";
 	}elsif(/H/){
-	    print OUT "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tDP=$row[8];GT=0/1\tDP:GT\t$row[8]:1/0\n";
+	    print OUT "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[7],$row[8]:$dp\n";
 	}
     }
 }
