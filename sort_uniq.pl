@@ -57,14 +57,21 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 	}
 	$cmd = "cat $workdir/read/*|";
 	$type = "fastq";
-    }elsif(/gz$|bz2$/){
+    }elsif(/gz$/){
 	if ($type ne "" and $type ne "gz"){
 	    print "Different compression format in read directory is not acceptable.";
 	    exit;
 	}
 	$cmd = "zcat $workdir/read/* 2> /dev/null |";
 	$type = "gz";
-     }elsif(/xz$/){
+    }elsif(/bz2$/){
+	if ($type ne "" and $type ne "bz2"){
+	    print "Different compression format in read directory is not acceptable.";
+	    exit;
+	}
+	$cmd = "bzcat $workdir/read/* 2> /dev/null |";
+	$type = "bz2";
+    }elsif(/xz$/){
 	if ($type ne "" and $type ne "xz"){
 	    print "Different compression format in read directory is not acceptable.";
 	    exit;

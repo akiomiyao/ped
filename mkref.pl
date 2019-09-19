@@ -179,8 +179,12 @@ sub mkChr{
 	    return;
 	}
 
-	if ($file =~ /gz$|bz2$/){
+	if ($file =~ /gz$/){
 	    open(IN, "zcat $file|");
+	if ($file =~ /bz2$/){
+	    open(IN, "bzcat $file|");
+	if ($file =~ /xz$/){
+	    open(IN, "xzcat $file|");
 	}else{
 	    $file = $file{$target} if $file{$target} ne "";
 	    open(IN, $file);
