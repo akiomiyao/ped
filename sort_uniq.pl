@@ -36,6 +36,7 @@ if ($ARGV[0] ne ""){
     $target    = $ENV{target};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $workdir = "$cwd/$target";
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
@@ -83,7 +84,7 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 closedir(DIR);
 
 open(IN, $cmd);
-open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $workdir/$target.sort_uniq");
+open(OUT, "|sort $sort_opt -T $tmpdir |uniq | gzip > $workdir/$target.sort_uniq.gz");
 while(<IN>){
     if ($count == 1 and !/N/){
 	chomp;

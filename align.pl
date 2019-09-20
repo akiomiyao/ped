@@ -49,6 +49,7 @@ if ($ARGV[0] ne ""){
     $margin    = $ENV{margin};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $workdir = "$cwd/$target";
 }else{
     print $usage;
@@ -118,7 +119,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "$target.sort_uniq");
+open(IN, "zcat $target.sort_uniq.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -128,7 +129,7 @@ close(IN);
 
 &openTag;
 
-open(IN, "$target.sort_uniq");
+open(IN, "zcat $target.sort_uniq.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $head_pos = $margin + 1;

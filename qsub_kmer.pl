@@ -77,14 +77,14 @@ close(IN);
 
 report("qsub_kmer.pl start.");
 
-if (! -e "$target/$target.sort_uniq"){
+if (! -e "$target/$target.sort_uniq.gz"){
     report("Making $target.sort_uniq.");
     $qsub = "-v target=$target sort_uniq.pl";
     @job = ();
     &doQsub($qsub);
 }
 
-if (! -e "$control/$control.sort_uniq"){
+if (! -e "$control/$control.sort_uniq.gz"){
     report("Making $control.sort_uniq.");
     $qsub = "-v target=$control sort_uniq.pl";
     @job = ();
@@ -92,9 +92,9 @@ if (! -e "$control/$control.sort_uniq"){
 }
 &holdUntilJobEnd;
 
-&sortWait("$target/$target.sort_uniq");
+&sortWait("$target/$target.sort_uniq.gz");
 
-&sortWait("$control/$control.sort_uniq");
+&sortWait("$control/$control.sort_uniq.gz");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
@@ -107,9 +107,9 @@ if (! -e "$control/$control.lbc.AAA.gz"){
 	next if !/$control/;
 	@row = split('\.', $_);
 	if ($tmpdir ne ""){
-	    $qsub = "-v target=$control,number=$row[$#row],tmpdir=$tmpdir count.pl";
+	    $qsub = "-v target=$control,number=$row[$#row - 1],tmpdir=$tmpdir count.pl";
 	}else{
-	    $qsub = "-v target=$control,number=$row[$#row] count.pl";
+	    $qsub = "-v target=$control,number=$row[$#row - 1] count.pl";
 	}
 	&doQsub($qsub);
     }
@@ -158,9 +158,9 @@ foreach (sort readdir(DIR)){
     next if ! /$target/;
     @row = split('\.', $_);
     if ($tmpdir ne ""){
-	$qsub = "-v target=$target,number=$row[$#row],tmpdir=$tmpdir count.pl";
+	$qsub = "-v target=$target,number=$row[$#row - 1],tmpdir=$tmpdir count.pl";
     }else{
-	$qsub = "-v target=$target,number=$row[$#row] count.pl";
+	$qsub = "-v target=$target,number=$row[$#row - 1] count.pl";
     }
     &doQsub($qsub);
 }

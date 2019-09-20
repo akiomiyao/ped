@@ -28,6 +28,7 @@ if($ENV{target} ne ""){
     $target    = $ENV{target};
     $tag       = $ENV{tag};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $tmpdir    = $ENV{tmpdir};
     $workdir = "$cwd/$target";
     &cluster;

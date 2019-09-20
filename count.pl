@@ -34,6 +34,7 @@ if($ENV{target} ne ""){
     $target    = $ENV{target};
     $number    = $ENV{number};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $tmpdir    = $ENV{tmpdir};
     $workdir = "$cwd/$target";
     &cluster;
@@ -46,20 +47,20 @@ if($ENV{target} ne ""){
 sub cluster{
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
-	$input_file = "$workdir/tmp/$target.sort_uniq.$number";
+	$input_file = "$workdir/tmp/$target.sort_uniq.$number.gz";
     }else{
 	if (-e "$tmpdir/$target"){
 	    system("rm -r $tmpdir/$target");
 	}
 	system("mkdir $tmpdir/$target");
 	$tmpdir = "$tmpdir/$target";
-	system("cp $workdir/tmp/$target.sort_uniq.$number $tmpdir");
-	$input_file = "$target.sort_uniq.$number";
+	system("cp $workdir/tmp/$target.sort_uniq.$number.gz $tmpdir");
+	$input_file = "$target.sort_uniq.$number.gz";
     }
 
     chdir $tmpdir;
     
-    open(IN, "$input_file");
+    open(IN, "zcat $input_file 2> /dev/null |");
     open(OUT, "|sort $sort_opt -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
     while(<IN>){
 	chomp;
@@ -78,7 +79,7 @@ sub cluster{
 sub standalone{
     $target = $ARGV[0];
     chdir $target;
-    $input_file = $target . ".sort_uniq";
+    $input_file = $target . ".sort_uniq.gz";
     if (-e "tmp"){
 	system("rm -rf tmp");
     }
@@ -86,11 +87,11 @@ sub standalone{
     $count = 0;
     $file_count = 1;
     open(IN, $input_file);
-    open(OUT, "> tmp/$input_file.$file_count");
+    open(OUT, "|gzip > tmp/$input_file.$file_count.gz");
     while(<IN>){
 	if ($count == 10000000){
 	    $file_count ++;
-	    open(OUT, "> tmp/$target.sort_uniq.$file_count");
+	    open(OUT, "|gzip > tmp/$target.sort_uniq.$file_count.gz");
 	    $count = 0;
 	}
 	$count++;
@@ -99,7 +100,7 @@ sub standalone{
     close(IN);
     close(OUT);
     for ($j = 1; $j <= $file_count; $j++){
-	open(IN, "tmp/$input_file.$j");
+	open(IN, "zcat tmp/$input_file.$j.gz 2> /dev/null |");
 	$number = "000$j";
 	$number = substr($number, length($number) -4, 4);
 	&report("$input_file.$j / $file_count is processing.");
@@ -138,7 +139,7 @@ sub split_count{
     }
     close(IN);
     close(OUT);
-    system("rm $target.count.$number");
+    system("rm $target.count.$number.gz");
 }
 
 sub merge{

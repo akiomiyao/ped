@@ -26,6 +26,7 @@ if ($ARGV[0] ne ""){
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $workdir = "$cwd/$target";
 }else{
     print $usage;
@@ -41,11 +42,11 @@ if (-e "$target.sort_uniq"){
 }elsif (-e "$target.sort_uniq.gz"){
     open(IN, "zcat $target.sort_uniq.gz|");
 }
-open(OUT, "> tmp/$target.sort_uniq.$file_count");
+open(OUT, "|gzip > tmp/$target.sort_uniq.$file_count.gz");
 while(<IN>){
     if ($count == 10000000){
 	$file_count ++;
-	open(OUT, "> tmp/$target.sort_uniq.$file_count");
+	open(OUT, "| gzip > tmp/$target.sort_uniq.$file_count.gz");
 	$count = 0;
     }
     $count++;

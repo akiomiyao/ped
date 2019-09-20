@@ -52,6 +52,7 @@ if ($ARGV[0] ne ""){
     $type      = $ENV{type};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
 }else{
     print $usage;
     exit;
@@ -61,7 +62,7 @@ if($tmpdir eq ""){
     $tmpdir = ".";
     $ref_path = "$cwd/$ref";
     $workdir = "$cwd/$target";
-    $target_sort_uniq = "$workdir/$target.sort_uniq";
+    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
 }else{
     if (! -d $tmpdir){
 	print "$tmpdir is not directory.
@@ -79,8 +80,8 @@ $usage";
 	system("rm -r $workdir");
     }
     system("mkdir $workdir");
-    system("$rsync -a $cwd/$target/$target.sort_uniq $workdir");
-    $target_sort_uniq = "$workdir/$target.sort_uniq";
+    system("$rsync -a $cwd/$target/$target.sort_uniq.gz $workdir");
+    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
 }
 
 $number = "01" if $number eq "";
@@ -127,7 +128,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "$target_sort_uniq");
+open(IN, "zcat $target_sort_uniq 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -242,28 +243,28 @@ while(<IN>){
 system("cat *.indel_sort.$number > indel_target.st.$number");
 &sortWait("indel_target.st.$number");
 system("rm *.indel_sort.$number");
-system("join $target_sort_uniq indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
+system("zcat $target_sort_uniq 2> /dev/null | join - indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
 &sortWait("indel_target.$number");
 system("rm indel_target.st.$number");
 if ($tmpdir ne "."){
-   system("rm $target.sort_uniq");
+   system("rm $target.sort_uniq.gz");
 }
 system("sort -T . $sort_opt indel_target.$number| uniq -c > indel_target.count.$number");
 &sortWait("indel_target.count.$number");
 system("rm indel_target.$number");
 
 if ($control eq "default" or $control eq "" or $control eq $ref){
-    $control = "$ref_path/$ref.sort_uniq";
+    $control = "$ref_path/$ref.sort_uniq.gz";
 }else{
     if ($tmpdir eq "."){
-	$control = "$cwd/$control/$control.sort_uniq";
+	$control = "$cwd/$control/$control.sort_uniq.gz";
     }else{
-	system("$rsync -a $cwd/$control/$control.sort_uniq $workdir");
-	$control = "$workdir/$control.sort_uniq";
+	system("$rsync -a $cwd/$control/$control.sort_uniq.gz $workdir");
+	$control = "$workdir/$control.sort_uniq.gz";
     }
 }
 
-open(IN, $control);
+open(IN, "zcat $control 2> /dev/null |");
 while(<IN>){
     chomp;
     $clength = length($_);
@@ -378,9 +379,10 @@ while(<IN>){
 &closeTag;
 &sortTag;
 
-system("cat *.indel_sort.$number | join $control - | cut -d ' ' -f 2- > indel_control.$number");
+system("cat *.indel_sort.$number > indel_sort.$number");
+system("zcat $control 2> /dev/null | join - indel_sort.$number | cut -d ' ' -f 2- > indel_control.$number");
 &sortWait("indel_control.$number");
-system("rm *.indel_sort.$number");
+system("rm *.indel_sort.$number indel_sort.$number");
 system("sort -T . $sort_opt indel_control.$number| uniq -c > indel_control.count.$number");
 &sortWait("indel_control.count.$number");
 system("rm indel_control.$number");

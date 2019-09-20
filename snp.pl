@@ -32,6 +32,7 @@ if($ENV{target} ne ""){
     $tag       = $ENV{tag};
     $cutoff    = $ENV{cutoff};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $tmpdir    = $ENV{tmpdir};
     $workdir = "$cwd/$target";
     $controldir = "$cwd/$control";

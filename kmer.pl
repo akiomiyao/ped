@@ -77,19 +77,19 @@ close(IN);
 
 report("kmer.pl start.");
 
-if (! -e "$target/$target.sort_uniq"){
+if (! -e "$target/$target.sort_uniq.gz"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
 }
 
-&sortWait("$target/$target.sort_uniq");
+&sortWait("$target/$target.sort_uniq.gz");
 
-if (! -e "$control/$control.sort_uniq"){
+if (! -e "$control/$control.sort_uniq.gz"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
 
-&sortWait("$control/$control.sort_uniq");
+&sortWait("$control/$control.sort_uniq.gz");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");

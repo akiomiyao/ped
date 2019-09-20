@@ -42,6 +42,7 @@ if ($ARGV[0] ne ""){
     $target    = $ENV{target};
     $file      = $ENV{file};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
 }
 
 @nuc = ('A', 'C', 'G', 'T');
@@ -54,9 +55,9 @@ while(<IN>){
 	$desc{$row[0]} = $row[2];
     }elsif($row[1] eq "wget"){
 	$wget{$row[0]} = $row[2];
-     }elsif($row[1] eq "file"){
+    }elsif($row[1] eq "file"){
 	$file{$row[0]} = $row[2];
-   }elsif($row[0] eq $target && $row[1] eq "chromosome"){
+    }elsif($row[0] eq $target && $row[1] eq "chromosome"){
 	@row = split;
 	if ($row[3] != 0){
 	    for ($i = $row[2]; $i <= $row[3]; $i++){
@@ -178,12 +179,12 @@ sub mkChr{
 	    }
 	    return;
 	}
-
+	
 	if ($file =~ /gz$/){
 	    open(IN, "zcat $file|");
-	if ($file =~ /bz2$/){
+	}elsif ($file =~ /bz2$/){
 	    open(IN, "bzcat $file|");
-	if ($file =~ /xz$/){
+	}elsif ($file =~ /xz$/){
 	    open(IN, "xzcat $file|");
 	}else{
 	    $file = $file{$target} if $file{$target} ne "";
@@ -214,8 +215,10 @@ sub mkChrFromFile{
 	$file = $file[$#file];
     }
     &report("Making chromosome file.");
-    if ($file =~ /gz$|bz2$/){
+    if ($file =~ /gz$/){
 	open(IN, "zcat $file|");
+    }elsif($file =~ /bz2$/){
+	open(IN, "bzcat $file|");
     }else{
 	open(IN, $file);
     }
@@ -286,7 +289,7 @@ sub mk20{
 
 sub mkControlRead{
     &report("Making Control Read.");
-    open(OUT, "|sort -T . $sort_opt |uniq > $target.sort_uniq");
+    open(OUT, "|sort -T . $sort_opt |uniq |gzip > $target.sort_uniq.gz");
     for(@chr){
 	next if $_ eq "NOP";
 	&report("Processing Chr$_");

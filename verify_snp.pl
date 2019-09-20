@@ -55,6 +55,7 @@ if ($ARGV[0] ne ""){
     $type      = $ENV{type};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
+    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
 }else{
     print $usage;
     exit;
@@ -64,7 +65,7 @@ if($tmpdir eq ""){
     $tmpdir = ".";
     $ref_path = "$cwd/$ref";
     $workdir = "$cwd/$target";
-    $target_sort_uniq = "$workdir/$target.sort_uniq";
+    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
 }else{
     if (! -d $tmpdir){
 	print "$tmpdir is not directory.
@@ -82,8 +83,8 @@ $usage";
 	system("rm -r $workdir");
     }
     system("mkdir $workdir");
-    system("$rsync -a $cwd/$target/$target.sort_uniq $workdir");
-    $target_sort_uniq = "$workdir/$target.sort_uniq";
+    system("$rsync -a $cwd/$target/$target.sort_uniq.gz $workdir");
+    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
 }
 
 $number = "01" if $number eq "";
@@ -130,7 +131,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "$target_sort_uniq");
+open(IN, "zcat $target_sort_uniq 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -222,28 +223,28 @@ foreach $chr (@chr){
 system("cat *.snp.sort.$number > target.snp.st.$number");
 &sortWait("target.snp.st.$number");
 system("rm *.snp.sort.$number");
-system("join $target_sort_uniq target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
+system("zcat $target_sort_uniq 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
 &sortWait("target.snp.$number");
 system("rm target.snp.st.$number");
 if ($tmpdir ne "."){
-   system("rm $target.sort_uniq");
+   system("rm $target.sort_uniq.gz");
 }
 system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
 &sortWait("target.snp.count.$number");
 system("rm target.snp.$number");
 
 if ($control eq "default" or $control eq "" or $control eq $ref){
-    $control = "$ref_path/$ref.sort_uniq";
+    $control = "$ref_path/$ref.sort_uniq.gz";
 }else{
     if ($tmpdir eq "."){
-	$control = "$cwd/$control/$control.sort_uniq";
+	$control = "$cwd/$control/$control.sort_uniq.gz";
     }else{
-	system("$rsync -a $cwd/$control/$control.sort_uniq $workdir");
-	$control = "$workdir/$control.sort_uniq";
+	system("$rsync -a $cwd/$control/$control.sort_uniq.gz $workdir");
+	$control = "$workdir/$control.sort_uniq.gz";
     }
 }
 
-open(IN, $control);
+open(IN, "zcat $control 2> /dev/null |");
 while(<IN>){
     chomp;
     $clength = length($_);
@@ -311,7 +312,8 @@ foreach $chr (sort keys %detected){
 
 system("rm -r tmpdata.snp.$number");
 
-system("cat *.snp.sort.$number | join $control - | cut -d ' ' -f 2- > control.snp.$number");
+system("cat *.snp.sort.$number > snp.sort.$number");
+system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
 &sortWait("control.snp.$number");
 system("rm *.snp.sort.$number");
 system("sort -T . $sort_opt control.snp.$number| uniq -c > control.snp.count.$number");

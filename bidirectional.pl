@@ -59,19 +59,19 @@ $target  =~ s/\/$//;
 $control =~ s/\/$//;
 $ref     =~ s/\/$//;
 
-if (! -e "$target/$target.sort_uniq"){
+if (! -e "$target/$target.sort_uniq.gz"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
 }
 
-&sortWait("$target/$target.sort_uniq");
+&sortWait("$target/$target.sort_uniq.gz");
 
-if (! -e "$control/$control.sort_uniq" and $ARGV[1] ne "default"){
+if (! -e "$control/$control.sort_uniq.gz" and $ARGV[1] ne "default"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
 sleep 2;
-&sortWait("$control/$control.sort_uniq");
+&sortWait("$control/$control.sort_uniq.gz");
 
 report("Aligning of $target sequence to $ref genome. margin = 5");
 system("perl align.pl $target $ref 5");
