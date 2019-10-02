@@ -446,7 +446,8 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
-Version 1.0
+Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.
+Version 1.0 Original version for PED paper.
 
 ## Citing PED
 Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data  
