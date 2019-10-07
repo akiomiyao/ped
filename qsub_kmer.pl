@@ -297,6 +297,7 @@ sub doQsub{
 sub holdUntilJobEnd{
     my (@row, %stat, $job, $flag);
     while(1){
+	%stat = ();
 	$flag = 0;
 	open(IN, "qstat |");
 	while(<IN>){
@@ -305,7 +306,7 @@ sub holdUntilJobEnd{
 	}
 	close(IN);
 	foreach $job(@job){
-	    $flag = 1 if $stat{$job} ne "C";
+	    $flag = 1 if $stat{$job} =~ /q|r|e/i;
 	}
 	last if ! $flag;
 	sleep 10;
