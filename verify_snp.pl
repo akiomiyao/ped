@@ -7,6 +7,18 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+if ($ENV{PBS_O_WORKDIR} ne ""){
+    $cwd = $ENV{PBS_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}elsif($ENV{SGE_O_WORKDIR} ne ""){
+    $cwd = $ENV{SGE_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}else{
+    require './common.pl';
+}
+
 $usage = '
      verify_snp.pl - verification program for SNPs.
 
@@ -29,15 +41,6 @@ tmpdir  : specify temporary directofy on local disk (can be ommited)
 Author  : Akio Miyao <miyao@affrc.go.jp>
 ';
 
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-    $rsync = "/usr/local/bin/rsync";
-}else{
-    $rsync = "/usr/bin/rsync";
-}
-
 if ($ARGV[0] ne ""){
     $target  = $ARGV[0];
     $control = $ARGV[1];
@@ -45,8 +48,6 @@ if ($ARGV[0] ne ""){
     $number  = $ARGV[3];
     $type    = $ARGV[4];
     $tmpdir  = $ARGV[5];
-    $cwd = `pwd`;
-    chomp($cwd);
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $control   = $ENV{control};
@@ -54,8 +55,6 @@ if ($ARGV[0] ne ""){
     $number    = $ENV{number};
     $type      = $ENV{type};
     $tmpdir    = $ENV{tmpdir};
-    $cwd       = $ENV{PBS_O_WORKDIR};
-    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
 }else{
     print $usage;
     exit;
@@ -65,7 +64,6 @@ if($tmpdir eq ""){
     $tmpdir = ".";
     $ref_path = "$cwd/$ref";
     $workdir = "$cwd/$target";
-    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
 }else{
     if (! -d $tmpdir){
 	print "$tmpdir is not directory.
@@ -83,13 +81,10 @@ $usage";
 	system("rm -r $workdir");
     }
     system("mkdir $workdir");
-    system("$rsync -a $cwd/$target/$target.sort_uniq.gz $workdir");
-    $target_sort_uniq = "$workdir/$target.sort_uniq.gz";
+    system("$rsync -a $cwd/$target/sort_uniq $workdir");
 }
 
 $number = "01" if $number eq "";
-
-@nuc = ('A', 'C', 'G', 'T');
 
 chdir $workdir;
 
@@ -131,7 +126,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "zcat $target_sort_uniq 2> /dev/null |");
+open(IN, "zcat sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -221,26 +216,26 @@ foreach $chr (@chr){
 &sortTag;
 
 system("cat *.snp.sort.$number > target.snp.st.$number");
-&sortWait("target.snp.st.$number");
+&waitFile("target.snp.st.$number");
 system("rm *.snp.sort.$number");
-system("zcat $target_sort_uniq 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
-&sortWait("target.snp.$number");
+system("zcat sort_uniq/*.gz 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
+&waitFile("target.snp.$number");
 system("rm target.snp.st.$number");
 if ($tmpdir ne "."){
    system("rm $target.sort_uniq.gz");
 }
 system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
-&sortWait("target.snp.count.$number");
+&waitFile("target.snp.count.$number");
 system("rm target.snp.$number");
 
 if ($control eq "default" or $control eq "" or $control eq $ref){
-    $control = "$ref_path/$ref.sort_uniq.gz";
+    $control = "$ref_path/sort_uniq/*.gz";
 }else{
     if ($tmpdir eq "."){
-	$control = "$cwd/$control/$control.sort_uniq.gz";
+	$control = "$cwd/$control/sort_uniq/*.gz";
     }else{
-	system("$rsync -a $cwd/$control/$control.sort_uniq.gz $workdir");
-	$control = "$workdir/$control.sort_uniq.gz";
+	system("$rsync -a $cwd/$control/sort_uniq $workdir");
+	$control = "$workdir/$control/sort_uniq/*.gz";
     }
 }
 
@@ -314,10 +309,10 @@ system("rm -r tmpdata.snp.$number");
 
 system("cat *.snp.sort.$number > snp.sort.$number");
 system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
-&sortWait("control.snp.$number");
+&waitFile("control.snp.$number");
 system("rm *.snp.sort.$number");
 system("sort -T . $sort_opt control.snp.$number| uniq -c > control.snp.count.$number");
-&sortWait("control.snp.count.$number");
+&waitFile("control.snp.count.$number");
 system("rm control.snp.$number");
 
 open(IN, "target.snp.count.$number");
@@ -431,63 +426,15 @@ sub openTag{
     }
 }
 
-sub closeTag{
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		close($tag);
-	    }
-	}
-    }
-}
-
 sub sortTag{
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		system("sort -T . $sort_opt $tag.snp.tmp.$number > $tag.snp.sort.$number");
-		&sortWait("$tag.snp.sort.$number");
+		&waitFile("$tag.snp.sort.$number");
 		system("rm $tag.snp.tmp.$number");
 	    }
 	}
     }
-}
-
-sub complement{
-    my $seq = shift;
-    my @seq = split('', $seq);
-    my $i = length($seq);
-    my $out = "";
-    while($i > 0){
-        $i--;
-        if ($seq[$i] eq "A"){
-            $out .= "T";
-        }elsif($seq[$i] eq "C"){
-            $out .= "G";
-        }elsif($seq[$i] eq "G"){
-            $out .= "C";
-        }elsif($seq[$i] eq "T"){
-            $out .= "A";
-        }else{
-            $out .= "N";
-        }
-    }
-    return $out;
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
-    }
-}
-
-sub bynumber{
-    $a <=> $b;
 }

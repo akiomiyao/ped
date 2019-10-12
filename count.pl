@@ -7,34 +7,39 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+if ($ENV{PBS_O_WORKDIR} ne ""){
+    $cwd = $ENV{PBS_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}elsif($ENV{SGE_O_WORKDIR} ne ""){
+    $cwd = $ENV{SGE_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}else{
+    require './common.pl';
+}
+
 $usage = '
      count.pl - create count of kmers from sort_uniq data. 
 
-e.g. qsub -v target=ERR194147,number=0001,tmpdir=/mnt/ssd count.pl
+e.g. qsub -v target=ERR194147,tag=AAA,tmpdir=/mnt/ssd count.pl
 
      For stand alone machine
 e.g. perl count.pl SRR8181712
      perl count.pl DRR054198
 
      target is name of target.
-     number is number of split target file (e.g. 0001).
+     tag is triplet of split target file (e.g. AAA).
      tmpdir can be ommited.
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-}
-
 if($ENV{target} ne ""){
     $target    = $ENV{target};
     $number    = $ENV{number};
-    $cwd       = $ENV{PBS_O_WORKDIR};
-    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
+    $tag       = $ENV{tag};
     $tmpdir    = $ENV{tmpdir};
     $workdir = "$cwd/$target";
     &cluster;
@@ -47,15 +52,15 @@ if($ENV{target} ne ""){
 sub cluster{
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
-	$input_file = "$workdir/tmp/$target.sort_uniq.$number.gz";
+	$input_file = "$workdir/sort_uniq/$target.sort_uniq.$tag.gz";
     }else{
 	if (-e "$tmpdir/$target"){
 	    system("rm -r $tmpdir/$target");
 	}
 	system("mkdir $tmpdir/$target");
 	$tmpdir = "$tmpdir/$target";
-	system("cp $workdir/tmp/$target.sort_uniq.$number.gz $tmpdir");
-	$input_file = "$target.sort_uniq.$number.gz";
+	system("cp $workdir/sort_uniq/$target.sort_uniq.$tag.gz $tmpdir");
+	$input_file = "$target.sort_uniq.$tag.gz";
     }
 
     chdir $tmpdir;
@@ -79,47 +84,34 @@ sub cluster{
 sub standalone{
     $target = $ARGV[0];
     chdir $target;
-    $input_file = $target . ".sort_uniq.gz";
-    if (-e "tmp"){
-	system("rm -rf tmp");
-    }
-    system("mkdir tmp");
-    $count = 0;
-    $file_count = 1;
-    open(IN, $input_file);
-    open(OUT, "|gzip > tmp/$input_file.$file_count.gz");
-    while(<IN>){
-	if ($count == 10000000){
-	    $file_count ++;
-	    open(OUT, "|gzip > tmp/$target.sort_uniq.$file_count.gz");
-	    $count = 0;
-	}
-	$count++;
-	print OUT;
-    }
-    close(IN);
-    close(OUT);
-    for ($j = 1; $j <= $file_count; $j++){
-	open(IN, "zcat tmp/$input_file.$j.gz 2> /dev/null |");
-	$number = "000$j";
-	$number = substr($number, length($number) -4, 4);
-	&report("$input_file.$j / $file_count is processing.");
-	$reads = 0;
-	open(OUT, "|sort $sort_opt -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
-	while(<IN>){
-	    $reads++;
-	    chomp;
-	    $length = length($_);
-	    for ($i = 0; $i <= $length - 20; $i++){
-		$seq = substr($_, $i, 20);
-		if ($seq !~ /N/){
-		    print OUT "$seq\n";
+    $j = 0;
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$j++;
+		open(IN, "zcat sort_uniq/$target.sort_uniq.$tag.gz 2> /dev/null |");
+		$number = "000$j";
+		$number = substr($number, length($number) -4, 4);
+		&report("$target.sort_uniq.$tag.gz $j/64 is processing.");
+		$reads = 0;
+		open(OUT, "|sort -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
+		while(<IN>){
+		    $reads++;
+		    chomp;
+		    $length = length($_);
+		    for ($i = 0; $i <= $length - 20; $i++){
+			$seq = substr($_, $i, 20);
+			if ($seq !~ /N/){
+			    print OUT "$seq\n";
+			}
+		    }
 		}
+		close(IN);
+		close(OUT);
+		&split_count($number);
 	    }
 	}
-	close(IN);
-	close(OUT);
-	&split_count($number);
     }
     &merge;
 }
@@ -139,7 +131,7 @@ sub split_count{
     }
     close(IN);
     close(OUT);
-    system("rm $target.count.$number.gz");
+    system("rm $target.count.$number");
 }
 
 sub merge{
@@ -191,11 +183,4 @@ sub merge{
 	    system("rm $file[0] $file[1]");
 	}
     }
-}
-
-sub report{
-    my $message = shift;
-    my $now = `date`;
-    chomp($now);
-    print "$now $message\n";
 }

@@ -7,6 +7,18 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+if ($ENV{PBS_O_WORKDIR} ne ""){
+    $cwd = $ENV{PBS_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}elsif($ENV{SGE_O_WORKDIR} ne ""){
+    $cwd = $ENV{SGE_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}else{
+    require './common.pl';
+}
+
 $usage = '
      align.pl - bi-directional alignment program. 
 
@@ -26,30 +38,17 @@ $usage = '
 
 ';
 
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-    $rsync = "/usr/local/bin/rsync";
-}else{
-    $rsync = "/usr/bin/rsync";
-}
-
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $ref = $ARGV[1];
     $margin = $ARGV[2];
     $tmpdir = $ARGV[3];
-    $cwd = `pwd`;
-    chomp($cwd);
     $workdir = $target;
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $ref       = $ENV{ref};
     $margin    = $ENV{margin};
     $tmpdir    = $ENV{tmpdir};
-    $cwd       = $ENV{PBS_O_WORKDIR};
-    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $workdir = "$cwd/$target";
 }else{
     print $usage;
@@ -76,8 +75,6 @@ if ($tmpdir ne ""){
     $tmpdir = ".";
     $ref_path = "$cwd/$ref";
 }
-
-@nuc = ('A', 'C', 'G', 'T');
 
 chdir $workdir;
 
@@ -119,7 +116,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "zcat $target.sort_uniq.gz 2> /dev/null |");
+open(IN, "zcat $cwd/$target/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -129,7 +126,7 @@ close(IN);
 
 &openTag;
 
-open(IN, "zcat $target.sort_uniq.gz 2> /dev/null |");
+open(IN, "zcat $cwd/$target/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $head_pos = $margin + 1;
@@ -181,9 +178,9 @@ sub map{
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
 		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin");
-		&sortWait("$tmpdir/$tag.$margin");
+		&waitFile("$tmpdir/$tag.$margin");
 		system("zcat $ref_path/ref20_uniq.$tag.gz | join $tmpdir/$tag.$margin - |cut -c 22- > $tmpdir/$tag.map.$margin");
-		&sortWait("$tmpdir/$tag.map.$margin");
+		&waitFile("$tmpdir/$tag.map.$margin");
 		system("rm $tmpdir/$tag.tmp.$margin $tmpdir/$tag.$margin");
 	    }
 	}
@@ -366,38 +363,5 @@ $head_bar
 $seq
 
 ";
-    }
-}
-
-sub complement{
-    my $seq = shift;
-    my @seq = split('', $seq);
-    my $i = length($seq);
-    my $out = "";
-    while($i > 0){
-        $i--;
-        if ($seq[$i] eq "A"){
-            $out .= "T";
-        }elsif($seq[$i] eq "C"){
-            $out .= "G";
-        }elsif($seq[$i] eq "G"){
-            $out .= "C";
-        }elsif($seq[$i] eq "T"){
-            $out .= "A";
-        }else{
-            $out .= "N";
-        }
-    }
-    return $out;
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
     }
 }

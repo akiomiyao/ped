@@ -7,6 +7,8 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+require './common.pl';
+
 $usage = '
      qsub_bidirectional.pl - pipeline for bidirectional method for computer cluster. 
 
@@ -67,24 +69,10 @@ $target  =~ s/\/$//;
 $control =~ s/\/$//;
 $ref     =~ s/\/$//;
 
-if (! -e "$target/$target.sort_uniq.gz"){
-    report("Making $target.sort_uniq.");
-    $qsub = "-v target=$target sort_uniq.pl";
-    @job = ();
-    &doQsub($qsub);
-}
+&mkSortUniq($target);
+&mkSortUniq($control);
 
-if (! -e "$control/$control.sort_uniq.gz" and $ARGV[1] ne "default"){
-    report("Making $control.sort_uniq.");
-    $qsub = "-v target=$control sort_uniq.pl";
-    @job = ();
-    &doQsub($qsub);
-}
-sleep 2;
 &holdUntilJobEnd;
-
-&sortWait("$target/$target.sort_uniq.gz");
-&sortWait("$control/$control.sort_uniq.gz");
 
 report("Aligning of $target sequence to $ref genome.");
 @job = ();
@@ -142,6 +130,8 @@ foreach(sort readdir(DIR)){
 closedir(DIR);
 &holdUntilJobEnd;
 
+&checkQsub;
+
 report("Making vcf file of SNP");
 system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.??");
 system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.* $target/$target.snp.??");
@@ -149,50 +139,3 @@ system("perl snp2vcf.pl $target");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
 report("bidirectional.pl complete.");
 
-sub report{
-    my $message = shift;
-    my $now = `date`;
-    chomp($now);
-    print "$now $message\n";
-}
-
-sub doQsub{
-    my $qsub = shift;
-    my $job;
-    open(IN, "qsub $qsub |");
-    $job = <IN>;
-    close(IN);
-    chomp($job);
-    push(@job, $job);
-    sleep 1;
-}
-
-sub holdUntilJobEnd{
-    my (@row, %stat, $job, $flag);
-    while(1){
-	%stat = ();
-	$flag = 0;
-	open(IN, "qstat |");
-	while(<IN>){
-	    @row = split;
-	    $stat{$row[0]} = $row[4];
-	}
-	close(IN);
-	foreach $job(@job){
-	    $flag = 1 if $stat{$job} =~/q|r|e/i;
-	}
-	last if ! $flag;
-	sleep 10;
-    }
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
-    }
-}

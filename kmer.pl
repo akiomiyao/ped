@@ -7,6 +7,8 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+require "./common.pl";
+
 $usage = '
      kmer.pl - pipeline of kmer method for standalone machine. 
 
@@ -38,12 +40,6 @@ $usage = '
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
-
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-}
 
 if ($ARGV[1] eq ""){
     print $usage;
@@ -77,19 +73,19 @@ close(IN);
 
 report("kmer.pl start.");
 
-if (! -e "$target/$target.sort_uniq.gz"){
+if (! -e "$target/sort_uniq/$target.sort_uniq.TTT.gz"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
 }
 
-&sortWait("$target/$target.sort_uniq.gz");
+&waitFile("$target/sort_uniq/$target.sort_uniq.TTT.gz");
 
-if (! -e "$control/$control.sort_uniq.gz"){
+if (! -e "$control/sort_uniq/$control.sort_uniq.TTT.gz" and $ARGV[1] ne "default"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
-
-&sortWait("$control/$control.sort_uniq.gz");
+sleep 2;
+&waitFile("$controlsort_uniq/$control.sort_uniq.TTT.gz");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
@@ -97,7 +93,7 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     system("gzip $control/$control.lbc.*");
 }
 
-&sortWait("$control/$control.lbc.TTT.gz");
+&waitFile("$control/$control.lbc.TTT.gz");
 
 report("Making kmer count of $target.");
 system("perl count.pl $target");
@@ -139,21 +135,3 @@ report("Convert to vcf");
 system("rm $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
 system("perl snp2vcf.pl $target kmer");
 report("kmer.pl done.");
-
-sub report{
-    my $message = shift;
-    my $now = `date`;
-    chomp($now);
-    print "$now $message\n";
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
-    }
-}

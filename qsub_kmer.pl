@@ -7,6 +7,8 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+require "./common.pl";
+
 $usage = '
      qsub_kmer.pl - pipeline of kmer method for computer cluster. 
 
@@ -14,6 +16,8 @@ $usage = '
      e.g. perl qsub_kmer.pl SRR8181712 default TAIR10
 
      This script is for computer cluster.
+     If reference is noref, script will terminated before mappig 
+     and target.kmer is saved in the target directory.
 
      Before run the script, downloading target reads and reference genome data
      are required.
@@ -38,12 +42,6 @@ $usage = '
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
-
-$uname = `uname`;
-chomp($uname);
-if ($uname eq "FreeBSD"){
-    $sort_opt = "-S 100M";
-}
 
 if ($ARGV[1] eq ""){
     print $usage;
@@ -77,50 +75,39 @@ close(IN);
 
 report("qsub_kmer.pl start.");
 
-if (! -e "$target/$target.sort_uniq.gz"){
-    report("Making $target.sort_uniq.");
-    $qsub = "-v target=$target sort_uniq.pl";
-    @job = ();
-    &doQsub($qsub);
-}
+&mkSortUniq($target);
+&mkSortUniq($control);
 
-if (! -e "$control/$control.sort_uniq.gz"){
-    report("Making $control.sort_uniq.");
-    $qsub = "-v target=$control sort_uniq.pl";
-    @job = ();
-    &doQsub($qsub);
-}
 &holdUntilJobEnd;
-
-&sortWait("$target/$target.sort_uniq.gz");
-
-&sortWait("$control/$control.sort_uniq.gz");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
-    $qsub = "-v target=$control split_sort_uniq.pl";
-    &doQsub($qsub);
-    &holdUntilJobEnd;
+    $number = 0;
     @job = ();
-    opendir(DIR, "$control/tmp");
-    foreach (sort readdir(DIR)){
-	next if !/$control/;
-	@row = split('\.', $_);
-	if ($tmpdir ne ""){
-	    $qsub = "-v target=$control,number=$row[$#row - 1],tmpdir=$tmpdir count.pl";
-	}else{
-	    $qsub = "-v target=$control,number=$row[$#row - 1] count.pl";
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$number ++;
+		$num = "000$number";
+		$num = substr($num, length($num) - 4, 4);
+		if ($tmpdir ne ""){
+		    $qsub = "-v target=$control,number=$num,tag=$tag,tmpdir=$tmpdir count.pl";
+		}else{
+		    $qsub = "-v target=$control,number=$num,tag=$tag count.pl";
+		}
+		&doQsub($qsub);
+	    }
 	}
-	&doQsub($qsub);
     }
     &holdUntilJobEnd;
-    @job = ();
 
+    @job = ();
     opendir(DIR, "$control");
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
 	if (/\.count\./){
-	    $tag{$row[$#row -2]} = 1;
+	    $tag{$row[$#row -1]} = 1;
 	}
     }
     foreach $tag (sort keys %tag){
@@ -132,6 +119,7 @@ if (! -e "$control/$control.lbc.AAA.gz"){
 	&doQsub($qsub);
     }
     &holdUntilJobEnd;
+
     @job = ();
     foreach $tag (sort keys %tag){
 	if ($tmpdir ne ""){
@@ -145,24 +133,26 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     @job = ();
 }
 
-&sortWait("$control/$control.lbc.TTT.gz");
+&waitFile("$control/$control.lbc.TTT.gz");
 
 report("Making kmer count of $target.");
-$qsub = "-v target=$target split_sort_uniq.pl";
-&doQsub($qsub);
-&holdUntilJobEnd;
-
+$number = 0;
 @job = ();
-opendir(DIR, "$target/tmp");
-foreach (sort readdir(DIR)){
-    next if ! /$target/;
-    @row = split('\.', $_);
-    if ($tmpdir ne ""){
-	$qsub = "-v target=$target,number=$row[$#row - 1],tmpdir=$tmpdir count.pl";
-    }else{
-	$qsub = "-v target=$target,number=$row[$#row - 1] count.pl";
+foreach $nuca (@nuc){
+    foreach $nucb (@nuc){
+	foreach $nucc (@nuc){
+	    $tag = $nuca . $nucb . $nucc;
+	    $number ++;
+	    $num = "000$number";
+	    $num = substr($num, length($num) - 4, 4);
+	    if ($tmpdir ne ""){
+		$qsub = "-v target=$target,number=$num,tag=$tag,tmpdir=$tmpdir count.pl";
+	    }else{
+		$qsub = "-v target=$target,number=$num,tag=$tag count.pl";
+	    }
+	    &doQsub($qsub);
+	}
     }
-    &doQsub($qsub);
 }
 &holdUntilJobEnd;
 
@@ -216,6 +206,8 @@ foreach $tag (sort keys %tag){
 &holdUntilJobEnd;
 
 system("cat $target/$target.snp.??? > $target/$target.kmer");
+system("rm $target/$target.count.* $target/$target.snp.* $target/$target.lbc.* ");
+exit if $ref eq "noref";
 
 report("Making map");
 @job = ();
@@ -270,56 +262,7 @@ report("Convert to vcf");
 if ($ref ne $control and -e "$control/$control.count.AAA.gz"){
     system("rm $control/$control.count.*");
 }
-system("rm $target/$target.count.* $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.* $target/$target.lbc.* ");
+system("rm $target/snp.sort.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.*");
 system("perl snp2vcf.pl $target kmer");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
 report("kmer.pl done.");
-
-
-sub report{
-    my $message = shift;
-    my $now = `date`;
-    chomp($now);
-    print "$now $message\n";
-}
-
-sub doQsub{
-    my $qsub = shift;
-    my $job;
-    open(IN, "qsub $qsub |");
-    $job = <IN>;
-    close(IN);
-    chomp($job);
-    push(@job, $job);
-    sleep 1;
-}
-
-sub holdUntilJobEnd{
-    my (@row, %stat, $job, $flag);
-    while(1){
-	%stat = ();
-	$flag = 0;
-	open(IN, "qstat |");
-	while(<IN>){
-	    @row = split;
-	    $stat{$row[0]} = $row[4];
-	}
-	close(IN);
-	foreach $job(@job){
-	    $flag = 1 if $stat{$job} =~ /q|r|e/i;
-	}
-	last if ! $flag;
-	sleep 10;
-    }
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
-    }
-}

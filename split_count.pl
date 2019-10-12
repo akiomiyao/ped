@@ -46,4 +46,3 @@ close(OUT);
 if ($tmpdir ne ""){
     system("cp $target.count* $workdir && rm -r $tmpdir/$target");
 }
-system("rm $workdir/tmp/$target.sort_uniq.$number");

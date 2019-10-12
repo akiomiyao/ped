@@ -7,14 +7,28 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-require './common.pl';
+if ($ENV{PBS_O_WORKDIR} ne ""){
+    $cwd = $ENV{PBS_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}elsif($ENV{SGE_O_WORKDIR} ne ""){
+    $cwd = $ENV{SGE_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}else{
+    require './common.pl';
+}
 
 $usage = "
      mkref.pl - script for making reference data. 
 
      For example,
-     perl mkref.pl target
-     perl mkref.pl TAIR10
+     perl qsub_mkref.pl target
+     perl qsub_mkref.pl TAIR10
+
+     For computer cluster,
+     qsub -v target=target qsub_mkref.pl
+     qsub -v target=hg38 qsub_mkref.pl
 
      Currently, target listed below are available.
 
@@ -24,6 +38,9 @@ $usage = "
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $file   = $ARGV[1];
+}elsif ($ENV{target} ne ""){
+    $target    = $ENV{target};
+    $file      = $ENV{file};
 }
 
 open(IN, "$cwd/config");
@@ -64,6 +81,7 @@ if ($target eq ""){
 
      If you want to make reference data which is not listed in config file,
      perl mkref.pl taget file_name
+     qsub -v target=RefBeet12,file=RefBeet-1.2.fna
 
      Before run the script,
      mkdir ./target
@@ -100,13 +118,26 @@ if ($file eq ""){
 
 &mk20;
 
+chdir $cwd;
+
 &mkControlRead;
 
-&report("Job End.");
+$check_file ="$target/sort_uniq/$target.sort_uniq.TTT.gz"; 
+while(1){
+    if (-e $check_file){
+	last;
+    }
+    sleep 5;
+}
+
+&waitFile($check_file)
+
+&checkQsub;
 
 sub mkChr{
+    chdir "$cwd/$target";
     my @file = split('/', $wget{$target});
-    my$file = $file[$#file];
+    my $file = $file[$#file];
     $file =~ s/\ +$//g;
     my $i = 0;
     &report("Making chromosome file from $file.");
@@ -190,6 +221,7 @@ sub mkChr{
 }
 
 sub mkChrFromFile{
+    chdir "$cwd/$target";
     my $file = shift;
     if ($file eq ""){
 	my @file = split('/', $wget{$target});
@@ -244,18 +276,8 @@ sub mk20{
 	&mk20mer($i);
     }
     
-    foreach $nuc (@nuc){
-	$tag[0] = $nuc;
-	foreach $nuc (@nuc){
-	    $tag[1] = $nuc;
-	    foreach $nuc (@nuc){
-		$tag[2] = $nuc;
-		$tag = join('', @tag);
-		close($tag);
-	    }
-	}
-    }
-    
+    &closeTag;
+
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -271,19 +293,19 @@ sub mk20{
 
 sub mkControlRead{
     &report("Making Control Read.");
+    system("mkdir $target/sort_uniq");
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $cwd/$target/sort_uniq/$tag.seq")
+		open($tag, "> $target/sort_uniq/$tag.seq")
 	    }
 	}
     }
-
     for(@chr){
 	next if $_ eq "NOP";
 	&report("Processing Chr$_");
-	open(IN, "$cwd/$target/chr$_");
+	open(IN, "$target/chr$_");
 	$data = <IN>;
 	close(IN);
 	$i = 0;
@@ -300,14 +322,14 @@ sub mkControlRead{
 	    $i += 2;
 	}
     }
-
     &closeTag;
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		system("sort -T $cwd/$target/sort_uniq/ $sort_opt $cwd/$target/sort_uniq/$tag.seq | uniq | gzip > $cwd/$target/sort_uniq/$target.sort_uniq.$tag.gz && rm $cwd/$target/sort_uniq/$tag.seq");
+		$qsub = "-v target=$target,tag=$tag sort_uniq_sub.pl";
+		&doQsub($qsub);
 	    }
 	}
     }

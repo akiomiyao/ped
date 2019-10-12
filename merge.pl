@@ -43,7 +43,7 @@ chdir $tmpdir;
 
 while(1){
     opendir(DIR, ".");
-    @file = sort(grep(/$tag/, readdir(DIR)));
+    @file = sort(grep(/count/, grep(/$tag/, readdir(DIR))));
     closedir(DIR);
     $total = @file;
     if ($total == 1){

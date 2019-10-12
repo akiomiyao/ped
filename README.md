@@ -47,7 +47,6 @@ perl will be installed to /usr/local/bin/
 \# ln -s /usr/local/bin/perl5 /usr/bin/perl  
 will be required, if you run the PED script on computer cluster with FreeBSD. 
 - If you want to run on computer cluster, Torque job scheduler is required.  
-Install method of Torque for CentOS 7 is described in the [Install of Torque grid engne](https://github.com/akiomiyao/ped/wiki/Install-of-Torque) .  
 Torque with default setting works fine.  For the customized Torque, modification of script may be required.
 
 ## Instruction for bidirectional method  
@@ -447,8 +446,9 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
-Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.
-Version 1.0 Original version for PED paper.
+Pre-Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
+Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.  
+Version 1.0 Original version for PED paper.  
 
 ## Citing PED
 Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data  

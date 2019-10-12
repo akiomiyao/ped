@@ -7,6 +7,18 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+if ($ENV{PBS_O_WORKDIR} ne ""){
+    $cwd = $ENV{PBS_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}elsif($ENV{SGE_O_WORKDIR} ne ""){
+    $cwd = $ENV{SGE_O_WORKDIR};
+    chdir $cwd;
+    require "$cwd/common.pl";
+}else{
+    require './common.pl';
+}
+
 $usage = '
      map.pl - map SNPs from snp file. 
 
@@ -24,17 +36,15 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
-if($ENV{target} ne ""){
+if($ENV{tag} ne ""){
     $target      = $ENV{target};
     $ref         = $ENV{ref};
     $tag         = $ENV{tag};
-    $cwd         = $ENV{PBS_O_WORKDIR};
-    $cwd         = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $tmpdir      = $ENV{tmpdir};
     $workdir     = "$cwd/$target";
     $refdir      = "$cwd/$ref";
     $target_file = "$target.snp.$tag";
-    $ref_file    = "zcat ref20_uniq.$tag.gz|";
+    $ref_file    = "zcat $refdir/ref20_uniq.$tag.gz|";
     $output_file = "$target.map.$tag";
 }elsif($ARGV[0] ne ""){
     $cwd       = `pwd`;
@@ -53,7 +63,6 @@ if($ENV{target} ne ""){
 
 if ($tmpdir eq ""){
     $tmpdir = $workdir;
-    $ref_file    = "zcat $refdir/ref20_uniq.*.gz|";
 }else{
     $tmpdir = "$tmpdir/$target";
     if (-e $tmpdir){
@@ -106,27 +115,4 @@ close(OUT);
 
 if ($tmpdir ne $workdir){
     system("cp $target.map.$tag $workdir && rm -r $tmpdir");
-}
-
-sub complement{
-    my $seq = shift;
-    my @seq = split('', $seq);
-    my $i = 0;
-    my $out = "";
-    for ($i = length($seq) - 1 ; $i >= 0; $i--){
-        if ($seq[$i] eq "A"){
-            $out .= "T";
-        }elsif($seq[$i] eq "C"){
-            $out .= "G";
-        }elsif($seq[$i] eq "G"){
-            $out .= "C";
-        }elsif($seq[$i] eq "T"){
-            $out .= "A";
-        }
-    }
-    return $out;
-}
-
-sub bynumber{
-    $a <=> $b;
 }

@@ -7,6 +7,8 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+require "./common.pl";
+
 $usage = '
      bidirectional.pl - pipeline for bidirectional method for stand alone macnine. 
 
@@ -59,19 +61,19 @@ $target  =~ s/\/$//;
 $control =~ s/\/$//;
 $ref     =~ s/\/$//;
 
-if (! -e "$target/$target.sort_uniq.gz"){
+if (! -e "$target/sort_uniq/$target.sort_uniq.TTT.gz"){
     report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
 }
 
-&sortWait("$target/$target.sort_uniq.gz");
+&waitFile("$target/sort_uniq/$target.sort_uniq.TTT.gz");
 
-if (! -e "$control/$control.sort_uniq.gz" and $ARGV[1] ne "default"){
+if (! -e "$control/sort_uniq/$control.sort_uniq.TTT.gz" and $ARGV[1] ne "default"){
     report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
 sleep 2;
-&sortWait("$control/$control.sort_uniq.gz");
+&waitFile("$controlsort_uniq/$control.sort_uniq.TTT.gz");
 
 report("Aligning of $target sequence to $ref genome. margin = 5");
 system("perl align.pl $target $ref 5");
@@ -110,21 +112,3 @@ system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target
 system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp $target/$target.snp.verify.* $target/$target.snp.??");
 system("perl snp2vcf.pl $target");
 report("bidirectional.pl complete.");
-
-sub report{
-    my $message = shift;
-    my $now = `date`;
-    chomp($now);
-    print "$now $message\n";
-}
-
-sub sortWait{
-    my $file = shift;
-    while(1){
-	$mtime = (stat($file))[9];
-	if (time > $mtime + 5){
-	    return;
-	}
-	sleep 1;
-    }
-}
