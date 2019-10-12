@@ -278,6 +278,7 @@ sub mk20{
     
     &closeTag;
 
+    chdir $cwd;
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -285,7 +286,8 @@ sub mk20{
 	    foreach $nuc (@nuc){
 		$tag[2] = $nuc;
 		$tag = join('', @tag);
-		&mkUniq($tag);
+		$qsub = "-v target=$target,tag=$tag $cwd/mkuniq.pl";
+		&doQsub($qsub);
 	    }
 	}
     }    
@@ -333,30 +335,6 @@ sub mkControlRead{
 	    }
 	}
     }
-}
-
-sub mkUniq{
-    my $tag = shift;
-    &report("Making ref20_uniq.$tag.gz");
-    system("sort -T . $sort_opt ref20.$tag > ref20_sort.$tag");
-    &waitFile("ref20_sort.$tag");
-    open(OUT, "|gzip -f > ref20_uniq.$tag.gz");
-    open(IN, "ref20_sort.$tag");
-    while(<IN>){
-	chomp;
-	@row = split;
-	if ($prev ne "" and $prev ne $row[0]){
-	    print OUT "$pline\n" if $count == 1;
-	    $count =0;
-	}
-	$prev = $row[0];
-	$pline = $_;
-	$count++;
-    }
-    close(IN);
-    close(OUT);
-    &waitFile("ref20_uniq.$tag.gz");
-    system("rm ref20.$tag ref20_sort.$tag");
 }
 
 sub mk20mer{

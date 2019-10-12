@@ -7,8 +7,6 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
-$sort_opt = "-S 100M";
-
 if ($cwd eq ""){
     $cwd = `pwd`;
     chomp($cwd);
@@ -19,6 +17,7 @@ chomp($uname);
 if ($uname eq "FreeBSD"){
     $wget = "/usr/local/bin/wget";
     $rsync = "/usr/local/bin/rsync";
+    $sort_opt = "-S 100M";
 }else{
     $wget = "/usr/bin/wget";
     $rsync = "/usr/bin/rsync";

@@ -95,7 +95,7 @@ sub standalone{
 		$number = substr($number, length($number) -4, 4);
 		&report("$target.sort_uniq.$tag.gz $j/64 is processing.");
 		$reads = 0;
-		open(OUT, "|sort -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
+		open(OUT, "|sort $sort_opt -T . | uniq -c | awk '{print \$2 \"\t\" \$1}' > $target.count.$number");
 		while(<IN>){
 		    $reads++;
 		    chomp;
