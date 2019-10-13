@@ -47,6 +47,7 @@ perl will be installed to /usr/local/bin/
 \# ln -s /usr/local/bin/perl5 /usr/bin/perl  
 will be required, if you run the PED script on computer cluster with FreeBSD. 
 - If you want to run on computer cluster, Torque job scheduler is required.  
+Install method of Torque for CentOS 7 is described in the [Install of Torque grid engne](https://github.com/akiomiyao/ped/wiki/Install-of-Torque).  
 Torque with default setting works fine.  For the customized Torque, modification of script may be required.
 
 ## Instruction for bidirectional method  

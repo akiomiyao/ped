@@ -20,15 +20,15 @@ if ($ENV{PBS_O_WORKDIR} ne ""){
 }
 
 $usage = "
-     mkref.pl - script for making reference data. 
+     qsub_mkref.pl - script for making reference data using computer cluster. 
 
-     For example,
      perl qsub_mkref.pl target
-     perl qsub_mkref.pl TAIR10
+     e.g. perl qsub_mkref.pl TAIR10
+     The qsub_mkref.pl runs on master server. Subprocess will run on nodes.
 
-     For computer cluster,
+     If you want to run qsub_mkref.pl by a node,
      qsub -v target=target qsub_mkref.pl
-     qsub -v target=hg38 qsub_mkref.pl
+     e.g. qsub -v target=TAIR10 qsub_mkref.pl
 
      Currently, target listed below are available.
 
@@ -80,8 +80,7 @@ if ($target eq ""){
      Customized reference can be made by adding or modifiing the config file.
 
      If you want to make reference data which is not listed in config file,
-     perl mkref.pl taget file_name
-     qsub -v target=RefBeet12,file=RefBeet-1.2.fna
+     perl qsub_mkref.pl taget file_name
 
      Before run the script,
      mkdir ./target
@@ -90,7 +89,7 @@ if ($target eq ""){
      For example,
      mkdir ./RefBeet12
      cp somewhere/RefBeet-1.2.fna ./RefBeet12
-     perl mkref.pl RefBeet12 RefBeet-1.2.fna
+     perl qsub_mkref.pl RefBeet12 RefBeet-1.2.fna
 
      Author: Akio Miyao <miyao\@affrc.go.jp>
 

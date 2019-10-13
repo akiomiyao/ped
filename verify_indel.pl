@@ -243,9 +243,6 @@ system("rm *.indel_sort.$number");
 system("zcat sort_uniq/*.gz 2> /dev/null | join - indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
 &waitFile("indel_target.$number");
 system("rm indel_target.st.$number");
-if ($tmpdir ne "."){
-   system("rm $target.sort_uniq.gz");
-}
 system("sort -T . $sort_opt indel_target.$number| uniq -c > indel_target.count.$number");
 &waitFile("indel_target.count.$number");
 system("rm indel_target.$number");

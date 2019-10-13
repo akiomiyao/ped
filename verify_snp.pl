@@ -221,9 +221,6 @@ system("rm *.snp.sort.$number");
 system("zcat sort_uniq/*.gz 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
 &waitFile("target.snp.$number");
 system("rm target.snp.st.$number");
-if ($tmpdir ne "."){
-   system("rm $target.sort_uniq.gz");
-}
 system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
 &waitFile("target.snp.count.$number");
 system("rm target.snp.$number");

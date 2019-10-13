@@ -27,22 +27,36 @@ if ($uname eq "FreeBSD"){
 
 sub mkSortUniq{
     my $target = shift;
-    my $count = 0;
-    &report("Making $target.sort_uniq.");
+    my ($job, @row, $flag, $count_gz, $count_seq);
     if (! -e "$target/sort_uniq"){
 	system ("mkdir $target/sort_uniq");
     }
     opendir(DIR, "$target/sort_uniq");
     foreach (readdir(DIR)){
 	if (/gz/){
-	    $count++;
+	    $count_gz++;
+	}elsif(/seq/){
+	    $count_seq++;
 	}
+	
     }
-    if ($count == 64){
+    if ($count_gz == 64){
 	return;
+    }elsif($count_seq == 64){
+	foreach $nuca (@nuc){
+	    foreach $nucb (@nuc){
+		foreach $nucc (@nuc){
+		    $tag = $nuca . $nucb . $nucc;
+		    $qsub = "-v target=$target,tag=$tag $cwd/sort_uniq_sub.pl";
+		    &doQsub($qsub);
+		}
+	    }
+	}
+    }else{
+	&report("Making $target.sort_uniq.");
+	$qsub = "-v target=$target qsub_sort_uniq.pl";
+	&doQsub($qsub);
     }
-    $qsub = "-v target=$target qsub_sort_uniq.pl";
-    &doQsub($qsub);
 }
 
 sub report{
@@ -82,20 +96,30 @@ sub checkQsub{
 }
 
 sub holdUntilJobEnd{
-    my (@row, %stat, $job, $flag);
+    my (@row,  %stat, $job, $flag);
     while(1){
 	%stat = ();
-	$flag = 0;
+	$flag = 1;
 	open(IN, "qstat |");
 	while(<IN>){
+	    chomp;
 	    @row = split;
-	    $stat{$row[0]} = $row[4];
+	    $stat{$row[0]} = $_;
 	}
 	close(IN);
 	foreach $job(@job){
-	    $flag = 1 if $stat{$job} =~/q|r|e/i;
+	    if($stat{$job} ne ""){
+		@row = split(/\s+/, $stat{$job});
+		foreach (@row){
+		    if (/^[qre]$/i){
+			$flag = 0;
+		    }
+		}
+	    }
 	}
-	last if ! $flag;
+	if ($flag){
+	    last;
+	}
 	sleep 10;
     }
 }

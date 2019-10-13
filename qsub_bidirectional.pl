@@ -71,8 +71,12 @@ $ref     =~ s/\/$//;
 
 &mkSortUniq($target);
 &mkSortUniq($control);
-
 &holdUntilJobEnd;
+
+&mkSortUniq($target);
+&mkSortUniq($control);
+&holdUntilJobEnd;
+
 
 report("Aligning of $target sequence to $ref genome.");
 @job = ();

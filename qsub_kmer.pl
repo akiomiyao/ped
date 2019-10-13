@@ -77,8 +77,12 @@ report("qsub_kmer.pl start.");
 
 &mkSortUniq($target);
 &mkSortUniq($control);
-
 &holdUntilJobEnd;
+
+&mkSortUniq($target);
+&mkSortUniq($control);
+&holdUntilJobEnd;
+
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");

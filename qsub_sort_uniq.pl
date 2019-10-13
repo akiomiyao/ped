@@ -43,8 +43,6 @@ if ($ARGV[0] ne ""){
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $tmpdir    = $ENV{tmpdir};
-    $cwd       = $ENV{PBS_O_WORKDIR};
-    $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
     $workdir = "$cwd/$target";
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
@@ -117,17 +115,3 @@ while(<IN>){
     $count++;
 }
 close(OUT);
-
-&closeTag;
-
-chdir $cwd;
-
-foreach $nuca (@nuc){
-    foreach $nucb (@nuc){
-	foreach $nucc (@nuc){
-	    $tag = $nuca . $nucb . $nucc;
-	    $qsub = "-v target=$target,tag=$tag sort_uniq_sub.pl";
-	    &doQsub($qsub);
-	}
-    }
-}
