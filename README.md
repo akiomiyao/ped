@@ -447,7 +447,7 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
-Pre-Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
+Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
 Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.  
 Version 1.0 Original version for PED paper.  
 
