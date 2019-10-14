@@ -7,6 +7,8 @@
 # License: refer to https://github.com/akiomiyao/ped
 #
 
+# $qsub_opt = "-S /usr/bin/perl -jc M.c8"; # example of additional option.
+
 if ($cwd eq ""){
     $cwd = `pwd`;
     chomp($cwd);
@@ -69,10 +71,11 @@ sub report{
 sub doQsub{
     my $qsub = shift;
     my $job;
-    open(IN, "qsub $qsub |");
+    open(IN, "qsub $qsub_opt $qsub |");
     $job = <IN>;
     close(IN);
     chomp($job);
+    $job = (split(/\s+/, $job))[2] if $job =~ /Your job/;
     push(@job, $job);
     sleep 1;
 }
@@ -111,7 +114,7 @@ sub holdUntilJobEnd{
 	    if($stat{$job} ne ""){
 		@row = split(/\s+/, $stat{$job});
 		foreach (@row){
-		    if (/^[qre]$/i){
+		    if (/^[qre]$|^qw$/i){
 			$flag = 0;
 		    }
 		}

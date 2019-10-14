@@ -129,7 +129,7 @@ while(1){
     sleep 5;
 }
 
-&waitFile($check_file)
+&waitFile($check_file);
 
 &checkQsub;
 
