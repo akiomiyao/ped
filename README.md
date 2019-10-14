@@ -56,7 +56,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   For example,  
   % perl mkref.pl WBcel235  
   or  
-  % qsub -v target=WBcel235 mkref.pl  
+  % perl qsub_mkref.pl WBcel235 (For computer cluster)  
   Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
   If run without argument, help and suported reference will be listed.  
   If you want to new reference, add the reference information to the config file.    

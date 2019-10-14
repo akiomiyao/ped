@@ -210,7 +210,7 @@ foreach $tag (sort keys %tag){
 &holdUntilJobEnd;
 
 system("cat $target/$target.snp.??? > $target/$target.kmer");
-system("rm $target/$target.count.* $target/$target.snp.* $target/$target.lbc.* ");
+system("rm $target/$target.count.* $target/$target.lbc.* ");
 exit if $ref eq "noref";
 
 report("Making map");
@@ -266,7 +266,7 @@ report("Convert to vcf");
 if ($ref ne $control and -e "$control/$control.count.AAA.gz"){
     system("rm $control/$control.count.*");
 }
-system("rm $target/snp.sort.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.*");
+system("rm $target/snp.sort.* $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.*");
 system("perl snp2vcf.pl $target kmer");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
 report("kmer.pl done.");
