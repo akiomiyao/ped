@@ -4,8 +4,8 @@
     <link rel = "stylesheet" href = "default.css">
   <head>
     <body>
-      <h1>NGS解析の手引</h1>
-      <h2>PEDを用いた多型検出</h2>
+      <h1>PEDを用いた多型検出</h1>
+      <h2>PEDのインストール</h2>
       Unix (Linux)がインストールされたコンピュータでの作業となります。
       <ul>
 	<li>プログラムのダウンロード<br>
@@ -16,44 +16,72 @@
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業する。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
 	  を実行すると、最新のスクリプトに同期される。
-	<li>リファレンスゲノムデータセットの作成<br>
+	  </ul>
+	<h2>リファレンスゲノムデータセットの作成</h2>
+	<ul>
+	  <li>引数なしで実行するとヘルプと対応しているゲノムがリストされる。<br>
 	  perl mkref.pl<br>
-	  引数なしで実行するとヘルプと対応しているゲノムがリストされる。<br>
+	  <li>イネ(日本晴)データセットは、<br>
 	  perl mkref.pl IRGSP1.0<br>
-	  を実行するとイネ(日本晴)データセットができる。<br>
-	  IRGSP1.0をhg38にするとヒトのデータセットができる。<br>
+	  を実行する。<br>
+	  <li>IRGSP1.0をhg38にするとヒトのデータセットができる。<br>
+	  perl mkref.pl hg38<br>
 	  ヒトの場合はサイズが大きいので、作成に1日程度かかる。<br>
-	<li>fastq-dumpのインストール<br>
-	  <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
+	</ul>
+	<h2>fastq-dumpのインストール</h2>
+	<ul>
+	  <li><a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
 	  から、コンパイルされた実行ファイルのアーカイブをダウンロードする。<br>
-	  OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードする。<br>
-	  tar xvzf ファイル名 で展開できる。
+	  <li>OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードする。<br>
+	  tar xvzf ファイル名<br>
+	  で展開できる。<br>
 	  tar xvzf sratoolkit.2.10.0-centos_linux64.tar.gz<br>
-	  展開されたディレクトリの中のbinの中にある、fastq-dump-orig.2.10.0をユーザのホームディレクトリのbinディレクトリにfastq-dumpというファイル名でコピーする。<br>
+	  <li>展開されたディレクトリの中のbinの中にある、fastq-dump-orig.2.10.0をユーザのホームディレクトリのbinディレクトリにfastq-dumpというファイル名でコピーする。<br>
 	  例<br>
 	  cp sratoolkit.2.10.0-centos_linux64/bin/fastq-dump-orig.2.10.0 ~/bin/fastq-dump
-	<li>Fastqデータの取得<br>
+	  </ul>
+	<h2>Fastqデータの取得</h2>
+	<ul>
+	<li>解析対象のfastqデータ<br>
 	  日本晴 DRR099989<br>
 	  コシヒカリ DRR054198<br>
+	<li>download.plを実行する。<br>
 	  perl download.pl DRR099989<br>
 	  perl download.pl DRR054198<br>
-	  pedのディレクトリの中に、DRR054198とDRR099989のディレクトリが作成され、その中のreadのディレクトリの中にfastqファイルがダウンロードされる。<br>
+	<li>pedのディレクトリの中に、DRR054198とDRR099989のディレクトリが作成され、その中のreadのディレクトリの中にfastqファイルがダウンロードされる。<br>
 	  fastqファイルは、gz形式やbz2形式で圧縮されていても、そのまま解析が可能である。<br>
 	  ターゲット名のディレクトリ下のreadディレクトリの中に置いたファイルがまとめて解析される。<br>
 	  ペアエンドのデータでも複数のシングルエンドのデータでも解析されるが、ファイルの圧縮形式は揃っている必要がある。<br>
-	  PEDではリード長が一定している必要がある。リード長がばらついているデータは、長さを揃える必要がある。<br>
-	<li>bidirectional法での多型の検出<br>
-	  perl bidirectional.pl ターゲット コントロール リファレンス<br>
+	 <li>PEDではリード長が一定している必要がある。リード長がばらついているデータは、長さを揃える必要がある。
+	 </ul>
+	<h2>bidirectional法での多型の検出</h2>
+	  bidirectional法では、SNP以外に、挿入、欠失、逆位、転座等の構造変異も検出される。<br>
+	  <ul>
+	  <li>perl bidirectional.pl ターゲット コントロール リファレンス<br>
 	  例<br>
 	  perl bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
-	  この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
+	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
 	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
 	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
 	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
-	<li>グリッドエンジンを用いた並列計算
+	  </ul>
+	<h2><i>k</i>-mer法での多型の検出</h2>
+	  <i>k</i>-mer法は、SNPの検出のみとなる。
+	  <ul>
+	  <li>perl kmer.pl ターゲット コントロール リファレンス<br>
+	  例<br>
+	  perl kmer.pl  DRR054198 DRR099989 IRGSP1.0<br>
+	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
+	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
+	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
+	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
+	  </ul>
+	<h2>グリッドエンジンを用いた並列計算</h2>
 	  Torqueをインストールする必要がある。<br>
-	  マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも有効であるが、十分なメモリを搭載する必要がある。<br>
+	  <ul>
+	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも有効であるが、十分なメモリを搭載する必要がある。<br>
 	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。<br>
+	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
 	  perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
 	  グリッドエンジンを用いて高速に計算することができる。
       </ul>
