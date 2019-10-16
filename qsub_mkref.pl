@@ -43,6 +43,8 @@ if ($ARGV[0] ne ""){
     $file      = $ENV{file};
 }
 
+&report("Job start: qsub_mkref.pl");
+
 open(IN, "$cwd/config");
 while(<IN>){
     chomp;
@@ -121,17 +123,23 @@ chdir $cwd;
 
 &mkControlRead;
 
-$check_file ="$target/sort_uniq/$target.sort_uniq.TTT.gz"; 
 while(1){
-    if (-e $check_file){
-	last;
+    $count = 0;
+    opendir(DIR, "$cwd/$target");
+    foreach(readdir(DIR)){
+	if (/done/){
+	    $count++;
+	}
     }
-    sleep 5;
+    last if $count == 64;
+    sleep 10;
 }
 
-&waitFile($check_file);
+&cleanupLog;
 
-&checkQsub;
+system("rm $cwd/$target/done.*");
+
+&report("Job end: qsub_mkref.pl");
 
 sub mkChr{
     chdir "$cwd/$target";
@@ -294,7 +302,9 @@ sub mk20{
 
 sub mkControlRead{
     &report("Making Control Read.");
-    system("mkdir $target/sort_uniq");
+    if (! -e "$target/sort_uniq"){
+	system("mkdir $target/sort_uniq");
+    }
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){

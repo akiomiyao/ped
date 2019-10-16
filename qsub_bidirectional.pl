@@ -134,7 +134,7 @@ foreach(sort readdir(DIR)){
 closedir(DIR);
 &holdUntilJobEnd;
 
-&checkQsub;
+&cleanupLog;
 
 report("Making vcf file of SNP");
 system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.??");

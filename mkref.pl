@@ -271,6 +271,9 @@ sub mk20{
 
 sub mkControlRead{
     &report("Making Control Read.");
+    if (! -e "$cwd/$target/sort_uniq"){
+	system("mkdir $cwd/$target/sort_uniq");
+    }
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){

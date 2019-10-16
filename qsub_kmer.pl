@@ -239,6 +239,8 @@ foreach $tag (sort keys %tag){
 }
 &holdUntilJobEnd;
 
+&cleanupLog;
+
 open(IN, "cat $target/$target.kmer.verify.*| sort $sort_opt -T $target |");
 while(<IN>){
     @row = split;

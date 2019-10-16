@@ -26,7 +26,6 @@ if ($ENV{target} ne ""){
     exit;
 }
 
-&report("Making ref20_uniq.$tag.gz");
 system("sort -T $cwd/$target $sort_opt $cwd/$target/ref20.$tag > $cwd/$target/ref20_sort.$tag");
 &waitFile("$cwd/$target/ref20_sort.$tag");
 open(OUT, "|gzip -f > $cwd/$target/ref20_uniq.$tag.gz");

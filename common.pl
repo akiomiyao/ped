@@ -80,20 +80,17 @@ sub doQsub{
     sleep 1;
 }
 
-sub checkQsub{
+sub cleanupLog{
     my ($job, @dat, $num);
     chdir $cwd;
     opendir(DIR, '.');
     foreach (sort readdir(DIR)){
-	if(/.e[0-9]+$/){
-	    @dat = split('\.', $_);
-	    ($num = $dat[$#dat]) =~ y/0-9//cd;
-	    if (-s $_ > 0){
-		print "Error JobId $num.s2\n";
-		system("cat $_");
-	    }else{
-		system("rm *.e$num *.o$num");
+	if(/\.pl\.e[0-9]+$/){
+	    if (-s $_ == 0){
+		system("rm $_");
 	    }
+	}elsif(/\.pl\.o[0-9]+$/){
+	    system("rm $_");
 	}
     }
 }
@@ -129,6 +126,10 @@ sub holdUntilJobEnd{
 
 sub waitFile{
     my $file = shift;
+    while(1){
+	last if -e $file;
+	sleep 10;
+    }
     while(1){
 	$mtime = (stat($file))[9];
 	if (time > $mtime + 5){
