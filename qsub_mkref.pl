@@ -123,8 +123,8 @@ chdir $cwd;
 
 &mkControlRead;
 
+$count = 0;
 while(1){
-    $count = 0;
     opendir(DIR, "$cwd/$target");
     foreach(readdir(DIR)){
 	if (/done/){
