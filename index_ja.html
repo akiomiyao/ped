@@ -49,8 +49,8 @@
 	<h2>Fastqデータの取得</h2>
 	<ul>
 	<li>解析対象のfastqデータ<br>
-	  日本晴 DRR099989<br>
-	  コシヒカリ DRR054198<br>
+	  日本晴 <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR099989" target = _blank">DRR099989</a><br>
+	  コシヒカリ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR054198" target = _blank">DRR054198</a><br>
 	<li>download.plを実行する。<br>
 	  perl download.pl DRR099989<br>
 	  perl download.pl DRR054198<br>
@@ -97,14 +97,48 @@
       のように実行する。リファレンスデータ等が /mnt/ssd にコピーされて保持されるのでマスター・ノード間のネットワークの負荷が軽減される。<br>
       ヒトのデータしか解析しないような場合に利用すると効率的である。
       </ul>
+    <h2>解析事例</h2>
+      <ul>
+       <li>イネの早生・晩稲分離個体のバルク解析による関係領域の推定
+         <ul>
+          <li>日本稲の日本晴とインド型稲のカサラスを交配した個体の自殖個体(F2世代)は、出穂の表現型が早生と晩稲に分離する。<br>
+              日本晴でバッククロスした個体の自殖個体の早生型と晩稲型の個体のバルクからのNGSデータを解析した。
+          <li>早生データ: <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056225" target = "_blank">DRR056225</a>
+<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056226" target = "_blank">DRR056226</a>、
+晩稲データ: <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056227" target = "_blank">DRR056227</a>
+ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056228" target = "_blank">DRR056228</a>
+ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056229" target = "_blank">DRR056229</a>
+ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR056230" target = "_blank">DRR056230</a>
+          <li>pedディレクトリ下にearly/readとlate/readのディレクトリを作り、fastqデータをセーブする。<br>
+              cd ped<br>
+              mkdir early<br>
+              mkdir early/read<br>
+              mkdir late<br>
+              mkdir late/read<br>
+              mv DRR056225_1.fastq DRR056225_2.fastq DRR056226_1.fastq DRR056226_2.fastq early/read<br>
+              mv DRR056227_1.fastq DRR056227_2.fastq DRR056228_1.fastq DRR056228_2.fastq DRR056229_1.fastq DRR056229_2.fastq DRR056230_1.fastq DRR056230_2.fastq late/read<br>
+           <li>イネのリファレンスデータを作り、bidirectional法で多型情報を取得する。<br>
+              perl mkref.pl IRGSP1.0<br>
+              perl bidirectional.pl early late IRGSP1.0
+           <li>イネの全配列長を1000当分して、各ブロックに存在する早生型、晩稲型で検出されたSNP座位数を調べて、晩稲型SNP数 - 早生型SNP数をプロットした。<br>
+              <a href = "delta.png" target = "_blank"><img src = "delta.png" width = "10%"></a>
+           <li>第6染色体の上腕部分に早生型で検出されるSNPが多く検出され、その後に晩稲型SNPが多く検出される領域が続いている。<br>
+               この領域にそれぞれ早生、晩稲に関与する遺伝子座が存在する。
+           <li>文献: <a href = "https://www.jstage.jst.go.jp/article/jsbbs/67/2/67_16096/_article" target = "_blank">Detection of novel QTLs qDTH4.5 and qDTH6.3, which confer late heading under short-day conditions, by SSR marker-based and QTL-seq analysis. Breed Sci. 67(2):101-109 (2017).</a>
+           <li><a href = "https://github.com/akiomiyao/ped/wiki/Bulked-segrigant-analysis-of-rice" target = "_blank">英文リンク</a>
+         </ul>
+      </ul> 
+
     <h2>PEDに関する資料</h2>
-    スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a><br><br>
-    論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a><br>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
     <h2>その他のお役立ち情報</h2>
-    <ul>
-    <li>NGSデータから転移したトランスポゾンを検出する方法 <a href = "https://github.com/akiomiyao/tif/" target = "_blank">Transposon Insertion Finder (TIF)</a>
-    <li>ミュータントパネルデータベース <a href = "https://tos.nias.affrc.go.jp" target = "_blank">https://tos.nias.affrc.go.jp</a> 
-   </ul>
+      <ul>
+      <li>NGSデータから転移したトランスポゾンを検出する方法 <a href = "https://github.com/akiomiyao/tif/" target = "_blank">Transposon Insertion Finder (TIF)</a>
+      <li>ミュータントパネルデータベース <a href = "https://tos.nias.affrc.go.jp" target = "_blank">https://tos.nias.affrc.go.jp</a> 
+      </ul>
     <h2>連絡先</h2>
     〒305-8518<br>
     茨城県つくば市観音台2-1-2<br>
