@@ -16,6 +16,12 @@
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業する。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
 	  を実行すると、最新のスクリプトに同期される。
+    <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
+    common.pl の中の<br>
+    # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
+    の行のコメントアウトを外して、<br>
+    $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
+    としてセーブしなおしてから実行する必要がある。
 	  </ul>
 	<h2>リファレンスゲノムデータセットの作成</h2>
 	<ul>
@@ -79,15 +85,26 @@
 	<h2>グリッドエンジンを用いた並列計算</h2>
 	  Torqueをインストールする必要がある。<br>
 	  <ul>
-	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも有効であるが、十分なメモリを搭載する必要がある。<br>
+	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも動作するが、十分なメモリを搭載する必要がある。<br>
+      メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要がある。<br>
 	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。<br>
 	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
 	  perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
 	  グリッドエンジンを用いて高速に計算することができる。
+      <li>各ノードに1TB程度のSSDを搭載してテンポラリーディレクトリに指定するとより高速に処理ができる。<br>
+      perl qsub_bidirectional.pl ターゲット コントロール リファレンス テンポラリーディレクトリ<br>
+      perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0 /mnt/ssd<br>
+      のように実行する。リファレンスデータ等が /mnt/ssd にコピーされて保持されるのでマスター・ノード間のネットワークの負荷が軽減される。<br>
+      ヒトのデータしか解析しないような場合に利用すると効率的である。
       </ul>
     <h2>PEDに関する資料</h2>
     スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a><br><br>
     論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a><br>
+    <h2>その他のお役立ち情報</h2>
+    <ul>
+    <li>NGSデータから転移したトランスポゾンを検出する方法 <a href = "https://github.com/akiomiyao/tif/" target = "_blank">Transposon Insertion Finder (TIF)</a>
+    <li>ミュータントパネルデータベース <a href = "https://tos.nias.affrc.go.jp" target = "_blank">https://tos.nias.affrc.go.jp</a> 
+   </ul>
     <h2>連絡先</h2>
     〒305-8518<br>
     茨城県つくば市観音台2-1-2<br>
