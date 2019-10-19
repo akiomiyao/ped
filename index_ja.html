@@ -127,6 +127,106 @@
            <li>文献: <a href = "https://www.jstage.jst.go.jp/article/jsbbs/67/2/67_16096/_article" target = "_blank">Detection of novel QTLs qDTH4.5 and qDTH6.3, which confer late heading under short-day conditions, by SSR marker-based and QTL-seq analysis. Breed Sci. 67(2):101-109 (2017).</a>
            <li><a href = "https://github.com/akiomiyao/ped/wiki/Bulked-segrigant-analysis-of-rice" target = "_blank">英文リンク</a>
          </ul>
+         <li>ヒトの多型検出
+         <ul>
+           <li>perl mkref.pl hg38<br>
+           を実行してリファレンスを作る。
+           <li>perl download.pl ERR194146<br>
+           で、<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP001960&o=acc_s%3Aa" target = "_blank">CEPH/UTAH家系の父親のfastqデータ</a>をダウンロードする。<br>
+           どういうわけか、最近ERR194152の配列がNCBI/SRAからダウンロードできなくなった。ERR194147は今のところダウンロード可能である。
+           <li><pre>[miyao@cluster1 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
+2019年 10月 16日 水曜日 16:30:24 JST Making ERR194146.sort_uniq.
+2019年 10月 17日 木曜日 10:48:55 JST Aligning of ERR194146 sequence to hg38 genome.
+2019年 10月 18日 金曜日 06:42:16 JST Splitting of Indel alignment.
+2019年 10月 18日 金曜日 06:42:17 JST Splitting of SNP alignment.
+2019年 10月 18日 金曜日 08:52:26 JST Verifying indel 01
+2019年 10月 18日 金曜日 08:52:27 JST Verifying SNPs 01
+2019年 10月 18日 金曜日 08:52:28 JST Verifying SNPs 02
+2019年 10月 18日 金曜日 08:52:29 JST Verifying SNPs 03
+2019年 10月 18日 金曜日 08:52:30 JST Verifying SNPs 04
+2019年 10月 18日 金曜日 08:52:31 JST Verifying SNPs 05
+2019年 10月 18日 金曜日 08:52:32 JST Verifying SNPs 06
+2019年 10月 18日 金曜日 08:52:33 JST Verifying SNPs 07
+2019年 10月 18日 金曜日 08:52:34 JST Verifying SNPs 08
+2019年 10月 18日 金曜日 08:52:35 JST Verifying SNPs 09
+2019年 10月 18日 金曜日 08:52:36 JST Verifying SNPs 10
+2019年 10月 18日 金曜日 08:52:37 JST Verifying SNPs 11
+2019年 10月 18日 金曜日 08:52:38 JST Verifying SNPs 12
+2019年 10月 18日 金曜日 08:52:39 JST Verifying SNPs 13
+2019年 10月 18日 金曜日 08:52:40 JST Verifying SNPs 14
+2019年 10月 18日 金曜日 08:52:41 JST Verifying SNPs 15
+2019年 10月 18日 金曜日 18:45:48 JST Making vcf file of SNP
+2019年 10月 18日 金曜日 18:48:58 JST bidirectional.pl complete.</pre>
+           <li>ERR194146.bi.vcf<br>
+           にSNPのvcf形式マップデータがセーブされる。<br>
+<pre>##fileformat=VCFv4.2
+##FILTER=&lt;ID=PASS,Description="All filters passed"&gt;
+##INFO=&lt;ID=GT,Number=1,Type=String,Description="Genotype"&gt;
+##INFO=&lt;ID=DP,Number=1,Type=Integer,Description="Approximate read depth)"&gt;
+##INFO=&lt;ID=AF,Number=.,Type=Float,Description="Allele Frequency"&gt;
+##FORMAT=&lt;ID=GT,Number=1,Type=String,Description="Genotype"&gt;
+##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed"&gt;
+##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description="Read depth"&gt;
+#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  ERR194146
+chr1    69511   .       A       G       1000    PASS    GT=1/1;AF=1;DP=19       GT:AD:DP        1/1:0,19:19
+chr1    629275  .       A       C       1000    PASS    GT=0/1;AF=0.522;DP=44   GT:AD:DP        0/1:21,23:44
+chr1    629275  .       A       G       1000    PASS    GT=0/1;AF=0.363;DP=33   GT:AD:DP        0/1:21,12:33
+chr1    629306  .       A       C       1000    PASS    GT=0/1;AF=0.342;DP=70   GT:AD:DP        0/1:46,24:70
+chr1    629487  .       A       C       1000    PASS    GT=0/1;AF=0.655;DP=61   GT:AD:DP        0/1:21,40:61
+chr1    629626  .       T       C       1000    PASS    GT=0/1;AF=0.472;DP=36   GT:AD:DP        0/1:19,17:36
+chr1    630318  .       A       C       1000    PASS    GT=0/1;AF=0.555;DP=45   GT:AD:DP        0/1:20,25:45
+chr1    630318  .       A       G       1000    PASS    GT=0/1;AF=0.333;DP=30   GT:AD:DP        0/1:20,10:30
+chr1    630775  .       A       C       1000    PASS    GT=0/1;AF=0.382;DP=68   GT:AD:DP        0/1:42,26:68
+chr1    630875  .       A       C       1000    PASS    GT=0/1;AF=0.422;DP=175  GT:AD:DP        0/1:101,74:175
+chr1    630899  .       A       C       1000    PASS    GT=0/1;AF=0.373;DP=150  GT:AD:DP        0/1:94,56:150
+chr1    631286  .       A       C       1000    PASS    GT=0/1;AF=0.302;DP=139  GT:AD:DP        0/1:97,42:139
+chr1    631811  .       C       T       1000    PASS    GT=0/1;AF=0.657;DP=35   GT:AD:DP        0/1:12,23:35
+chr1    632574  .       A       C       1000    PASS    GT=0/1;AF=0.32;DP=134   GT:AD:DP        0/1:91,43:134
+chr1    632692  .       A       G       1000    PASS    GT=0/1;AF=0.694;DP=59   GT:AD:DP        0/1:18,41:59
+chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   GT:AD:DP        0/1:19,23:42</pre>
+           PEDでは、bwaを使わず独自の方法でマッピングしているので、クオリティースコアの算出が難しい。<br>
+           そのため、クオリティースコアは1000の固定値となっている。<br>
+           多型のクオリティーは、サポートされるリードのカバー数(DP)で判断してもらいたい。<br>
+           vcfの元データは、ERR194146.bi.snpとなっている。<br>
+           一番右にMと表示されている行がホモ変異、Hがヘテロと判定している。<br>
+           <li>構造変異は、ERR194146.indel<br>
+           に出力される。
+           <pre>[miyao@cluster1 ERR194146]$ egrep 'M|H' ERR194146.indel|head  -n 30
+1       61361   15      101929373       r       translocation           50      0       23      10      H       TTTTCAAAATTCTTAATAAACCATTTATTCCTTCAACTTTCTATGCCATTTGATGTTTTGTAAAAAAAAAA
+1       630059  2       102215022       f       translocation           50      0       17      10      H       C
+1       634925  16      10724035        r       translocation           50      0       16      12      H       TCTCCCTTCACCATTTCCGACGGCATCTACGG
+1       634925  5       100051350       r       translocation           50      0       16      15      H       TCTCCCTTCACCATTTC
+1       790979  1       790943  f       deletion        -10     50      0       16      31      H       GAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATG
+1       840424  1       840410  f       deletion        -1      50      0       8       9       H       AAAAAAAAAAAAAA
+1       855380  1       855380  f       deletion        -2      50      0       11      13      H       T
+1       897794  1       897792  f       insertion       4       50      0       20      18      H       GAA
+1       902788  1       902774  f       deletion        -1      50      0       10      9       H       AAAAAAAAAAAAAA
+1       907869  1       907835  f       insertion       32      50      0       19      11      H       C
+1       911222  1       911221  f       deletion        -1      50      0       21      15      H       T
+1       923312  1       923312  f       deletion        -1      50      0       0       34      M
+1       932618  1       932617  f       deletion        -4      50      0       1       32      M       TTTC
+1       939575  1       939570  f       insertion       12      50      0       14      16      H       GGAGGACC
+1       939785  1       939797  f       deletion        -18     50      0       18      20      H       GCCAG
+1       945261  1       945260  f       deletion        -1      50      0       21      12      H       C
+1       949175  1       949175  f       deletion        -4      50      0       10      11      H       AGA
+1       950670  1       950672  f       deletion        -3      50      0       0       11      M
+1       959515  1       959510  f       insertion       4       50      0       1       13      M
+1       960382  1       960375  f       insertion       1       50      0       0       7       M       GGGGG
+1       967383  1       967377  f       deletion        -1      50      1       0       7       M       CCCCCC
+1       967386  1       967377  f       deletion        -1      50      0       0       7       M       CCCCCCCCC
+1       971793  1       971791  f       deletion        -1      50      0       18      22      H       GG
+1       989072  1       989072  f       deletion        -4      50      0       0       21      M       TTG
+1       1013468 1       1013466 f       insertion       1       50      0       1       9       M
+1       1014737 1       1014737 f       deletion        -4      50      0       1       20      M       AAG
+1       1019486 1       1019480 f       deletion        -1      50      0       0       10      M       GGGGGG
+1       1020069 1       1020061 f       deletion        -1      50      0       0       7       M       CCCCCCCC
+1       1022591 1       1022587 f       insertion       23      50      0       1       28      M       AGTCTGACCTGTGGTCTGAC
+1       1043224 1       1043225 f       deletion        -2      50      0       1       27      M
+</pre>
+         各カラムの値の対応関係は、<a href = "https://github.com/akiomiyao/ped/" target = "_blank">README.md</a>を参照のこと。
+         <li>translocationに関しては、散在しているリファレンスゲノム上の反復配列で比較的多くのSNPがある場合、それぞれユニークな配列として認識される。対象配列の反復配列にさらにSNPが入った場合、別の染色体に存在している反復配列領域と偶然認識される場合がある。あるいは、ERR194146配列のもとになったDNAは、培養細胞由来なので長期間の培養の間に、一部の細胞に変異が入った可能性も考えられる。反復配列領域の確認はサザンハイブリダイゼーションでは、スメアになり転座の確認は難しい。対象部位の上流と下流で確実にユニークと思われる部分にプライマーを設計して、Long PCRで想定サイズの断片が増幅されれば、転座の確認ができる。
+         <li>数塩基の挿入・欠失は、1～数塩基の単純反復配列の反復数の変動の場合が多い。最後のカラムは、検出されたエッジに挟まれた部分の配列で、この部分に反復配列が認められる場合は、単純反復配列の反復数の変動である。
+         </ul>
       </ul> 
 
     <h2>PEDに関する資料</h2>
