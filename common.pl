@@ -49,7 +49,11 @@ sub mkSortUniq{
 	    foreach $nucb (@nuc){
 		foreach $nucc (@nuc){
 		    $tag = $nuca . $nucb . $nucc;
-		    $qsub = "-v target=$target,tag=$tag $cwd/sort_uniq_sub.pl";
+		    if ($tmpdir eq ""){
+			$qsub = "-v target=$target,tag=$tag sort_uniq_sub.pl";
+		    }else{
+			$qsub = "-v target=$target,tag=$tag,tmpdir=$tmpdir sort_uniq_sub.pl";
+		    }
 		    &doQsub($qsub);
 		}
 	    }

@@ -24,13 +24,11 @@ if ($ENV{PBS_O_WORKDIR} ne ""){
 $usage = '
      qsub_sort_uniq.pl - make sorted unique read data. 
 
-e.g. perl sort_uniq.pl target
-     perl sort_uniq.pl DRR054198
-     perl sort_uniq.pl SRR8181712
+e.g. perl qsub_sort_uniq.pl target
+     perl qsub_sort_uniq.pl DRR054198
+     perl qsub_sort_uniq.pl SRR8181712
 
-     qsub -v target=ERR194147,tmpdir=/mnt/ssd sort_uniq.pl
-
-     tmpdir can be ommitted.
+     qsub -v target=ERR194147 qsub_sort_uniq.pl
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
@@ -39,17 +37,10 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 if ($ARGV[0] ne ""){
     $target = $ARGV[0];
     $workdir = $target;
-    $tmpdir = $workdir;
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
     $tmpdir    = $ENV{tmpdir};
     $workdir = "$cwd/$target";
-    if ($tmpdir eq ""){
-	$tmpdir = $workdir;
-    }else{
-	system("mkdir $tmpdir/$target");
-	$tmpdir = "$tmpdir/$target";
-    }
 }else{
     print $usage;
     exit;
@@ -114,4 +105,3 @@ while(<IN>){
     }
     $count++;
 }
-close(OUT);
