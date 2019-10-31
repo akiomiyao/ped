@@ -73,7 +73,7 @@ if (! -e "$control/sort_uniq/$control.sort_uniq.TTT.gz" and $ARGV[1] ne "default
     system("perl sort_uniq.pl $control");
 }
 sleep 2;
-&waitFile("$controlsort_uniq/$control.sort_uniq.TTT.gz");
+&waitFile("$control/sort_uniq/$control.sort_uniq.TTT.gz");
 
 report("Aligning of $target sequence to $ref genome. margin = 5");
 system("perl align.pl $target $ref 5");
