@@ -114,6 +114,7 @@ if ($chr[0] eq ""){
 	    chomp;
 	    ($chr = $_) =~ s/^chr//;
 	    push(@chr, $chr);
+	    print "chr   $chr\n";
 	}
     }
     closedir(REF);
@@ -172,6 +173,7 @@ while(<IN>){
     }else{
 	@row = split('\t', $_);
 	($hchr, $hpos, $tchr, $tpos, $direction, $type, $size) = (split(' ', $row[0]))[1.. 7];
+	$hchr =~ s/^0+//;
 	$current = "$hchr $hpos $tchr $tpos";
 	next if $current eq $prev;
 	$prev = $current;
@@ -308,6 +310,7 @@ while(<IN>){
     }else{
 	@row = split('\t', $_);
 	($hchr, $hpos, $tchr, $tpos, $direction, $type, $size) = (split(' ', $row[0]))[1.. 7];
+	$hchr =~ s/^0+//;
 	$current = "$hchr $hpos $tchr $tpos";
 	next if $current eq $prev;
 	$prev = $current;
@@ -452,36 +455,23 @@ foreach $dat (sort keys %all){
     $chr_exist{$row[0]} = 1;
     $chr_exist{$row[2]} = 1;
 }
+close(OUT);
 
 if ( -e "$cwd/$target/$target.indel.verify.$number"){
     system("rm $cwd/$target/$target.indel.verify.$number");
 }
 
-system("mkdir indel_result.$number");
-
 open(IN, "$target.indel_result.$number");
+open(OUT, "> $cwd/$target/$target.indel.verify.$number");
 while(<IN>){
+    chomp;
     @row = split;
-    if($pre ne $row[0]){
-	open(OUT, "> indel_result.$number/$row[0]");
-	$detected{$row[0]} = 1;
-    }
-    print OUT;
-    $pre = $row[0];
+    print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\n";
 }
 close(IN);
 close(OUT);
 
-system("rm $cwd/$target/$target.indel.verify.$number") if -e "$cwd/$target/$target.indel.verify.$number";
-foreach $chr (sort keys %detected){
-    if ($ftype eq "vcf"){
-	system( "sort -T . $sort_opt -k 2 -n indel_result.$number/$chr >> $cwd/$target/$target.indel_vcf.verify.$number");
-    }else{
-	system("sort -T . $sort_opt -k 2 -n indel_result.$number/$chr >> $cwd/$target/$target.indel.verify.$number");
-    }
-}
-
-system("rm -r indel_result.$number $target.indel_result.$number");
+system("rm $target.indel_result.$number");
 
 if ($tmpdir ne "."){
     system("rm -r $workdir");

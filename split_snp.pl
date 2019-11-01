@@ -93,7 +93,6 @@ while(<IN>){
     $count++;
     chomp;
     @row = split;
-    $row[1] =~ s/^0+//;
     $row[0] = int($row[0] / $aln_count) + 1;
     print OUT "$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[0]\n";
 }

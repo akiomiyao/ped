@@ -102,12 +102,7 @@ while(<IN>){
         $count = 0;
     }
     $count++;
-    chomp;
-    @row = split('\t', $_);
-    @dat = split(' ', $row[0]);
-    $dat[1] += 0;
-    $dat = join(' ', @dat) . "\t";
-    print OUT $dat . "$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\n";
+    print OUT;
 }
 close(IN);
 close(OUT);
