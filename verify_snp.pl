@@ -62,7 +62,7 @@ if ($ARGV[0] ne ""){
 
 if($tmpdir eq ""){
     $tmpdir = ".";
-    $ref_path = "$cwd/$ref";
+    $refdir = "$cwd/$ref";
     $workdir = "$cwd/$target";
 }else{
     if (! -d $tmpdir){
@@ -71,17 +71,19 @@ if($tmpdir eq ""){
 $usage";
 	exit;
     }
-    $ref_path = "$tmpdir/$ref";
-    if (! -e $ref_path){
-	system("mkdir $ref_path");
-    }
-    system("$rsync -a $cwd/$ref/ $ref_path");
-    $workdir = "$tmpdir/$target";
-    if (-d $workdir){
-	system("rm -r $workdir");
-    }
+    $refdir = $tmpdir . "/pedtmp." . int(rand 1000000);
+    system("mkdir $refdir");
+    system("$rsync -a $cwd/$ref/chr* $cwd/$ref/sort_uniq $refdir");
+    $workdir = $tmpdir . "/pedtmp." . int(rand 1000000);
     system("mkdir $workdir");
     system("$rsync -a $cwd/$target/sort_uniq $workdir");
+    if (($control ne $ref) and ($control ne "default")){
+	$controldir = $tmpdir . "/pedtmp." . int(rand 1000000);
+	if(! -e "$tmpdir/$control"){
+	    system("mkdir $controldir");
+	}
+	system("$rsync -a $cwd/$control/sort_uniq $controldir");
+    }
 }
 
 $number = "01" if $number eq "";
@@ -108,7 +110,7 @@ while(<IN>){
 close(IN);
 
 if ($chr[0] eq ""){
-    opendir(REF, $ref_path);
+    opendir(REF, $refdir);
     foreach(sort readdir(REF)){
 	if (/^chr/){
 	    chomp;
@@ -120,7 +122,7 @@ if ($chr[0] eq ""){
 }
 
 foreach $i (@chr){
-    my $chr_file = "$ref_path/chr$i";
+    my $chr_file = "$refdir/chr$i";
     open (IN, $chr_file);
     ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
     close(IN);
@@ -226,13 +228,12 @@ system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$numb
 system("rm target.snp.$number");
 
 if ($control eq "default" or $control eq "" or $control eq $ref){
-    $control = "$ref_path/sort_uniq/*.gz";
+    $control = "$refdir/sort_uniq/*.gz";
 }else{
     if ($tmpdir eq "."){
 	$control = "$cwd/$control/sort_uniq/*.gz";
     }else{
-	system("$rsync -a $cwd/$control/sort_uniq $workdir");
-	$control = "$workdir/$control/sort_uniq/*.gz";
+	$control = "$controldir/sort_uniq/*.gz";
     }
 }
 
@@ -410,6 +411,8 @@ if ($tmpdir ne "."){
 	system("cp $target.kmer.verify.$number $cwd/$target");
     }
     system("rm -r $workdir");
+    system("rm -r $refdir");
+    system("rm -r $controldir") if $controldir ne "";
 }
 
 sub openTag{
