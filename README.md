@@ -1,6 +1,6 @@
 # PED : Polymorphic Edge Detection
 
-Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in the [wiki](https://github.com/akiomiyao/ped/wiki) and [Web page](https://akiomiyao.github.io/ped/).
+Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in the [wiki](https://github.com/akiomiyao/ped/wiki) and [Web page (English)](https://akiomiyao.github.io/ped/) [(Japanese)](https://akiomiyao.github.io/ped/index_ja.html).
 
 ### Polymorphic Edge
 
