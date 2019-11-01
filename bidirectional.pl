@@ -89,9 +89,9 @@ report("Aligning of $target sequence to $ref genome. margin = 15");
 system("perl align.pl $target $ref 15");
 
 report("Splitting of Indel alignment.");
-system("perl split_indel.pl $target $ref");
+system("perl split_indel.pl $target");
 report("Splitting of SNP alignment.");
-system("perl split_snp.pl $target $ref");
+system("perl split_snp.pl $target");
 
 opendir(DIR, $target);
 foreach(sort readdir(DIR)){
