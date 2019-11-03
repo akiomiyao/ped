@@ -327,6 +327,7 @@ $tail_space Chr$tchr $tail_junction
     }
     close(IN);
     close(OUT);
+    system("rm $targetdir/*.map.$margin");
 }
 
 sub snp{

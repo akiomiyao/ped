@@ -77,6 +77,8 @@ $ref     =~ s/\/$//;
 &mkSortUniq($control);
 &holdUntilJobEnd;
 
+system("rm $target/done.* > /dev/null 2>&1");
+system("rm $control/done.* > /dev/null 2>&1");
 
 report("Aligning of $target sequence to $ref genome.");
 @job = ();
@@ -138,8 +140,8 @@ closedir(DIR);
 
 report("Making vcf file of SNP");
 system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.??");
-system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.* $target/$target.snp.??");
+system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.*");
 system("perl snp2vcf.pl $target");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
+system("rm $target/$target.indel.sort") if -e "$target/$target.indel.sort";
 report("bidirectional.pl complete.");
-

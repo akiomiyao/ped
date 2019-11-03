@@ -60,14 +60,19 @@ foreach (readdir(DIR)){
 closedir(DIR);
 
 open(IN, "cat $cwd/$target/$target.aln.*|");
-open(OUT, "|sort $sort_opt -T $tmpdir -k 1 -k 2 -n |uniq -c > $tmpdir/$target.snp.tmp");
+open(OUT, "|sort $sort_opt -T $tmpdir |uniq -c > $tmpdir/$target.snp.tmp");
 while(<IN>){
     if (/snp/){
 	chomp;
 	@row = split;
-	$chr = "00$row[1]";
-	$chr = substr($chr, length($chr) - 3, 3);
-	print OUT "$chr\t$row[2]\t$row[4]\t$row[5]\n";
+	$chr = $row[1];
+	if ($chr =~ /^[0-9]*$/){
+	    $chr = "00$chr";
+	    $chr = substr($chr, length($chr) - 3, 3);
+	}
+	$pos = "0000000000$row[2]";
+	$pos = substr($pos, length($pos) - 10, 10);
+	print OUT "$chr\t$pos\t$row[4]\t$row[5]\n";
     }
 }
 close(IN);
@@ -100,6 +105,10 @@ close(IN);
 close(OUT);
 
 system("rm $tmpdir/$target.snp.tmp");
+
+if (-e "$cwd/$target/$target.snp.tmp"){
+    system("rm $cwd/$target/$target.snp.tmp");
+}
 
 if ($tmpdir ne "$cwd/$target"){
     system("rm -r $tmpdir");

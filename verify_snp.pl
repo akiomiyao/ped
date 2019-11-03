@@ -73,7 +73,7 @@ $usage";
     }
     $refdir = $tmpdir . "/pedtmp." . int(rand 1000000);
     system("mkdir $refdir");
-    system("$rsync -a $cwd/$ref/chr* $cwd/$ref/sort_uniq $refdir");
+    system("$rsync -a $cwd/$ref/sort_uniq $refdir");
     $workdir = $tmpdir . "/pedtmp." . int(rand 1000000);
     system("mkdir $workdir");
     system("$rsync -a $cwd/$target/sort_uniq $workdir");
@@ -109,18 +109,6 @@ while(<IN>){
 }
 close(IN);
 
-if ($chr[0] eq ""){
-    opendir(REF, $refdir);
-    foreach(sort readdir(REF)){
-	if (/^chr/){
-	    chomp;
-	    ($chr = $_) =~ s/^chr//;
-	    push(@chr, $chr);
-	}
-    }
-    closedir(REF);
-}
-
 foreach $i (@chr){
     my $chr_file = "$refdir/chr$i";
     open (IN, $chr_file);
@@ -135,85 +123,78 @@ while(<IN>){
     last;
 }
 close(IN);
-system("mkdir tmpdata.snp.$number");
-
-if ($type eq "vcf"){
-    open(IN,  "$cwd/$target/$target.vcf");
-}elsif ($type eq "bi"){
-    open(IN, "$cwd/$target/$target.snp.$number");
-}elsif ($type eq "kmer"){
-    open(IN, "sort $cwd/$target/$target.map.$number |");
-}
-while(<IN>){
-    @row = split;
-    $row[0] =~ s/^chr//i;
-    $row[0] += 0 if $row[0] =~ /^[0-9]+$/;
-    if ($pre ne $row[0]){
-	open(OUT, "> tmpdata.snp.$number/$row[0]");
-	$detected{$row[0]} = 1;
-    }
-    print OUT;
-    $pre = $row[0];
-}
-close(IN);
-close(OUT);
 
 &openTag;
-foreach $chr (@chr){
-    next if $detected{$chr} != 1;
-    my @dat = ();
-    open(IN,  "tmpdata.snp.$number/$chr");
-    while(<IN>){
-	chomp;
-	@row = split;
-	if ($type eq "vcf"){
-	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
-		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
-	    }
-	}elsif ($type eq "bi" or $type eq "kmer"){
-	    if($row[0] eq $chr){
-		push (@dat, $_);
-	    }
+
+if($type eq "vcf"){
+    open(IN,  "$cwd/$target/$target.vcf");
+}elsif($type eq "bi"){
+    open(IN,  "$cwd/$target/$target.snp.$number");
+}elsif($type eq "kmer"){
+    open(IN,  "sort $cwd/$target/$target.map.$number |");
+}else{
+    print $usage;
+    exit;
+}
+while(<IN>){
+    chomp;
+    @row = split;
+    if ($type eq "vcf"){
+	if(length($row[3]) == 1 and length($row[4]) == 1){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[3];
+	    $alt   = $row[4];
+	    $count = 20;
 	}
-    }
-    close(IN);
-    for ($j = 0; $j < $#dat; $j++){
-	if ($type eq "vcf"){
-	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
-	}elsif ($type eq "bi"){
-	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
-	}elsif ($type eq "kmer"){
-	    ($chr, $pos, $rf, $alt) = (split(' ', $dat[$j]))[0, 1, 4, 5];
+    }elsif ($type eq "bi"){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[2];
+	    $alt   = $row[3];
+	    $count = $row[4];
+    }elsif ($type eq "kmer"){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[4];
+	    $alt   = $row[5];
 	    $alt =~ s/$rf//;
 	    $count = 5;
-	}
-	$ref_seq = substr($chr{$chr}, $pos - $length, $length * 2 -1);
-	next if length($ref_seq) != $length * 2 -1;
-	$head = substr($ref_seq, 0, $length-1);
-	$tail = substr($ref_seq, $length, $length);
-	$mut_seq = $head . $alt . $tail;
-	for($h = 0; $h < 10; $h++){
-	    $k = $j + $h -5;
-	    if ($k >= 0 and $k <= $#dat){
-		($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
-		if ($icount > 2 and abs($pos - $ipos) < $length and $pos != $ipos){
-		    $i = $length - ($pos - $ipos) -1;
-		    $head = substr($mut_seq, 0, $i);
-		    $tail = substr($mut_seq, $i +1);
-		    $mut_seq = $head . $ialt . $tail;
-		}
+    }
+    $chr_prev = $chr_name;
+    ($chr_name = $chr) =~ s/^0+//;
+    if ($chr_name ne $chr_prev){
+	open(CHR, "$cwd/$ref/chr$chr_name");
+	$chr_seq = <CHR>;
+	close(CHR);
+    }
+    $ref_seq = substr($chr_seq, $pos - $length, $length * 2 -1);
+    next if length($ref_seq) != $length * 2 -1;
+    $head = substr($ref_seq, 0, $length-1);
+    $tail = substr($ref_seq, $length, $length);
+    $mut_seq = $head . $alt . $tail;
+    for($h = 0; $h < 10; $h++){
+	$k = $j + $h -5;
+	if ($k >= 0 and $k <= $#dat){
+	    ($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
+	    if ($icount > 2 and abs($pos - $ipos) < $length and $pos != $ipos){
+		$i = $length - ($pos - $ipos) -1;
+		$head = substr($mut_seq, 0, $i);
+		$tail = substr($mut_seq, $i +1);
+		$mut_seq = $head . $ialt . $tail;
 	    }
 	}
-	for($i = 0; $i < $length; $i++){
-	    $tw = substr($ref_seq, $i, $length);
-	    $tm = substr($mut_seq, $i, $length);
-	    $tag = substr($tw, 0, 3);
-	    print $tag "$tw\t$chr $pos $rf $alt tw\n";
-	    $tag = substr($tm, 0, 3);
-	    print $tag "$tm\t$chr $pos $rf $alt tm\n";
-	}		
     }
+    for($i = 0; $i < $length; $i++){
+	$tw = substr($ref_seq, $i, $length);
+	$tm = substr($mut_seq, $i, $length);
+	$tag = substr($tw, 0, 3);
+	print $tag "$tw\t$chr $pos $rf $alt tw\n";
+	$tag = substr($tm, 0, 3);
+	print $tag "$tm\t$chr $pos $rf $alt tm\n";
+    }		
 }
+close(IN);
 &closeTag;
 &sortTag;
 
@@ -246,64 +227,78 @@ while(<IN>){
 close(IN);
 
 &openTag;
-foreach $chr (sort keys %detected){
-    my @dat = ();
-    open(IN,  "tmpdata.snp.$number/$chr");
-    while(<IN>){
-	chomp;
-	@row = split;
-	if ($type eq "vcf"){
-	    if($row[0] eq $chr and length($row[3]) == 1 and length($row[4]) == 1){
-		push (@dat, "$row[0]\t$row[1]\t$row[3]\t$row[4]\t20\n");
-	    }
-	}elsif ($type eq "bi" or $type eq "kmer"){
-	    if($row[0] eq $chr){
-		push (@dat, $_);
-	    }
+
+if($type eq "vcf"){
+    open(IN,  "$cwd/$target/$target.vcf");
+}elsif($type eq "bi"){
+    open(IN,  "$cwd/$target/$target.snp.$number");
+}elsif($type eq "kmer"){
+    open(IN,  "sort $cwd/$target/$target.map.$number |");
+}else{
+    print $usage;
+    exit;
+}
+while(<IN>){
+    chomp;
+    @row = split;
+    if ($type eq "vcf"){
+	if(length($row[3]) == 1 and length($row[4]) == 1){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[3];
+	    $alt   = $row[4];
+	    $count = 20;
 	}
-    }
-    close(IN);
-    for ($j = 0; $j < $#dat; $j++){
-	if ($type eq "vcf"){
-	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
-	}elsif ($type eq "bi"){
-	    ($chr, $pos, $rf, $alt, $count) = split(' ', $dat[$j]);
-	}elsif ($type eq "kmer"){
-	    ($chr, $pos, $rf, $alt) = (split(' ', $dat[$j]))[0, 1, 4, 5];
+    }elsif ($type eq "bi"){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[2];
+	    $alt   = $row[3];
+	    $count = $row[4];
+    }elsif ($type eq "kmer"){
+	    $chr   = $row[0];
+	    $pos   = $row[1];
+	    $rf    = $row[4];
+	    $alt   = $row[5];
 	    $alt =~ s/$rf//;
 	    $count = 5;
-	}
-	$ref_seq = substr($chr{$chr}, $pos - $clength, $clength * 2 -1);
-	next if length($ref_seq) != $clength * 2 -1;
-	$head = substr($ref_seq, 0, $clength-1);
-	$tail = substr($ref_seq, $clength, $clength);
-	$mut_seq = $head . $alt . $tail;
-	for($h = 0; $h < 10; $h++){
-	    $k = $j + $h -5;
-	    if ($k >= 0 and $k <= $#dat){
-		($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
-		if ($icount > 2 and abs($pos - $ipos) < $clength and $pos != $ipos){
-		    $i = $clength - ($pos - $ipos) -1;
-		    $head = substr($mut_seq, 0, $i);
-		    $tail = substr($mut_seq, $i +1);
-		    $mut_seq = $head . $ialt . $tail;
-		}
+    }
+    $chr_prev = $chr_name;
+    ($chr_name = $chr) =~ s/^0+//;
+    if ($chr_name ne $chr_prev){
+	open(CHR, "$cwd/$ref/chr$chr_name");
+	$chr_seq = <CHR>;
+	close(CHR);
+    }
+    $ref_seq = substr($chr_seq, $pos - $clength, $clength * 2 -1);
+    next if length($ref_seq) != $clength * 2 -1;
+    $head = substr($ref_seq, 0, $clength-1);
+    $tail = substr($ref_seq, $clength, $clength);
+    $mut_seq = $head . $alt . $tail;
+    for($h = 0; $h < 10; $h++){
+	$k = $j + $h -5;
+	if ($k >= 0 and $k <= $#dat){
+	    ($ichr, $ipos, $irf, $ialt, $icount) = split(' ', $dat[$k]);
+	    if ($icount > 2 and abs($pos - $ipos) < $clength and $pos != $ipos){
+		$i = $clength - ($pos - $ipos) -1;
+		$head = substr($mut_seq, 0, $i);
+		$tail = substr($mut_seq, $i +1);
+		$mut_seq = $head . $ialt . $tail;
 	    }
 	}
-	for($i = 0; $i < $clength; $i++){
-	    $cw = substr($ref_seq, $i, $clength);
-	    $cm = substr($mut_seq, $i, $clength);
-	    $tag = substr($cw, 0, 3);
-	    print $tag "$cw\t$chr $pos $rf $alt cw\n";
-	    $tag = substr($cm, 0, 3);
-	    print $tag "$cm\t$chr $pos $rf $alt cm\n";
-	}		
     }
+    for($i = 0; $i < $clength; $i++){
+	$cw = substr($ref_seq, $i, $clength);
+	$cm = substr($mut_seq, $i, $clength);
+	$tag = substr($cw, 0, 3);
+	print $tag "$cw\t$chr $pos $rf $alt cw\n";
+	$tag = substr($cm, 0, 3);
+	print $tag "$cm\t$chr $pos $rf $alt cm\n";
+    }		
 }
+close(IN);
 &closeTag;
 &sortTag;
-
-system("rm -r tmpdata.snp.$number");
 
 system("cat *.snp.sort.$number > snp.sort.$number");
 system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
@@ -395,9 +390,13 @@ while(<IN>){
 	    print OUT "$_\n";
 	}
     }elsif ($type eq "bi"){
+	$row[0] =~ s/^0+//;
+	$row[1] =~ s/^0+//;
 	print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
     }elsif ($type eq "kmer"){
-	print OUT "$_\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
+	$row[0] =~ s/^0+//;
+	$row[1] =~ s/^0+//;
+	print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\t$row[13]\t$row[14]\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
     }
 }
 close(OUT);
@@ -413,6 +412,13 @@ if ($tmpdir ne "."){
     system("rm -r $workdir");
     system("rm -r $refdir");
     system("rm -r $controldir") if $controldir ne "";
+}
+
+if (-e "$cwd/$target/snp.sort.$number"){
+    system("rm $cwd/$target/snp.sort.$number");
+}
+if (-e "$cwd/$target/$target.snp.$number"){
+    system("rm $cwd/$target/$target.snp.$number");
 }
 
 sub openTag{
