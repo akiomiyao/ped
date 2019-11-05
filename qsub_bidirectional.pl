@@ -80,7 +80,7 @@ $ref     =~ s/\/$//;
 system("rm $target/done.* > /dev/null 2>&1");
 system("rm $control/done.* > /dev/null 2>&1");
 
-report("Aligning of $target sequence to $ref genome.");
+report("Aligning of $target sequence to $ref genome");
 @job = ();
 foreach $margin (0, 5, 10, 15){
     if ($tmpdir ne ""){
@@ -92,8 +92,12 @@ foreach $margin (0, 5, 10, 15){
 }
 &holdUntilJobEnd;
 
+report("Indexing of alignment");
+$qsub = "-v target=$target index.pl";
+&doQsub($qsub);
+
 @job = ();
-report("Splitting of Indel alignment. ");
+report("Splitting of Indel alignment");
 if ($tmpdir ne ""){
     $qsub = "-v target=$target,tmpdir=$tmpdir split_indel.pl";
 }else{
@@ -101,7 +105,7 @@ if ($tmpdir ne ""){
 }
 &doQsub($qsub);
 
-report("Splitting of SNP alignment.");
+report("Splitting of SNP alignment");
 if($tmpdir ne ""){
     $qsub = "-v target=$target,tmpdir=$tmpdir split_snp.pl";
 }else{

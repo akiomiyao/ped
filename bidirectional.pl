@@ -88,6 +88,8 @@ system("perl align.pl $target $ref 10");
 report("Aligning of $target sequence to $ref genome. margin = 15");
 system("perl align.pl $target $ref 15");
 
+report("Indexing of alignment.");
+system("perl index.pl $target");
 report("Splitting of Indel alignment.");
 system("perl split_indel.pl $target");
 report("Splitting of SNP alignment.");
