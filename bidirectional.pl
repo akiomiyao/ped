@@ -107,8 +107,8 @@ foreach(sort readdir(DIR)){
 }
 closedir(DIR);
 
-report("Making vcf file of SNP");
-system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.sort $target/$target.indel.??");
+system("cat $target/$target.indel.verify.* > $target/$target.sv && rm $target/$target.indel.verify.* $target/$target.indel.sort $target/$target.indel.??");
 system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.*");
+report("Making vcf file of SNP");
 system("perl snp2vcf.pl $target");
 report("bidirectional.pl complete.");

@@ -20,7 +20,7 @@ if ($ENV{PBS_O_WORKDIR} ne ""){
 }
 
 $usage = '
-     align.pl - bi-directional alignment program. 
+     align.pl - bidirectional alignment program. 
 
      For example,
      perl align.pl target reference margin tmpdir
