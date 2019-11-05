@@ -22,14 +22,15 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
-$target = "$ARGV[0]/$ARGV[0].*.sort";
+$target = $ARGV[0];
+$chr    = $ARGV[1];
+$pos    = $ARGV[2];
 
-open(IN, "cat $target | grep $ARGV[2] |");
+open(IN, "$target/$target.aln.0");
+seek(IN, 3062691,0);
 while(<IN>){
-    chomp;
-    @row = split;
-    if ($row[1] eq $ARGV[1] and $row[2] == $ARGV[2]){
-	s/\t/\n/g;
-	print;
-    }
+    exit if $flag and /^#/;
+    print;
+    $flag = 1;
 }
+
