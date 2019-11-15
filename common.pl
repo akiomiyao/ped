@@ -9,6 +9,8 @@
 
 # $qsub_opt = "-S /usr/bin/perl -jc M.c8"; # example of additional option.
 
+$sort_opt = "-S 1M"; # This value is very small. But if the buffer size is specified to 100M or more, Gnu sort sometimes freezes.
+
 if ($cwd eq ""){
     $cwd = `pwd`;
     chomp($cwd);
@@ -19,7 +21,6 @@ chomp($uname);
 if ($uname eq "FreeBSD"){
     $wget = "/usr/local/bin/wget";
     $rsync = "/usr/local/bin/rsync";
-    $sort_opt = "-S 100M";
 }else{
     $wget = "/usr/bin/wget";
     $rsync = "/usr/bin/rsync";
