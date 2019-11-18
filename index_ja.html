@@ -133,7 +133,7 @@
            を実行してリファレンスを作る。
            <li>perl download.pl ERR194146<br>
            で、<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP001960&o=acc_s%3Aa" target = "_blank">CEPH/UTAH家系の父親のfastqデータ</a>をダウンロードする。<br>
-           どういうわけか、最近ERR194152の配列がNCBI/SRAからダウンロードできなくなった。ERR194147は今のところダウンロード可能である。
+           どういうわけか、最近息子のERR194152の配列がNCBI/SRAからダウンロードできなくなった。母親ERR194147は今のところダウンロード可能である。
            <li><pre>[miyao@cluster1 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
 2019年 10月 16日 水曜日 16:30:24 JST Making ERR194146.sort_uniq.
 2019年 10月 17日 木曜日 10:48:55 JST Aligning of ERR194146 sequence to hg38 genome.
@@ -189,9 +189,9 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
            多型のクオリティーは、サポートされるリードのカバー数(DP)で判断してもらいたい。<br>
            vcfの元データは、ERR194146.bi.snpとなっている。<br>
            一番右にMと表示されている行がホモ変異、Hがヘテロと判定している。<br>
-           <li>構造変異は、ERR194146.indel<br>
+           <li>構造変異は、ERR194146.sv<br>
            に出力される。
-           <pre>[miyao@cluster1 ERR194146]$ egrep 'M|H' ERR194146.indel|head  -n 30
+           <pre>[miyao@cluster1 ERR194146]$ egrep 'M|H' ERR194146.sv|head  -n 30
 1       61361   15      101929373       r       translocation           50      0       23      10      H       TTTTCAAAATTCTTAATAAACCATTTATTCCTTCAACTTTCTATGCCATTTGATGTTTTGTAAAAAAAAAA
 1       630059  2       102215022       f       translocation           50      0       17      10      H       C
 1       634925  16      10724035        r       translocation           50      0       16      12      H       TCTCCCTTCACCATTTCCGACGGCATCTACGG
