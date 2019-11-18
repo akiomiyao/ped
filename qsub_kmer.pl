@@ -83,6 +83,8 @@ report("qsub_kmer.pl start.");
 &mkSortUniq($control);
 &holdUntilJobEnd;
 
+system("rm $target/done.* > /dev/null 2>&1");
+system("rm $control/done.* > /dev/null 2>&1");
 
 if (! -e "$control/$control.lbc.AAA.gz"){
     report("Making kmer count of $control.");
@@ -111,7 +113,11 @@ if (! -e "$control/$control.lbc.AAA.gz"){
     foreach (sort readdir(DIR)){
 	@row = split('\.', $_);
 	if (/\.count\./){
-	    $tag{$row[$#row -1]} = 1;
+	    if ($row[$#row -1] =~ /^[ACGT][ACGT][ACGT]$/){
+		$tag{$row[$#row -1]} = 1;
+	    }elsif($row[$#row -2] =~ /^[ACGT][ACGT][ACGT]$/){
+		$tag{$row[$#row -2]} = 1;
+	    }
 	}
     }
     foreach $tag (sort keys %tag){
@@ -268,7 +274,7 @@ report("Convert to vcf");
 if ($ref ne $control and -e "$control/$control.count.AAA.gz"){
     system("rm $control/$control.count.*");
 }
-system("rm $target/snp.sort.* $target/$target.snp.* $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.*");
+system("rm $target/$target.map.* $target/$target.kmer.verify.* $target/$target.kmer_chr.*");
 system("perl snp2vcf.pl $target kmer");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
 report("kmer.pl done.");

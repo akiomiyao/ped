@@ -10,6 +10,8 @@
 # $qsub_opt = "-S /usr/bin/perl -jc M.c8"; # example of additional option.
 $sort_opt = "-S 1M";
 
+$sort_opt = "-S 1M"; # This value is very small. But if the buffer size is specified to 100M or more, Gnu sort sometimes freezes.
+
 if ($cwd eq ""){
     $cwd = `pwd`;
     chomp($cwd);
@@ -49,7 +51,11 @@ sub mkSortUniq{
 	    foreach $nucb (@nuc){
 		foreach $nucc (@nuc){
 		    $tag = $nuca . $nucb . $nucc;
-		    $qsub = "-v target=$target,tag=$tag $cwd/sort_uniq_sub.pl";
+		    if ($tmpdir eq ""){
+			$qsub = "-v target=$target,tag=$tag sort_uniq_sub.pl";
+		    }else{
+			$qsub = "-v target=$target,tag=$tag,tmpdir=$tmpdir sort_uniq_sub.pl";
+		    }
 		    &doQsub($qsub);
 		}
 	    }

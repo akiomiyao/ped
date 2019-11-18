@@ -77,8 +77,10 @@ $ref     =~ s/\/$//;
 &mkSortUniq($control);
 &holdUntilJobEnd;
 
+system("rm $target/done.* > /dev/null 2>&1");
+system("rm $control/done.* > /dev/null 2>&1");
 
-report("Aligning of $target sequence to $ref genome.");
+report("Aligning of $target sequence to $ref genome");
 @job = ();
 foreach $margin (0, 5, 10, 15){
     if ($tmpdir ne ""){
@@ -90,20 +92,24 @@ foreach $margin (0, 5, 10, 15){
 }
 &holdUntilJobEnd;
 
+report("Indexing of alignment");
+$qsub = "-v target=$target index.pl";
+&doQsub($qsub);
+
 @job = ();
-report("Splitting of Indel alignment. ");
+report("Splitting of Indel alignment");
 if ($tmpdir ne ""){
-    $qsub = "-v target=$target,ref=$ref,tmpdir=$tmpdir split_indel.pl";
+    $qsub = "-v target=$target,tmpdir=$tmpdir split_indel.pl";
 }else{
-    $qsub = "-v target=$target,ref=$ref split_indel.pl";
+    $qsub = "-v target=$target split_indel.pl";
 }
 &doQsub($qsub);
 
-report("Splitting of SNP alignment.");
+report("Splitting of SNP alignment");
 if($tmpdir ne ""){
-    $qsub = "-v target=$target,ref=$ref,tmpdir=$tmpdir split_snp.pl";
+    $qsub = "-v target=$target,tmpdir=$tmpdir split_snp.pl";
 }else{
-    $qsub = "-v target=$target,ref=$ref split_snp.pl";
+    $qsub = "-v target=$target split_snp.pl";
 }
 &doQsub($qsub);
 &holdUntilJobEnd;
@@ -136,10 +142,10 @@ closedir(DIR);
 
 &cleanupLog;
 
+system("cat $target/$target.indel.verify.* > $target/$target.sv && rm $target/$target.indel.verify.* $target/$target.indel.??");
+system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.*");
 report("Making vcf file of SNP");
-system("cat $target/$target.indel.verify.* > $target/$target.indel && rm $target/$target.indel.verify.* $target/$target.indel.??");
-system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.* $target/$target.snp.??");
 system("perl snp2vcf.pl $target");
 system("rm $target/$target.snp") if -e "$target/$target.snp";
+system("rm $target/$target.indel.sort") if -e "$target/$target.indel.sort";
 report("bidirectional.pl complete.");
-

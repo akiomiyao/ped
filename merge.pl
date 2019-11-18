@@ -34,8 +34,8 @@ if($ENV{target} ne ""){
 if ($tmpdir eq ""){
     $tmpdir = $workdir;
 }else{
-    system("mkdir $tmpdir/$target");
-    $tmpdir = "$tmpdir/$target";
+    $tmpdir = $tmpdir . "/pedtmp." . int(rand 1000000);
+    system("mkdir $tmpdir");
     system("cp $workdir/*.count.$tag.*.gz $tmpdir && gzip -d $tmpdir/*.gz");
 }
 
@@ -67,5 +67,5 @@ chop($final);
 if ($tmpdir eq $workdir){
     system("mv $output $final && gzip $final");
 }else{
-    system("mv $output $final && gzip $final && mv $final.gz $workdir && cd .. && rm -r $target && rm $workdir/*.$tag.*.gz");
+    system("mv $output $final && gzip $final && mv $final.gz $workdir && rm -r $tmpdir && rm $workdir/*.$tag.*.gz");
 }

@@ -22,14 +22,65 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
-$target = "$ARGV[0]/$ARGV[0].*.sort";
+$target = $ARGV[0];
+$chr    = $ARGV[1];
+$pos    = $ARGV[2];
 
-open(IN, "cat $target | grep $ARGV[2] |");
-while(<IN>){
-    chomp;
-    @row = split;
-    if ($row[1] eq $ARGV[1] and $row[2] == $ARGV[2]){
-	s/\t/\n/g;
+if ($chr =~ /^[0-9]*$/){
+    $chr = "000$chr";
+    $chr = substr($chr, length($chr) - 3, 3);
+}
+
+$pos = "0000000000" . $pos;
+$pos = substr($pos, length($pos) - 10, 10);
+
+$size = -s "$target/$target.index";
+open(INDEX, "$target/$target.index");
+binmode(INDEX);
+$top = 0;
+$bottom = $size;
+$middle = int($size / 2);
+while($bottom - $top > 1){
+    seek(INDEX, $middle, 0);
+    read(INDEX, $data, 1000);
+    foreach (split('\n', $data)){
+	@row = split;
+	if ($row[1] =~ /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/){
+	    $ichr = $row[0];
+	    $ipos = $row[1];
+	    if ($chr eq $ichr){
+		if ($pos eq $ipos){
+		    &printData;
+		    $hit = 1;
+		}
+	    }
+	}
+    }
+    exit if $hit;
+    if ($ichr gt $chr){
+	$bottom = $middle;
+    }elsif($ichr eq $chr){
+	if ($ipos gt $pos){
+	    $bottom = $middle;
+	}else{
+	    $top = $middle;
+	}
+    }else{
+	$top = $middle;
+    }
+    $middle = int(($top + $bottom) / 2);
+ }
+
+sub printData{
+    open(IN, "$target/$target.aln.$row[2]");
+    seek(IN, $row[3], 0);
+    while(<IN>){
+	if ($flag and /^$/){
+	    $flag = 0;
+	    print "\n";
+	    return;
+	}
 	print;
+	$flag = 1;
     }
 }

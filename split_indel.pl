@@ -32,13 +32,11 @@ if ($uname eq "FreeBSD"){
 
 if ($ARGV[0] ne ""){
     $target  = $ARGV[0];
-    $ref     = $ARGV[1];
-    $tmpdir  = $ARGV[2];
+    $tmpdir  = $ARGV[1];
     $cwd = `pwd`;
     chomp($cwd);
 }elsif($ENV{target} ne ""){
     $target    = $ENV{target};
-    $ref       = $ENV{ref};
     $tmpdir    = $ENV{tmpdir};
     $cwd       = $ENV{PBS_O_WORKDIR};
     $cwd       = $ENV{SGE_O_WORKDIR} if $ENV{SGE_O_WORKDIR} ne "";
@@ -50,50 +48,26 @@ if ($ARGV[0] ne ""){
 $workdir = "$cwd/$target";
 
 if ($tmpdir ne ""){
-    $tmpdir = $tmpdir . "/$target";
+    $tmpdir = $tmpdir . "/pedtmp." . int(rand 1000000);
     system("mkdir $tmpdir");
 }else{
-    $tmpdir = $workdir;
-}
-
-open(IN, "$cwd/config");
-while(<IN>){
-    chomp;
-    @row = split;
-    if($row[0] eq $ref && $row[1] eq "chromosome"){
-	if ($row[3] != 0){
-	    for ($i = $row[2]; $i <= $row[3]; $i++){
-		push(@chr, $i);
-	    }
-	}
-	if ($row[4] ne ""){
-	    foreach ($i = 4; $i <= $#row; $i++){
-		push(@chr, $row[$i]);
-	    }
-	}
-    }
-}
-close(IN);
-
-if ($chr[0] eq ""){
-    opendir(REF, "$cwd/$ref");
-    foreach(sort readdir(REF)){
-	chomp;
-	if (/^chr/){
-	    ($chr = $_) =~ s/^chr//; 
-	    push(@chr, $chr);
-	}
-    }
-    closedir(REF);
+    $tmpdir = "$cwd/$target";
 }
 
 open(IN, "cat $workdir/$target.aln.*|");
-open(OUT, "|sort $sort_opt -T $tmpdir |uniq > $tmpdir/$target.indel.tmp");
+open(OUT, "|sort $sort_opt -T $tmpdir -k 1 -k 2 -n |uniq > $tmpdir/$target.indel.sort");
 while(<IN>){
     chomp;
     if (/ion/){
 	$flag = 1;
-	$out .= "$_\t";
+	@row = split;
+	$chr = "00$row[1]";
+	$chr = substr($chr, length($chr) - 3, 3);
+	if ($row[7] eq ""){
+	    $out .= "$row[0] $chr $row[2] $row[3] $row[4] $row[5] $row[6]\t";
+	}else{
+	    $out .= "$row[0] $chr $row[2] $row[3] $row[4] $row[5] $row[6] $row[7]\t";
+	}
 	$count = 0;
     }elsif($flag and $count != 1){
 	if ($_ eq ""){
@@ -108,26 +82,6 @@ while(<IN>){
 }
 close(IN);
 close(OUT);
-
-system("mkdir $tmpdir/indel.tmp");
-open(IN, "$tmpdir/$target.indel.tmp");
-while(<IN>){
-    @row = split;
-    if ($prev ne $row[1]){
-	open(OUT, "> $tmpdir/indel.tmp/$row[1]");
-    }
-    print OUT;
-    $prev = $row[1];
-    $detected{$row[1]} =1
-}
-close(IN);
-close(OUT);
-
-system("rm $workdir/$target.indel.sort") if -e "$workdir/$target.indel.sort";
-foreach $chr (sort keys %detected){
-    system("sort $sort_opt -k 2 -n -T $tmpdir $tmpdir/indel.tmp/$chr >> $tmpdir/$target.indel.sort");
-}
-system("rm -r $tmpdir/indel.tmp $tmpdir/$target.indel.tmp");
 
 while(1){
     $mtime = (stat("$tmpdir/$target.indel.sort"))[9];

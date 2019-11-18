@@ -20,7 +20,7 @@ if ($ENV{PBS_O_WORKDIR} ne ""){
 }
 
 $usage = '
-     align.pl - bi-directional alignment program. 
+     align.pl - bidirectional alignment program. 
 
      For example,
      perl align.pl target reference margin tmpdir
@@ -64,19 +64,15 @@ $usage";
 $margin = 0 if $margin eq "";
 
 if ($tmpdir ne ""){
-    system("$rsync -a $cwd/$ref $tmpdir");
-    $ref_path = "$tmpdir/$ref";
-    $tmpdir = "$tmpdir/$target";
-    if (-d $tmpdir){
-	system("rm -r $tmpdir");
-    }
-    system("mkdir $tmpdir");
+    $refdir = $tmpdir . "/pedtmp." . int(rand 1000000);
+    system("$rsync -a $cwd/$ref/ $refdir");
+    $targetdir = $tmpdir . "/pedtmp." . int(rand 1000000);
+    system("mkdir $targetdir");
+    system("$rsync -a $cwd/$target/sort_uniq $targetdir");
 }else{
-    $tmpdir = ".";
-    $ref_path = "$cwd/$ref";
+    $targetdir = "$cwd/$target";
+    $refdir = "$cwd/$ref";
 }
-
-chdir $workdir;
 
 open(IN, "$cwd/config");
 while(<IN>){
@@ -98,7 +94,7 @@ while(<IN>){
 close(IN);
 
 if ($chr[0] eq ""){
-    opendir(REF, $ref_path);
+    opendir(REF, $refdir);
     foreach(readdir(REF)){
 	chomp;
 	if (/^chr/){
@@ -110,13 +106,13 @@ if ($chr[0] eq ""){
 }
 
 foreach $i (@chr){
-    my $chr_file = "$ref_path/chr$i";
+    my $chr_file = "$refdir/chr$i";
     open (IN, $chr_file);
     ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
     close(IN);
 }
 
-open(IN, "zcat $cwd/$target/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -126,7 +122,7 @@ close(IN);
 
 &openTag;
 
-open(IN, "zcat $cwd/$target/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $head_pos = $margin + 1;
@@ -139,7 +135,7 @@ while(<IN>){
 
 &openTag;
 
-open(IN, "cat $tmpdir/*.map.$margin|");
+open(IN, "cat $targetdir/*.map.$margin|");
 while(<IN>){
     chomp;
     $tail_pos = $length - 20 - $margin + 1;
@@ -152,12 +148,9 @@ while(<IN>){
 
 &analysis;
 
-if ($tmpdir ne "."){
-    if (-d $tmpdir){
-	system ("rm -r $tmpdir");
-    }
-}else{
-    system ("rm *.map.$margin");
+if ($tmpdir ne ""){ 
+    system("cp $targetdir/$target.aln.$margin $cwd/$target");
+    system ("rm -r $targetdir $refdir");
 }
 
 sub openTag{
@@ -165,7 +158,7 @@ sub openTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $tmpdir/$tag.tmp.$margin")
+		open($tag, "> $targetdir/$tag.tmp.$margin")
 	    }
 	}
     }
@@ -177,19 +170,19 @@ sub map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
-		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.tmp.$margin > $tmpdir/$tag.$margin");
-		&waitFile("$tmpdir/$tag.$margin");
-		system("zcat $ref_path/ref20_uniq.$tag.gz | join $tmpdir/$tag.$margin - |cut -c 22- > $tmpdir/$tag.map.$margin");
-		&waitFile("$tmpdir/$tag.map.$margin");
-		system("rm $tmpdir/$tag.tmp.$margin $tmpdir/$tag.$margin");
+		system("sort $sort_opt -T $targetdir $targetdir/$tag.tmp.$margin > $targetdir/$tag.$margin");
+		&waitFile("$targetdir/$tag.$margin");
+		system("zcat $refdir/ref20_uniq.$tag.gz | join $targetdir/$tag.$margin - |cut -c 22- > $targetdir/$tag.map.$margin");
+		&waitFile("$targetdir/$tag.map.$margin");
+		system("rm $targetdir/$tag.tmp.$margin $targetdir/$tag.$margin");
 	    }
 	}
     }
 }
 
 sub analysis{
-    open(OUT, "> $tmpdir/$target.aln.$margin");
-    open(IN, "cat $tmpdir/*.map.$margin|");
+    open(OUT, "> $targetdir/$target.aln.$margin");
+    open(IN, "cat $targetdir/*.map.$margin|");
     while(<IN>){
 	chomp;
 	($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction) = split;
@@ -334,9 +327,7 @@ $tail_space Chr$tchr $tail_junction
     }
     close(IN);
     close(OUT);
-    if ($tmpdir ne "."){
-	system("cp $tmpdir/$target.aln.$margin $workdir");
-    }
+    system("rm $targetdir/*.map.$margin");
 }
 
 sub snp{
