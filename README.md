@@ -125,7 +125,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   If control is specified, counts from target and control will be listed.  
   For example,  
   % perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
-  retruns 'M' or 'H' marked SNPs and indels of ERR3063487 which are absent in ERR3063486.  
+  returns 'M' or 'H' marked SNPs and structural variations of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
   % perl search.pl target chr position  
   For example,  
@@ -167,7 +167,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  
   For example,  
-  % kmer.pl ERR3063487 ERR3063486  
+  % perl kmer.pl ERR3063487 ERR3063486  
   or  
   % perl qsub_kmer.pl ERR3063487 ERR3063486  
   ERR3063487.kmer is list of polymorphic edge.  
