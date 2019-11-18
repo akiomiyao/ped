@@ -85,7 +85,8 @@ Torque with default setting works fine.  For the customized Torque, modification
 ```
   For building human reference data, it takes about two days.  
   For building wheat reference data, it takes more than one week, and 32GB memory and 3TB disk space are required for detection of polymorphism.  
-  For building *Lotus japonicus* data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.  
+  For building *Lotus japonicus* data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.
+  If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory.  
 - Otherwise,  
   % perl mkref.pl reference fasta_file_name  
   For example,  
@@ -115,7 +116,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   or  
   % qsub target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
    After four hours, you will find results in ERR3063487 directory.  
-   ERR3063487.indel is list of structural variation.  
+   ERR3063487.sv is list of structural variation.  
    ERR3063487.bi.snp is list of SNPs.  
    ERR3063487.bi.snp.vcf is the vcf file for SNPs.  
     
@@ -136,7 +137,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
   Run without arguments, help for script will be shown.  
-- ERR3063487.indel is list of structural variations.  
+- ERR3063487.sv is list of structural variations.  
   ERR3063487.bi.snp is list of SNPs.  
   ERR3063487.bi.vcf is the vcf file for SNPs.  
   Quality score in vcf file is fixed to 1000.  
@@ -197,7 +198,7 @@ Column 9: Number of reads in the target sort_uniq file with target type polymorp
 Column 10: Genotype (M: homozygous, H: heterozygous)
 ```
 
-- A part of indel result is
+- A part of structural variation result is
 ```
 1       923312  1       923312  f       deletion        -1      50      0       0       31      M
 1       931147  1       931131  f       insertion       4       50      0       5       19              CCCTCCCTCCC
@@ -373,7 +374,7 @@ X       15815152        T       G       3       13      1       5       3       
 X       16861146        C       T       6       9       0       0       17      M
 X       16964164        T       G       3       14      0       5       3       H
 ```
-- indels between ERR3063486 (wild-type) and ERR3063487 (mutant)  
+- Structural variations between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
 I       834776  I       834746  f       deletion        -12     6       0       7       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
@@ -447,6 +448,7 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
+Version 1.3 Update for search.pl for comfirmation of alignment. Improuvement of making sort_uniq data.  
 Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
 Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.  
 Version 1.0 Original version for PED paper.  
