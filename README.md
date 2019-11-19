@@ -102,8 +102,8 @@ Torque with default setting works fine.  For the customized Torque, modification
   % perl download.pl ERR3063487   
   Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
-  ERR3063486 is read data of *Caenorhabditis elegans* wild-type.  
-  ERR3063487 is read data of *Caenorhabditis elegans* mutant.  
+  ERR3063486 is the read data of *Caenorhabditis elegans* wild-type.  
+  ERR3063487 is the read data of *Caenorhabditis elegans* mutant.  
   BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze local file,  
   % mkdir mydata1  
@@ -116,9 +116,9 @@ Torque with default setting works fine.  For the customized Torque, modification
   or  
   % qsub target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
    After four hours, you will find results in ERR3063487 directory.  
-   ERR3063487.sv is list of structural variation.  
-   ERR3063487.bi.snp is list of SNPs.  
-   ERR3063487.bi.snp.vcf is the vcf file for SNPs.  
+   ERR3063487.sv is the list of structural variation.  
+   ERR3063487.bi.snp is the list of SNPs.  
+   ERR3063487.bi.vcf is the vcf file for SNPs.  
     
 - Our verify process counts reads containing polymorphic region.  
   Basically, counts are from target and reference.  
@@ -137,8 +137,8 @@ Torque with default setting works fine.  For the customized Torque, modification
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
   Run without arguments, help for script will be shown.  
-- ERR3063487.sv is list of structural variations.  
-  ERR3063487.bi.snp is list of SNPs.  
+- ERR3063487.sv is the list of structural variations.  
+  ERR3063487.bi.snp is the list of SNPs.  
   ERR3063487.bi.vcf is the vcf file for SNPs.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
