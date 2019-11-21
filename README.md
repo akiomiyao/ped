@@ -35,6 +35,10 @@ or
 % git clone https://github.com/akiomiyao/ped.git  
 If you got scripts from github, update to newest version is very easy using pull command of git.  
 % git pull  
+or  
+\# docker run -v your_working_directory:/work -it akiomiyao/ped  
+\# mv ped work  
+\# cd /work/ped  
 
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
