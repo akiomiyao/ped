@@ -16,6 +16,11 @@
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業する。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
 	  を実行すると、最新のスクリプトに同期される。
+	<li>Dockerで実行する場合は、
+		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a>
+		から最新版のイメージを公開している。
+		# docker run -v /home/your_account/data_dir:/work -it akiomiyao/ped<br>
+		で稼働できる。
     <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
     common.pl の中の<br>
     # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
