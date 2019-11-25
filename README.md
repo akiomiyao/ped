@@ -36,7 +36,7 @@ or
 If you got scripts from github, update to newest version is very easy using pull command of git.  
 % git pull  
 or  
-\# docker run -v your_working_directory:/work -it akiomiyao/ped  
+\# docker run -v /full_path_of_your_working_directory:/work -it akiomiyao/ped  
 \# mv ped work  
 \# cd /work/ped  
 

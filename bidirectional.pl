@@ -61,15 +61,15 @@ $target  =~ s/\/$//;
 $control =~ s/\/$//;
 $ref     =~ s/\/$//;
 
+report("bidirectional.pl execute");
+
 if (! -e "$target/sort_uniq/$target.sort_uniq.TTT.gz"){
-    report("Making $target.sort_uniq.");
     system("perl sort_uniq.pl $target");
 }
 
 &waitFile("$target/sort_uniq/$target.sort_uniq.TTT.gz");
 
 if (! -e "$control/sort_uniq/$control.sort_uniq.TTT.gz" and $ARGV[1] ne "default"){
-    report("Making $control.sort_uniq.");
     system("perl sort_uniq.pl $control");
 }
 sleep 2;
@@ -99,7 +99,7 @@ opendir(DIR, $target);
 foreach(sort readdir(DIR)){
     if (/$target.indel.[0-9][0-9]$/){
 	$number = (split('\.', $_))[2];
-	report("Verifying indel $number");
+	report("Verifying indels $number");
 	system("perl verify_indel.pl $target $control $ref $number bi");
     }elsif(/$target.snp.[0-9][0-9]$/){
 	$number = (split('\.', $_))[2];
@@ -113,4 +113,4 @@ system("cat $target/$target.indel.verify.* > $target/$target.sv && rm $target/$t
 system("cat $target/$target.snp.verify.* > $target/$target.bi.snp && rm $target/$target.snp.verify.*");
 report("Making vcf file of SNP");
 system("perl snp2vcf.pl $target");
-report("bidirectional.pl complete.");
+report("bidirectional.pl complete");

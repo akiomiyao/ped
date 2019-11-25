@@ -204,10 +204,16 @@ system("rm *.snp.sort.$number");
 system("zcat sort_uniq/*.gz 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
 &waitFile("target.snp.$number");
 system("rm target.snp.st.$number");
+if($ARGV[0] ne ""){
+    &report("Verifying SNPs $number: Sorting for target.snp.count.$number");
+}
 system("sort -T . $sort_opt target.snp.$number| uniq -c > target.snp.count.$number");
 &waitFile("target.snp.count.$number");
 system("rm target.snp.$number");
 
+if($ARGV[0] ne ""){
+    &report("Verifying SNPs $number: Selecting reads containing SNP");
+}
 if ($control eq "default" or $control eq "" or $control eq $ref){
     $control = "$refdir/sort_uniq/*.gz";
 }else{
@@ -300,10 +306,16 @@ close(IN);
 &closeTag;
 &sortTag;
 
+if($ARGV[0] ne ""){
+    &report("Verifying SNPs $number: Selecting reads without the SNP");
+}
 system("cat *.snp.sort.$number > snp.sort.$number");
 system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
 &waitFile("control.snp.$number");
 system("rm *.snp.sort.$number");
+if($ARGV[0] ne ""){
+    &report("Verifying SNPs $number: Sorting for control.snp.count.$number");
+}
 system("sort -T . $sort_opt control.snp.$number| uniq -c > control.snp.count.$number");
 &waitFile("control.snp.count.$number");
 system("rm control.snp.$number");
@@ -421,6 +433,10 @@ if (-e "$cwd/$target/$target.snp.$number"){
     system("rm $cwd/$target/$target.snp.$number");
 }
 
+if($ARGV[0] ne ""){
+    &report("Verifying SNPs $number: Done");
+}
+
 sub openTag{
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -437,6 +453,9 @@ sub sortTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
+		if($ARGV[0] ne ""){
+		    &report("Verifying SNPs $number: Sorting for $tag.snp.sort.$number");
+		}
 		system("sort -T . $sort_opt $tag.snp.tmp.$number > $tag.snp.sort.$number");
 		&waitFile("$tag.snp.sort.$number");
 		system("rm $tag.snp.tmp.$number");

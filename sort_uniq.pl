@@ -27,6 +27,8 @@ if ($ARGV[0] ne ""){
     exit;
 }
 
+&report("sort_uniq.pl: execute. Making $target.sort_uniq");
+
 opendir(DIR, "$cwd/$target/read");
 foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
     if (/fq$|fastq$/){
@@ -66,6 +68,8 @@ if (! -e "$cwd/$target/sort_uniq"){
     system("mkdir $cwd/$target/sort_uniq");
 }
 
+&report("Making $target.sort_uniq: Split to subfiles");
+
 foreach $nuca (@nuc){
     foreach $nucb (@nuc){
 	foreach $nucc (@nuc){
@@ -84,6 +88,10 @@ while(<IN>){
 	$complement = &complement($_);
 	$tag = substr($complement, 0, 3);
 	print $tag "$complement\n";
+	$total ++;
+	if ($total % 1000000 == 0){
+	    &report("Making $target.sort_uniq files: Split to subfiles. $total reads processed");
+	}
     }elsif($count == 4){
 	$count = 0;
     }
@@ -92,12 +100,16 @@ while(<IN>){
 close(OUT);
 
 &closeTag;
+&report("Making $target.sort_uniq files: Split to subfiles. Done. $total reads processed");
 
 foreach $nuca (@nuc){
     foreach $nucb (@nuc){
 	foreach $nucc (@nuc){
 	    $tag = $nuca . $nucb . $nucc;
+	    &report("Making $target.sort_uniq files: Sorting for $target.sort_uniq.$tag.gz");
 	    system("sort -T $cwd/$target/sort_uniq/ $sort_opt $cwd/$target/sort_uniq/$tag.seq | uniq | gzip > $cwd/$target/sort_uniq/$target.sort_uniq.$tag.gz && rm $cwd/$target/sort_uniq/$tag.seq");
 	}
     }
 }
+
+&report("sort_uniq.pl for $target: complete");

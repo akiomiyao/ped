@@ -246,6 +246,9 @@ system("rm *.indel_sort.$number");
 system("zcat sort_uniq/*.gz 2> /dev/null | join - indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
 &waitFile("indel_target.$number");
 system("rm indel_target.st.$number");
+if ($ARGV[0] ne ""){
+    &report("Verifying indels $number: Sorting for indel_target.count.$number");
+}
 system("sort -T . $sort_opt indel_target.$number| uniq -c > indel_target.count.$number");
 &waitFile("indel_target.count.$number");
 system("rm indel_target.$number");
@@ -380,6 +383,9 @@ system("cat *.indel_sort.$number > indel_sort.$number");
 system("zcat $control 2> /dev/null | join - indel_sort.$number | cut -d ' ' -f 2- > indel_control.$number");
 &waitFile("indel_control.$number");
 system("rm *.indel_sort.$number indel_sort.$number");
+if ($ARGV[0] ne ""){
+    &report("Verifying indels $number: Sorting for indel_control.count.$number");
+}
 system("sort -T . $sort_opt indel_control.$number| uniq -c > indel_control.count.$number");
 &waitFile("indel_control.count.$number");
 system("rm indel_control.$number");
@@ -483,6 +489,10 @@ if ($tmpdir ne "."){
     }
 }
 
+if($ARGV[0] ne ""){
+    &report("Verifying indels $number: Done");
+}
+
 sub openTag{
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -499,6 +509,9 @@ sub sortTag{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
+		if ($ARGV[0] ne ""){
+		    &report("Verifying indels $number: Sorting for $tag.indel_sort.$number");
+		}
 		system("sort -T . $sort_opt $tag.indel_tmp.$number > $tag.indel_sort.$number");
 		&waitFile("$tag.indel_sort.$number");
 		system("rm $tag.indel_tmp.$number");

@@ -105,6 +105,9 @@ if ($chr[0] eq ""){
     closedir(REF);
 }
 
+if($ARGV[0] ne ""){
+    &report("Aligning of $target sequence to $ref genome. margin = $margin: Reading genome sequeces");
+}
 foreach $i (@chr){
     my $chr_file = "$refdir/chr$i";
     open (IN, $chr_file);
@@ -122,6 +125,10 @@ close(IN);
 
 &openTag;
 
+if($ARGV[0] ne ""){
+    &report("Aligning of $target sequence to $ref genome. margin = $margin: Dividing the sort_uniq sequence");
+}
+
 open(IN, "zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
@@ -135,6 +142,10 @@ while(<IN>){
 
 &openTag;
 
+if($ARGV[0] ne ""){
+    &report("Aligning of $target sequence to $ref genome. margin = $margin: Dividing the 5'-mapped sequences");
+}
+
 open(IN, "cat $targetdir/*.map.$margin|");
 while(<IN>){
     chomp;
@@ -146,11 +157,19 @@ while(<IN>){
 
 &map;
 
+if($ARGV[0] ne ""){
+    &report("Aligning of $target sequence to $ref genome. margin = $margin: Output alignments");
+}
+
 &analysis;
 
 if ($tmpdir ne ""){ 
     system("cp $targetdir/$target.aln.$margin $cwd/$target");
     system ("rm -r $targetdir $refdir");
+}
+
+if($ARGV[0] ne ""){
+    &report("Aligning of $target sequence to $ref genome. margin = $margin: Done");
 }
 
 sub openTag{
@@ -170,6 +189,9 @@ sub map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
+		if($ARGV[0] ne ""){
+		    &report("Aligning of $target sequence to $ref genome. margin = $margin: Mapping for the $tag.$margin subfile");
+		}
 		system("sort $sort_opt -T $targetdir $targetdir/$tag.tmp.$margin > $targetdir/$tag.$margin");
 		&waitFile("$targetdir/$tag.$margin");
 		system("zcat $refdir/ref20_uniq.$tag.gz | join $targetdir/$tag.$margin - |cut -c 22- > $targetdir/$tag.map.$margin");
@@ -181,6 +203,7 @@ sub map{
 }
 
 sub analysis{
+    $total = 0;
     open(OUT, "> $targetdir/$target.aln.$margin");
     open(IN, "cat $targetdir/*.map.$margin|");
     while(<IN>){
@@ -322,11 +345,16 @@ $tail_space |
 $tail_space Chr$tchr $tail_junction
 
 ";
+		$total ++;
+		if ($total % 1000000 == 0){
+		    report("Aligning of $target sequence to $ref genome. margin = $margin: Output alignments. $total alignments are processed.");
+		}
 	    }
 	}
     }
     close(IN);
     close(OUT);
+    report("Aligning of $target sequence to $ref genome. margin = $margin: Output alignments. $total alignments are processed.");
     system("rm $targetdir/*.map.$margin");
 }
 
@@ -354,5 +382,9 @@ $head_bar
 $seq
 
 ";
+	$total ++;
+	if ($total % 1000000 == 0){
+	    report("Aligning of $target sequence to $ref genome. margin = $margin: Output alignments. $total alignments are processed.");
+	}
     }
 }
