@@ -18,9 +18,13 @@
 	  を実行すると、最新のスクリプトに同期される。
 	<li>Dockerで実行する場合は、<br>
 		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a><br>
-		から最新版のイメージを公開している。<br>
+		から最新版のイメージを公開している。Dockerファイルでは、PED以外に、fastq-dumpもセットアップ済みである。<br>
 		# docker run -v /home/your_account/data_dir:/work -it akiomiyao/ped<br>
-		で稼働できる。
+		で稼働できる。<br>
+		docker run した後、/ped を /workにmvして、<br>
+		cd /work/ped<br>
+		と、/workに移したpedのディレクトリの中で作業を行うと、dockerを終了しても実行結果が/home/your_account/data_dirに残り便利である。<br>
+		ホストの/etc/groupのdockerグループにuserアカウントを登録するとuser権限で実行できる。
     <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
     common.pl の中の<br>
     # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
