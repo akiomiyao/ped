@@ -109,13 +109,6 @@ while(<IN>){
 }
 close(IN);
 
-foreach $i (@chr){
-    my $chr_file = "$refdir/chr$i";
-    open (IN, $chr_file);
-    ($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-    close(IN);
-}
-
 open(IN, "zcat sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
@@ -307,7 +300,7 @@ close(IN);
 &sortTag;
 
 if($ARGV[0] ne ""){
-    &report("Verifying SNPs $number: Selecting reads without the SNP");
+    &report("Verifying SNPs $number: Selecting reads with control allele");
 }
 system("cat *.snp.sort.$number > snp.sort.$number");
 system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");

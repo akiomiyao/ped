@@ -39,7 +39,7 @@ or
 \# docker run -v /full_path_of_your_working_directory:/work -it akiomiyao/ped  
 \# mv ped work  
 \# cd /work/ped  
-
+The docker includes the fastq-dump program.  
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 

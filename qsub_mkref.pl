@@ -41,9 +41,12 @@ if ($ARGV[0] ne ""){
 }elsif ($ENV{target} ne ""){
     $target    = $ENV{target};
     $file      = $ENV{file};
+    $tag       = $ENV{tag};
+    $chr       = $ENV{chr};
+    $execution = $ENV{execution};
 }
 
-&report("Job start: qsub_mkref.pl");
+&report("Job executed: qsub_mkref.pl");
 
 open(IN, "$cwd/config");
 while(<IN>){
@@ -99,47 +102,133 @@ if ($target eq ""){
     exit;
 }
 
-if (! -d "$cwd/$target"){
-    system("mkdir $cwd/$target");
-}
-
-chdir "$cwd/$target";
-
-if ($file eq ""){
-    @row = split('/', $wget{$target});
-    $remote_file = $row[$#row];
-    if (! -e $remote_file and $wget{$target} ne ""){
-	&report("Downloading $wget{$target}");
-	system("$wget -o wget-log $wget{$target}");
+if ($execution eq ""){
+    if (! -d "$cwd/$target"){
+	system("mkdir $cwd/$target");
     }
-    &mkChr;
-}else{
-    &mkChrFromFile($file);
-}
+    
+    chdir "$cwd/$target";
+    
+    if ($file eq ""){
+	@row = split('/', $wget{$target});
+	$remote_file = $row[$#row];
+	if (! -e $remote_file and $wget{$target} ne ""){
+	    &report("Downloading $wget{$target}");
+	    system("$wget -o wget-log $wget{$target}");
+	}
+	&mkChr;
+    }else{
+	&mkChrFromFile($file);
+    }
 
-&mk20;
+    chdir $cwd;
 
-chdir $cwd;
+    &report("Making 20mer position file for chromosome");
+    foreach $chr (@chr){
+	$qsub = "-v target=$target,chr=$chr,execution=mk20 $cwd/qsub_mkref.pl";
+	&doQsub($qsub);
+	$chr_count ++;
+    }
+    while(1){
+	$file_count = 0;
+	opendir(DIR, "$cwd/$target");
+	foreach (readdir(DIR)){
+	    if (/^ref20./){
+		$mtime = (stat("$cwd/$target/$_"))[9];
+		$ti = time - $mtime;
+		if (time > $mtime + 10){
+		    $file_count++;
+		}
+	    }
+	}
+	closedir(DIR);
+	if ($file_count == $chr_count * 64){
+	    last;
+	}
+	sleep 10;
+    }
+ 
+    &report("Selecting uniqe position");
+    foreach $nuc (@nuc){
+	$tag[0] = $nuc;
+	foreach $nuc (@nuc){
+	    $tag[1] = $nuc;
+	    foreach $nuc (@nuc){
+		$tag[2] = $nuc;
+		$tag = join('', @tag);
+		$qsub = "-v target=$target,tag=$tag,execution=mkUniq $cwd/qsub_mkref.pl";
+		&doQsub($qsub);
 
-&mkControlRead;
-
-$count = 0;
-while(1){
-    opendir(DIR, "$cwd/$target");
-    foreach(readdir(DIR)){
-	if (/done/){
-	    $count++;
+	    }
 	}
     }
-    last if $count == 64;
-    sleep 10;
+ 
+    &report("Making control read");
+    foreach $chr (@chr){
+	$qsub = "-v target=$target,tag=$tag,chr=$chr,execution=mkControlRead $cwd/qsub_mkref.pl";
+	&doQsub($qsub);
+    }
+    while(1){
+	$file_count = 0;
+	opendir(DIR, "$cwd/$target/sort_uniq");
+	foreach (readdir(DIR)){
+	    if (/^[ACGT][ACGT][ACGT].tmp/){
+		$mtime = (stat("$cwd/$target/sort_uniq/$_"))[9];
+		if (time > $mtime + 10){
+		    $file_count++;
+		}
+	    }
+	}
+	closedir(DIR);
+	if ($file_count == $chr_count * 64){
+	    last;
+	}
+	sleep 10;
+    }
+
+    &report("Sorting control read");
+    foreach $nuc (@nuc){
+	$tag[0] = $nuc;
+	foreach $nuc (@nuc){
+	    $tag[1] = $nuc;
+	    foreach $nuc (@nuc){
+		$tag[2] = $nuc;
+		$tag = join('', @tag);
+		$qsub = "-v target=$target,tag=$tag,execution=sortControlRead $cwd/qsub_mkref.pl";
+		&doQsub($qsub);
+
+	    }
+	}
+    }
+
+    while(1){
+	$file_count = 0;
+	opendir(DIR, "$cwd/$target/sort_uniq");
+	foreach (readdir(DIR)){
+	    if (/[ACGT][ACGT][ACGT].gz$/){
+		$mtime = (stat("$cwd/$target/sort_uniq/$_"))[9];
+		if (time > $mtime + 10){
+		    $file_count++;
+		}
+	    }
+	}
+	closedir(DIR);
+	if ($file_count ==  64){
+	    last;
+	}
+	sleep 10;
+    }
+
+    &report("Job complete: qsub_mkref.pl");
+}elsif($execution eq "mk20"){
+    &mk20;
+}elsif($execution eq "mkUniq"){
+    &mkUniq;
+}elsif($execution eq "mkControlRead"){
+    &mkControlRead;
+}elsif($execution eq "sortControlRead"){
+    &sortControlRead;
 }
-
-&cleanupLog;
-
-system("rm $cwd/$target/done.*");
-
-&report("Job end: qsub_mkref.pl");
 
 sub mkChr{
     chdir "$cwd/$target";
@@ -147,7 +236,6 @@ sub mkChr{
     my $file = $file[$#file];
     $file =~ s/\ +$//g;
     my $i = 0;
-    &report("Making chromosome file from $file.");
     if ($target eq "hg38"){
 	open(IN, "zcat $file|");
 	while(<IN>){
@@ -234,7 +322,6 @@ sub mkChrFromFile{
 	my @file = split('/', $wget{$target});
 	$file = $file[$#file];
     }
-    &report("Making chromosome file.");
     if ($file =~ /gz$/){
 	open(IN, "zcat $file|");
     }elsif($file =~ /bz2$/){
@@ -264,7 +351,6 @@ sub mkChrFromFile{
 
 sub mk20{
     chdir "$cwd/$target";
-    &report("Making 20mer position file.");
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -272,83 +358,11 @@ sub mk20{
 	    foreach $nuc (@nuc){
 		$tag[2] = $nuc;
 		$tag = join('', @tag);
-		open($tag, "> ref20.$tag");
+		open($tag, "> ref20.$tag.$chr");
 	    }
 	}
     }
     
-    foreach $i (@chr){
-	next if $i eq "NOP";
-	&report("Processing Chr$i");
-	&mk20mer($i);
-    }
-    
-    &closeTag;
-
-    chdir $cwd;
-    foreach $nuc (@nuc){
-	$tag[0] = $nuc;
-	foreach $nuc (@nuc){
-	    $tag[1] = $nuc;
-	    foreach $nuc (@nuc){
-		$tag[2] = $nuc;
-		$tag = join('', @tag);
-		$qsub = "-v target=$target,tag=$tag $cwd/mkuniq.pl";
-		&doQsub($qsub);
-	    }
-	}
-    }    
-}
-
-sub mkControlRead{
-    &report("Making Control Read.");
-    if (! -e "$target/sort_uniq"){
-	system("mkdir $target/sort_uniq");
-    }
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $target/sort_uniq/$tag.seq")
-	    }
-	}
-    }
-    for(@chr){
-	next if $_ eq "NOP";
-	&report("Processing Chr$_");
-	open(IN, "$target/chr$_");
-	$data = <IN>;
-	close(IN);
-	$i = 0;
-	while(1){
-	    $read = substr($data, $i, 100);
-	    last if length($read) != 100;
-	    if ($read !~ /[MRWSYKVHDBN]/){
-		$tag = substr($read, 0, 3);
-		print $tag "$read\n";
-		$read = &complement($read);
-		$tag = substr($read, 0, 3);
-		print $tag "$read\n";
-	    }
-	    $i += 2;
-	}
-    }
-    &closeTag;
-
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		$qsub = "-v target=$target,tag=$tag sort_uniq_sub.pl";
-		&doQsub($qsub);
-	    }
-	}
-    }
-}
-
-sub mk20mer{
-    my $i;
-    my $chr = shift;
     $file = "chr$chr";
     open(IN, $file);
     while(<IN>){
@@ -367,4 +381,64 @@ sub mk20mer{
 	    print $tag "$reverse\t$chr\t$rpos\tr\n";
 	}
     }
+    &closeTag;
+}
+
+sub mkUniq{
+    system("cat $cwd/$target/ref20.$tag.* |sort -T $cwd/$target $sort_opt  > $cwd/$target/ref20_sort.$tag");
+    &waitFile("$cwd/$target/ref20_sort.$tag");
+    open(OUT, "|gzip -f > $cwd/$target/ref20_uniq.$tag.gz");
+    open(IN, "$cwd/$target/ref20_sort.$tag");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($prev ne "" and $prev ne $row[0]){
+	    print OUT "$pline\n" if $count == 1;
+	    $count =0;
+	}
+	$prev = $row[0];
+	$pline = $_;
+	$count++;
+    }
+    close(IN);
+    close(OUT);
+    &waitFile("$cwd/$target/ref20_uniq.$tag.gz");
+    system("rm $cwd/$target/ref20.$tag.* $cwd/$target/ref20_sort.$tag");
+ }
+
+sub mkControlRead{
+    if (! -e "$target/sort_uniq"){
+	system("mkdir $target/sort_uniq");
+    }
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		open($tag, "> $cwd/$target/sort_uniq/$tag.tmp.$chr")
+	    }
+	}
+    }
+    open(IN, "$cwd/$target/chr$chr");
+    $data = <IN>;
+    close(IN);
+    $i = 0;
+    while(1){
+	$read = substr($data, $i, 100);
+	last if length($read) != 100;
+	if ($read !~ /[MRWSYKVHDBN]/){
+	    $tag = substr($read, 0, 3);
+	    print $tag "$read\n";
+	    $read = &complement($read);
+	    $tag = substr($read, 0, 3);
+	    print $tag "$read\n";
+	}
+	$i += 2;
+    }
+    &closeTag;
+}
+
+sub sortControlRead{
+    system("cat $cwd/$target/sort_uniq/$tag.tmp.* | sort -T $cwd/$target $sort_opt |uniq |gzip > $cwd/$target/sort_uniq/$target.$tag.gz");
+    &waitFile("$cwd/$target/sort_uniq/$target.$tag.gz");
+    system("rm $cwd/$target/sort_uniq/$tag.tmp.*");
 }
