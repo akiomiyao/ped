@@ -24,7 +24,6 @@
 		docker run した後、/ped を /workにmvして、<br>
 		cd /work/ped<br>
 		と、/workに移したpedのディレクトリの中で作業を行うと、dockerを終了しても実行結果が/home/your_account/data_dirに残り便利である。<br>
-		ホストの/etc/groupのdockerグループにuserアカウントを登録するとuser権限で実行できる。
     <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
     common.pl の中の<br>
     # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
@@ -96,7 +95,8 @@
 	  <ul>
 	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも動作するが、十分なメモリを搭載する必要がある。<br>
       メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要がある。<br>
-	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。<br>
+	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。yumで簡単にインストールできる。<br>
+      <li>CentOSを搭載した16CPU, 38GBのコンピュータにTorqueをインストールしてhg38ゲノムに対するヒトの多型データ検出に成功している。
 	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
 	  perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
 	  グリッドエンジンを用いて高速に計算することができる。
@@ -247,6 +247,10 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
       <ul>
       <li>NGSデータから転移したトランスポゾンを検出する方法 <a href = "https://github.com/akiomiyao/tif/" target = "_blank">Transposon Insertion Finder (TIF)</a>
       <li>ミュータントパネルデータベース <a href = "https://tos.nias.affrc.go.jp" target = "_blank">https://tos.nias.affrc.go.jp</a> 
+      </ul>
+    <h2>取扱い会社</h2>
+      <ul>
+      <li><a href = "https://gikenbio.com/" target = "_blank">株式会社生物技研</a>
       </ul>
     <h2>連絡先</h2>
     〒305-8518<br>
