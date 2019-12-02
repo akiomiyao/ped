@@ -400,6 +400,8 @@ while(<IN>){
     }else{
 	$dat .= "\t" if $#row == 8;
     }
+    $row[2] = "00000000000$row[2]";
+    $row[2] = substr($row[2], length($row[2]) - 11);
     $all{"$row[1]\t$row[2]\t$row[3]\t$row[4]"} = $dat;
     if($row[$#row] eq "tw"){
         $tw{"$row[1]\t$row[2]\t$row[3]\t$row[4]"} = $row[0];
@@ -419,6 +421,8 @@ while(<IN>){
     }else{
 	$dat .= "\t" if $#row == 8;
     }
+    $row[2] = "00000000000$row[2]";
+    $row[2] = substr($row[2], length($row[2]) - 11);
     $all{"$row[1]\t$row[2]\t$row[3]\t$row[4]"} = $dat;
     if($row[$#row] eq "cw"){
         $cw{"$row[1]\t$row[2]\t$row[3]\t$row[4]"} = $row[0];
@@ -472,6 +476,7 @@ open(OUT, "> $cwd/$target/$target.indel.verify.$number");
 while(<IN>){
     chomp;
     @row = split;
+    $row[2] += 0;
     print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\n";
 }
 close(IN);
