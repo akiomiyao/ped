@@ -11,7 +11,7 @@
 	<li>プログラムのダウンロード<br>
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
 	  Clone or downloadのプルダウンメニューよりzipファイルをダウンロードする。あるいは、<br>
-	  git clone https://github.com/akiomiyao/ped<br>
+	  git clone https://github.com/akiomiyao/ped.git<br>
 	  を実行する。
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業する。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
@@ -166,6 +166,31 @@
 2019年 10月 18日 金曜日 08:52:41 JST Verifying SNPs 15
 2019年 10月 18日 金曜日 18:45:48 JST Making vcf file of SNP
 2019年 10月 18日 金曜日 18:48:58 JST bidirectional.pl complete.</pre>
+           <li>16 core、38GBの1台のコンピュータにTorqueをインストールして実行した所要時間は以下の通り。<pre>
+[miyao@s2 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
+Mon Dec  2 23:30:45 JST 2019 Aligning of ERR194146 sequence to hg38 genome
+Tue Dec  3 20:47:06 JST 2019 Indexing of alignment
+Tue Dec  3 20:47:07 JST 2019 Splitting of Indel alignment
+Tue Dec  3 20:47:08 JST 2019 Splitting of SNP alignment
+Tue Dec  3 21:10:11 JST 2019 Verifying indel 01
+Tue Dec  3 21:10:12 JST 2019 Verifying SNPs 01
+Tue Dec  3 21:10:13 JST 2019 Verifying SNPs 02
+Tue Dec  3 21:10:14 JST 2019 Verifying SNPs 03
+Tue Dec  3 21:10:16 JST 2019 Verifying SNPs 04
+Tue Dec  3 21:10:17 JST 2019 Verifying SNPs 05
+Tue Dec  3 21:10:18 JST 2019 Verifying SNPs 06
+Tue Dec  3 21:10:19 JST 2019 Verifying SNPs 07
+Tue Dec  3 21:10:20 JST 2019 Verifying SNPs 08
+Tue Dec  3 21:10:21 JST 2019 Verifying SNPs 09
+Tue Dec  3 21:10:22 JST 2019 Verifying SNPs 10
+Tue Dec  3 21:10:23 JST 2019 Verifying SNPs 11
+Tue Dec  3 21:10:24 JST 2019 Verifying SNPs 12
+Tue Dec  3 21:10:25 JST 2019 Verifying SNPs 13
+Tue Dec  3 21:10:26 JST 2019 Verifying SNPs 14
+Tue Dec  3 21:10:27 JST 2019 Verifying SNPs 15
+Wed Dec  4 19:19:06 JST 2019 Making vcf file of SNP
+Wed Dec  4 19:21:32 JST 2019 bidirectional.pl complete.
+</pre>
            <li>ERR194146.bi.vcf<br>
            にSNPのvcf形式マップデータがセーブされる。<br>
 <pre>##fileformat=VCFv4.2
