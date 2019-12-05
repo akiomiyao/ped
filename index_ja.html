@@ -114,8 +114,10 @@
       メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要がある。<br>
 	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。yumで簡単にインストールできる。<br>
       <li>CentOSを搭載した16CPU, 38GBのコンピュータにTorqueをインストールしてhg38ゲノムに対するヒトの多型データ検出に成功している。
+	  <li>perl qsub_mkref.pl リファレンス<br>
+	  例 perl qsub_mkref.pl IRGSP1.0
 	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
-	  perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
+	  例 perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
 	  グリッドエンジンを用いて高速に計算することができる。
       <li>各ノードに1TB程度のSSDを搭載してテンポラリーディレクトリに指定するとより高速に処理ができる。<br>
       perl qsub_bidirectional.pl ターゲット コントロール リファレンス テンポラリーディレクトリ<br>
