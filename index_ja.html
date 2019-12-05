@@ -78,6 +78,23 @@
 	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
 	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
 	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
+	  <li>DRR054198のディレクトリには、<br>
+	  DRR054198.aln.0<br>
+	  DRR054198.aln.5<br>
+	  DRR054198.aln.10<br>
+	  DRR054198.aln.15<br>
+	  DRR054198.bi.snp<br>
+	  DRR054198.bi.vcf<br>
+	  DRR054198.index<br>
+	  DRR054198.sv<br>
+	  が出力される。<br>
+	  snp情報は、DRR054198.bi.snpに独自フォーマットで出力され、確度の高いSNPがvcf形式でDRR054198.bi.vcfに出力される。<br>
+	  構造変異は、独自フォーマットでDRR054198.svに出力される。<br>
+	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上のの位置を求めている。<br>
+	  pedディレクトリで、<br>
+	  perl search.pl DRR054198 1 1369483<br>
+	  のように、perl search.pl target chr position<br>
+	  を実行すると対応するアラインメントが検索され表示される。<br>
 	  </ul>
 	<h2><i>k</i>-mer法での多型の検出</h2>
 	  <i>k</i>-mer法は、SNPの検出のみとなる。
@@ -87,7 +104,7 @@
 	  perl kmer.pl  DRR054198 DRR099989 IRGSP1.0<br>
 	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
 	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
-	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
+	  perl kmer.pl DRR054198 default IRGSP1.0<br>
 	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
 	  </ul>
 	<h2>グリッドエンジンを用いた並列計算</h2>
@@ -143,7 +160,7 @@
            <li>perl download.pl ERR194146<br>
            で、<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP001960&o=acc_s%3Aa" target = "_blank">CEPH/UTAH家系の父親のfastqデータ</a>をダウンロードする。<br>
            どういうわけか、最近息子のERR194152の配列がNCBI/SRAからダウンロードできなくなった。母親ERR194147は今のところダウンロード可能である。
-           <li><pre>[miyao@cluster1 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
+           <li>高度解析センターのclusterを用いた場合の実行ログ<pre>[miyao@cluster1 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
 2019年 10月 16日 水曜日 16:30:24 JST Making ERR194146.sort_uniq.
 2019年 10月 17日 木曜日 10:48:55 JST Aligning of ERR194146 sequence to hg38 genome.
 2019年 10月 18日 金曜日 06:42:16 JST Splitting of Indel alignment.
