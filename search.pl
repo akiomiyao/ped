@@ -72,7 +72,11 @@ while($bottom - $top > 1){
  }
 
 sub printData{
-    open(IN, "$target/$target.aln.$row[2]");
+    if ($row[2] eq "S"){
+	open(IN, "$target/$target.aln");
+    }else{
+	open(IN, "$target/$target.aln.$row[2]");
+    }
     seek(IN, $row[3], 0);
     while(<IN>){
 	if ($flag and /^$/){
