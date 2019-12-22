@@ -225,7 +225,7 @@ $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &snpReadCount;
 
 &toVcf;
-sysytem("rm -r $wd/$target/tmp");
+system("rm -r $wd/$target/tmp");
 report("Job completed");
 
 sub mkSortUniq{
