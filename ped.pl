@@ -17,15 +17,20 @@ use Thread::Semaphore;
 my $max_semaphore = 14;
 
 $usage = '
-     ped.pl - program for polymorphic edge detection. 
+ ped.pl - program for polymorphic edge detection. 
 
-     e.g. perl ped.pl target=ERR194147,ref=hg38
+ e.g. perl ped.pl target=ERR194147,ref=hg38
 
-     If you want to specify the working directory,
-     e.g. perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work
+ If you want to detect polymorphisms between target and control,
+ e.g. perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235
 
-     For setting of thread,
-     e.g. perl ped.pl target=ERR194147,ref=hg38,thread=16
+ If you want to specify the working directory,
+ e.g. perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work
+
+ For setting of muximum number of threads,
+ e.g. perl ped.pl target=ERR194147,ref=hg38,thread=16
+
+ Results will be saved in target directory.
 
      Author: Akio Miyao <miyao@affrc.go.jp>
 
@@ -57,6 +62,9 @@ if ($wd eq ""){
     chomp($wd);
 }
 
+$uname = `uname`;
+chomp($uname);
+
 open(REPORT, "> $wd/$target/$target.log");
 print REPORT "# Log of ped.pl
 $log";
@@ -65,14 +73,24 @@ report("Job begin");
 if ($thread ne ""){
     $max_semaphore = $thread;
 }else{
-    open(IN, "/proc/cpuinfo");
-    while(<IN>){
-	$processor ++  if /processor/;
+    if ($uname eq "FreeBSD"){
+	open(IN, "sysctl kern.smp.cpus |");
+	while(<IN>){
+	    chomp;
+	    $processor = (split(': ', $_))[1];
+	}
+	close(IN);
+    }elsif($uname eq "Linux"){
+	open(IN, "/proc/cpuinfo");
+	while(<IN>){
+	    $processor ++  if /processor/;
+	}
+	close(IN);
     }
-    close(IN);
-    if ($processor > 0){
+    if ($processor > 6){
 	$processor -= 2;
 	$max_semaphore = $processor;
+	$semaphore4sort = 4;
     }
 }
 my $semaphore = Thread::Semaphore->new($max_semaphore);
@@ -136,21 +154,21 @@ while(<IN>){
     last;
 }
 close(IN);
-#=pod
+
 &mkData4MapF;
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &sortData4Map;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &map;
 
 &mkData4MapR;
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &sortData4Map;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &map;
 &align;
 
@@ -159,7 +177,7 @@ system("cat $tmpdir/$target.aln.* > $wd/$target/$target.aln && rm $wd/$target/tm
 $semaphore->down;
 threads->new(\&index);
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 threads->new(\&svSort);
 &joinAll;
 
@@ -169,17 +187,17 @@ threads->new(\&svMkT);
 
 &sortSeq;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &joinTarget;
 
 $semaphore->down;
 threads->new(\&svMkC);
 &joinAll;
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &sortSeq;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &joinControl;
 
 &svReadCount;
@@ -188,27 +206,26 @@ $semaphore->down;
 threads->new(\&snpMkT);
 &joinAll;
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &sortSeq;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &joinTarget;
-#=cut
 
 $semaphore->down;
 threads->new(\&snpMkC);
 &joinAll;
 
-$semaphore->down($max_semaphore - 4);
+$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &sortSeq;
 
-$semaphore->up($max_semaphore - 4);
+$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &joinControl;
 
 &snpReadCount;
 
 &toVcf;
-
+sysytem("rm -r $wd/$target/tmp");
 report("Job completed");
 
 sub mkSortUniq{
@@ -253,7 +270,7 @@ sub mkSortUniq{
 	&sortUniqSub($cmd);
     }
     &closeTag;
-    $semaphore->down($max_semaphore - 4);
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -264,7 +281,7 @@ sub mkSortUniq{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - 4);
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 }
 
 sub sortUniqSort{
