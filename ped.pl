@@ -258,6 +258,39 @@ sub mkRef{
     }
     &mk20;
     &mkControlRead;
+    system("rm -r $wd/$ref/tmp");
+}
+
+sub mkChrFromFile{
+    &report("Making chromosome file.");
+    my $out;
+    die "$file is not found in $wd/$ref." if ! -e "$wd/$ref/$file";
+    @chr = ();
+    if ($file =~ /gz$/){
+	open(IN, "zcat $wd/$ref/$file|");
+    }elsif($file =~ /bz2$/){
+	open(IN, "bzcat $wd/$ref/$file|");
+    }else{
+	open(IN, "$wd/$ref/$file");
+    }
+    while(<IN>){
+	chomp;
+	if (/^>/){
+	    close(OUT);
+	    $out = (split)[0];
+	    $out =~ s/>//;
+	    $out =~ s/^chr//i;
+	    $out += 0 if $out =~ /^[0-9]*$/;
+	    push(@chr, $out) if ! $chr_flag;
+	    $out = "chr$out";
+	    open(OUT, "> $out");
+	}else{
+	    y/a-z/A-Z/;
+	    print OUT;
+	}
+    }
+    close(IN);
+    close(OUT);
 }
 
 sub mkControlRead{
@@ -624,8 +657,8 @@ sub toVcf{
     report("Convert to vcf format");
     my $fin = "in-vcf";
     my $fout ="out-vcf";
-    open($fin, "cat $target/$target.bi.snp|");
-    open($fout, "> $target/$target.bi.vcf");
+    open($fin, "cat $wd/$target/$target.bi.snp|");
+    open($fout, "> $wd/$target/$target.bi.vcf");
     print $fout "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
 ##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
@@ -1237,8 +1270,8 @@ sub index{
     report("Making index");
     my $pos  = 0;
     my ($length, @row);
-    open(INDEXOUT, "|sort $sort_opt -T $tmpdir > $target/$target.index");
-    open(INDEXIN, "$target/$target.aln");
+    open(INDEXOUT, "|sort $sort_opt -T $tmpdir > $wd/$target/$target.index");
+    open(INDEXIN, "$wd/$target/$target.aln");
     while(<INDEXIN>){
 	$length = length($_);
 	if(/^#/){
