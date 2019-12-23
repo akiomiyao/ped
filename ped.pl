@@ -887,7 +887,11 @@ sub svReadCount{
 		}
 	    }
 	    @prev = split('\t', $prev);
-	    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n" if $prev ne "";
+	    if ($prev[5] =~~/version/){
+		$prev[7] = $prev[6];
+		$prev[6] = "_";
+	    }
+	    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n" if $prev ne "";
 	    $cm = 0;
 	    $cw = 0;
 	    $tm = 0;
