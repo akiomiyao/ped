@@ -887,7 +887,7 @@ sub svReadCount{
 		}
 	    }
 	    @prev = split('\t', $prev);
-	    if ($prev[5] =~~/version/){
+	    if ($prev[5] =~ /version/){
 		$prev[7] = $prev[6];
 		$prev[6] = "_";
 	    }
