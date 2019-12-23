@@ -103,8 +103,15 @@ $control = $ref if $control eq "" or $control eq "default";
 open(IN, "$wd/config");
 while(<IN>){
     chomp;
-    @row = split;
-    if($row[0] eq $ref && $row[1] eq "chromosome"){
+    @row = split('\t', $_);
+    if ($row[1] eq "description"){
+	$desc{$row[0]} = $row[2];
+    }elsif($row[1] eq "wget"){
+	$wget{$row[0]} = $row[2];
+    }elsif($row[1] eq "file"){
+	$file{$row[0]} = $row[2];
+    }elsif($row[0] eq $ref && $row[1] eq "chromosome"){
+	@row = split;
 	if ($row[3] != 0){
 	    for ($i = $row[2]; $i <= $row[3]; $i++){
 		push(@chr, $i);
@@ -137,6 +144,10 @@ if (! -e "$wd/$target/sort_uniq/$target.sort_uniq.TTT.gz"){
 
 if ($control ne $ref && ! -e "$wd/$control/sort_uniq/$control.sort_uniq.TTT.gz"){
     &mkSortUniq($control);
+}
+
+if (! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
+    &mkRef;
 }
 
 open(IN, "zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
@@ -227,6 +238,294 @@ $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 &toVcf;
 system("rm -r $wd/$target/tmp");
 report("Job completed");
+
+sub mkRef{
+    my (@row, $i, $remote_file);
+    if (! -e "$wd/$ref"){
+	system("mkdir $wd/$ref");
+    }
+    chdir "$wd/$ref";
+    if ($file eq ""){
+	@row = split('/', $wget{$target});
+	$remote_file = $row[$#row];
+	if (! -e $remote_file and $wget{$ref} ne ""){
+	    &report("Downloading $wget{$ref}");
+	    system("wget $wget{$ref}");
+	}
+	&mkChr;
+    }else{
+	&mkChrFromFile($file);
+    }
+    &mk20;
+    &mkControlRead;
+}
+
+sub mkControlRead{
+    &report("Making Control Read.");
+    if (! -e "$wd/$ref/sort_uniq"){
+	system("mkdir $wd/$ref/sort_uniq");
+    }
+
+    for (@chr){
+	next if $_ eq "NOP";
+	$semaphore->down;
+	&report("Processing Chr$_");
+	threads->new(\&mkControlReadChr, $_);
+    }
+    &joinAll;
+
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Making Control Read. $tag");
+		threads->new(\&mkControlReadSub, $tag);
+	    }
+	}
+    }
+    &joinAll;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+}
+
+sub mkControlReadChr{
+    my $chr = shift;
+    my ($tag, $nuca, $nucb, $nucc, $fin, $fout, $read, $data, $i);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$fout = "$tag.$chr";
+		open($fout, "> $wd/$ref/tmp/$tag.$chr");
+	    }
+	}
+    }
+    $fin = $chr;
+    open($fin, "$wd/$ref/chr$chr");
+    $data = <$fin>;
+    close(IN);
+    $i = 0;
+    while(1){
+	$read = substr($data, $i, 100);
+	last if length($read) != 100;
+	if ($read !~ /[MRWSYKVHDBN]/){
+	    $tag = substr($read, 0, 3) . ".$chr";
+	    
+	    print $tag "$read\n";
+	    $read = &complement($read);
+	    $tag = substr($read, 0, 3) . ".$chr";
+		print $tag "$read\n";
+	}
+	$i += 2;
+    }
+    close($fin);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		close($fout);
+	    }
+	}
+    }
+   
+    $semaphore->up;
+}
+
+sub mkControlReadSub{
+    my $tag = shift;
+    system("cat $wd/$ref/tmp/$tag.* | sort -T $wd/$ref/tmp/ $sort_opt  | uniq | gzip > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz && rm $wd/$ref/tmp/$tag.*");
+    $semaphore->up;
+}
+
+sub mkUniq{
+    my $tag = shift;
+    &report("Making ref20_uniq.$tag.gz");
+    system("cat $wd/$ref/tmp/ref20.$tag.* | sort -T $tmpdir $sort_opt  > $wd/$ref/tmp/ref20_sort.$tag");
+    &waitFile("$wd/$ref/tmp/ref20_sort.$tag");
+    open(OUT, "|gzip -f > $wd/$ref/ref20_uniq.$tag.gz");
+    open(IN, "$wd/$ref/tmp/ref20_sort.$tag");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($prev ne "" and $prev ne $row[0]){
+	    print OUT "$pline\n" if $count == 1;
+	    $count =0;
+	}
+	$prev = $row[0];
+	$pline = $_;
+	$count++;
+    }
+    close(IN);
+    close(OUT);
+    &waitFile("$wd/$ref/ref20_uniq.$tag.gz");
+    system("rm $wd/$ref/tmp/ref20.$tag.* $wd/$ref/tmp/ref20_sort.$tag");
+    $semaphore->up;
+}
+
+sub mk20mer{
+    my ($fin, $fout, $i, @tag, $tag, $data, $forward, $length, $comp, $fpos, $rpos, );
+    my $chr = shift;
+
+    foreach $nuc (@nuc){
+	$tag[0] = $nuc;
+	foreach $nuc (@nuc){
+	    $tag[1] = $nuc;
+	    foreach $nuc (@nuc){
+		$tag[2] = $nuc;
+		$tag = join('', @tag);
+		$fout = "$tag.$chr";
+		open($fout, "> $wd/$ref/tmp/ref20.$tag.$chr");
+	    }
+	}
+    }
+
+    my $file = "chr$chr";
+    open(IN, $file);
+    while(<IN>){
+	$data = $_;
+    }
+    $length = length($data);
+    for ($i = 0; $i <= $length - 20; $i++){
+	$forward = substr($data, $i, 20);
+	if ($forward !~ /[MRWSYKVHDBN]/){
+	    $comp = complement($forward);
+	    $fpos = $i + 1;
+	    $rpos = $fpos + 20 -1;
+	    $tag = substr($forward, 0, 3) . ".$chr";
+	    print $tag "$forward\t$chr\t$fpos\tf\n";
+	    $tag = substr($comp, 0, 3) . ".$chr";
+	    print $tag "$comp\t$chr\t$rpos\tr\n";
+	}
+    }
+    foreach $nuc (@nuc){
+	$tag[0] = $nuc;
+	foreach $nuc (@nuc){
+	    $tag[1] = $nuc;
+	    foreach $nuc (@nuc){
+		$tag[2] = $nuc;
+		$tag = join('', @tag) . ".$chr";
+		close($tag);
+	    }
+	}
+    }
+    $semaphore->up;
+}
+
+sub mk20{
+    system("mkdir $wd/$ref/tmp");
+    &report("Making 20mer position file.");
+    
+    foreach $i (@chr){
+	next if $i eq "NOP";
+	$semaphore->down;
+	&report("Processing Chr$i");
+	threads->new(\&mk20mer, $i);
+    }
+    &joinAll;
+    
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    foreach $nuc (@nuc){
+	$tag[0] = $nuc;
+	foreach $nuc (@nuc){
+	    $tag[1] = $nuc;
+	    foreach $nuc (@nuc){
+		$tag[2] = $nuc;
+		$tag = join('', @tag);
+		$semaphore->down;
+		threads->new(\&mkUniq, $tag);
+	    }
+	}
+    }    
+    &joinAll;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+}
+
+sub mkChr{
+    my $output;
+    my @file = split('/', $wget{$ref});
+    my $file = $file[$#file];
+    $file =~ s/\ +$//g;
+    my $i = 0;
+    &report("Making chromosome file from $file.");
+    if ($ref eq "hg38"){
+	open(IN, "zcat $file|");
+	while(<IN>){
+	    chomp;
+	    if (/^>/){
+		close(OUT);
+		$output = (split)[0];
+		$output =~ s/>//;
+		if ($output =~ /\_/){
+		    $flag = 1;
+		}else{
+		    $flag = 0;
+		    $output =~ s/chr//i;
+		    $output += 0 if $output =~ /^[0-9]*$/;
+		    $output = "chr$output";
+		    open(OUT, "> $output");
+		}
+	    }elsif(! $flag){
+		y/a-z/A-Z/;
+		print OUT;
+	    }
+	}
+	close(IN);
+	close(OUT);
+    }else{
+	if ($ref eq "IWGSC1.0"){
+	    system("unzip iwgsc_refseqv1.0_all_chromosomes.zip && mv iwgsc_refseqv1.0_all_chromosomes/$file{$ref} .");
+	}elsif($ref eq "SL3"){
+	    system("tar xvfz $file && rm $file");
+	    $file =~ s/\.tar\.gz//;
+ 	}elsif($ref =~ /^B73/){
+	    for ($i = 1; $i <= 10; $i++){
+		$file = $wget{$ref} . "chr$i.fna.gz";
+		&report("Downloading $file");
+		system("wget $file");
+		$file = "chr$i.fna.gz";
+		open(IN, "zcat $file|");
+		open(OUT, "> chr$i");
+		while(<IN>){
+		    chomp;
+		    if (! /^>/){
+			y/a-z/A-Z/;
+			print OUT;
+		    }
+		}
+		close(IN);
+		close(OUT);
+	    }
+	    return;
+	}
+	
+	if ($file =~ /gz$/){
+	    open(IN, "zcat $file|");
+	}elsif ($file =~ /bz2$/){
+	    open(IN, "bzcat $file|");
+	}elsif ($file =~ /xz$/){
+	    open(IN, "xzcat $file|");
+	}else{
+	    $file = $file{$ref} if $file{$ref} ne "";
+	    open(IN, $file);
+	}
+	while(<IN>){
+	    chomp;
+	    if (/^>/){
+		close(OUT);
+		$output = "chr" . $chr[$i];
+		last if $chr[$i] eq "";
+		open(OUT, "> $output");
+		$i++;
+	    }else{
+		y/a-z/A-Z/;
+		print OUT;
+	    }
+	}
+	close(IN);
+	close(OUT);
+    }
+}
 
 sub mkSortUniq{
     my $target = shift;
