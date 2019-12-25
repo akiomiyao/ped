@@ -54,6 +54,14 @@ will be required, if you run the PED script on computer cluster with FreeBSD.
 Install method of Torque for CentOS 7 is described in the [Install of Torque grid engne](https://github.com/akiomiyao/ped/wiki/Install-of-Torque).  
 Torque with default setting works fine.  For the customized Torque, modification of script may be required.
 
+## Simplified instruction
+- ped.pl is a multithreaded script.  
+  Demonstration of SNPs and SVs detection from a *Caenorhabditis elegans* with repeated generations.  
+  % perl download.pl ERR3063486  
+  % perl download.pl ERR3063487  
+  % perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
+  will return results of the bidirectional method in ERR3063487 directory.
+
 ## Instruction for bidirectional method  
 - At first, set up reference data is required.  
   % perl mkref.pl reference  
@@ -118,7 +126,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   For example,  
   % perl bidirectional.pl ERR3063487 default WBcel235  
   or  
-  % qsub target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
+  % qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
    After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
