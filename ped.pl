@@ -14,28 +14,34 @@
 use threads;
 use Thread::Semaphore;
 
-my $max_semaphore = 14;
-
 $usage = '
  ped.pl - program for polymorphic edge detection. 
 
  e.g. perl ped.pl target=ERR194147,ref=hg38
 
  If you want to detect polymorphisms between target and control,
- e.g. perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235
+ perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235
 
  If you want to specify the working directory,
- e.g. perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work
+ perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work
 
- For setting of muximum number of threads,
- e.g. perl ped.pl target=ERR194147,ref=hg38,thread=16
+ If you want to specify both the working directory and tmp directory,
+ perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
- Results will be saved in target directory.
+ Muximam number of threads is adjusted to number of processor minus 2.
+ If you want to set muximum number of threads,
+ perl ped.pl target=ERR194147,ref=hg38,thread=16
+
+ For kmer method,
+ perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
+
+ Results will be saved in the target directory.
 
      Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+my $max_semaphore = 14;
 my $sort_opt = "-S 1M";
 @nuc = ('A', 'C', 'G', 'T');
 $ENV{LANG} = "C";
@@ -43,6 +49,7 @@ $ENV{LANG} = "C";
 if ($ARGV[0] =~ /target|ref/){
     my @arg = split(',', $ARGV[0]);
     foreach (sort @arg){
+	next if $_ eq "";
 	my ($name, $val) = split('=', $_);
 	$$name = $val;
 	$log .= "# $name: $val\n";
@@ -65,10 +72,12 @@ if ($wd eq ""){
 $uname = `uname`;
 chomp($uname);
 
+$method = "bidirectional" if $method eq "";
+
 open(REPORT, "> $wd/$target/$target.log");
 print REPORT "# Log of ped.pl
 $log";
-report("Job begin");
+report("Job begin: $method method");
 
 if ($thread ne ""){
     $max_semaphore = $thread;
@@ -87,19 +96,34 @@ if ($thread ne ""){
 	}
 	close(IN);
     }
-    if ($processor > 6){
+    if ($processor > 8){
 	$processor -= 2;
 	$max_semaphore = $processor;
-	$semaphore4sort = 4;
+	$semaphore4sort = 8 if $semaphore4sort eq "";
+    }elsif($precessor == 8){
+	$processor -= 2;
+	$max_semaphore = $processor;
+	$semaphore4sort = $max_semaphore if $semaphore4sort eq "";
+    }else{
+	$max_semaphore = $processor;
+	$semaphore4sort = 1 if $semaphore4sort eq "";
     }
 }
+
 my $semaphore = Thread::Semaphore->new($max_semaphore);
 
 $refdir = "$wd/$ref";
-system("mkdir $wd/$target/tmp") if ! -e "$wd/$target/tmp";
-$tmpdir = "$wd/$target/tmp";
-
+if ($tmpdir eq ""){
+    system("mkdir $wd/$target/tmp") if ! -e "$wd/$target/tmp";
+    $tmpdir = "$wd/$target/tmp";
+}
 $control = $ref if $control eq "" or $control eq "default";
+
+if (! -e "$wd/config"){
+    chdir $wd;
+    system("wget https://raw.githubusercontent.com/akiomiyao/ped/master/config");
+}
+
 open(IN, "$wd/config");
 while(<IN>){
     chomp;
@@ -138,16 +162,16 @@ if ($chr[0] eq ""){
     closedir(REF);
 }
 
+if (! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
+    &mkRef;
+}
+
 if (! -e "$wd/$target/sort_uniq/$target.sort_uniq.TTT.gz"){
     &mkSortUniq($target);
 }
 
 if ($control ne $ref && ! -e "$wd/$control/sort_uniq/$control.sort_uniq.TTT.gz"){
     &mkSortUniq($control);
-}
-
-if (! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
-    &mkRef;
 }
 
 open(IN, "zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
@@ -166,78 +190,377 @@ while(<IN>){
 }
 close(IN);
 
-&mkData4MapF;
+if ($method eq "kmer"){
+    &kmer;
+}else{
+    &bidirectional;
+}
+if ($tmpdir eq "$wd/$target/tmp"){
+    system("rm -r $tmpdir");
+}else{
+    system("rm $tmpdir/*");
+}
+system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
+report("Job completed: $method method.");
 
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&sortData4Map;
+sub kmer{
+    &countKmer($target);
+    &countKmer($control);
+    &joinKmer;
+    if($ref eq ""){
+	system("cat $tmpdir/$target.snp.* > $wd/$target/$target.kmer.snp");
+	system("rm $tmpdir/$target.snp.*");
+	return;
+    }
+    &mapKmer;
+    &snpMkT;
+    &sortSeq;
+    &joinTarget;
+    &snpMkC;
+    &sortSeq;
+    &joinControl;
+    &kmerReadCount;
+    &toVcf;
+}
 
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&map;
+sub bidirectional{
+    &mkData4MapF;
+    &sortData4Map;
+    &map;
+    &mkData4MapR;
+    &sortData4Map;
+    &map;
+    &align;
 
-&mkData4MapR;
+    $semaphore->down;
+    threads->new(\&index);
+    $semaphore->down;
+    threads->new(\&svSort);
+    &joinAll;
 
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&sortData4Map;
+    &svMkT;
+    &sortSeq;
+    &joinTarget;
+    &svMkC;
+    &sortSeq;
+    &joinControl;
+    &svReadCount;
+    &snpMkT;
+    &sortSeq;
+    &joinTarget;
+    &snpMkC;
+    &sortSeq;
+    &joinControl;
+    &snpReadCount;
+    &toVcf;
+}
 
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&map;
-&align;
+sub mapKmer{
+    my ($tag, $nuca, $nucb, $nucc);
+   
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Mapping SNPs between $target and $control. $tag");
+		threads->new(\&mapKmerSub, $tag);
+	    }
+	}
+    }
+    &joinAll;
+}
 
-system("cat $tmpdir/$target.aln.* > $wd/$target/$target.aln && rm $wd/$target/tmp/*");
+sub mapKmerSub{
+    my $tag = shift;
+    my $fin = "map.in.$tag";
+    my $fout = "map.out.$tag";
+    my $fref = "map.ref.$tag";
+    my (@row, %dat, $seq, $nuc, $pos, @dat);
+    open($fin, "$tmpdir/$target.snp.$tag");
+    while(<$fin>){
+	chomp;
+	@row = split;
+	$seq = shift(@row);
+	if (length($row[0]) == 1){
+	    $dat{$seq} = "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]";
+	}
+    }
+    close($fin);
+    open($fout, "> $tmpdir/$target.map.$tag");
+    open($fref, "zcat $wd/$ref/ref20_uniq.$tag.gz|");
+    while(<$fref>){
+	chomp;
+	@row = split;
+	$seq = substr($row[0], 0, 19);
+	$nuc = substr($row[0], 19, 1);
+	if ($dat{$seq}){
+	    @dat = split('\t', $dat{$seq});
+	    if($row[3] eq "f"){
+		$pos = $row[2] + 19;
+		if ($nuc eq $dat[0]){
+		    print $fout "$row[1]\t$pos\t$seq\t$nuc\t$dat[0]\t$dat[1]\t$row[3]\t$dat[2]\t$dat[3]\t$dat[4]\t$dat[5]\t$dat[6]\t$dat[7]\t$dat[8]\t$dat[9]\n";
+		}
+	    }else{
+		$pos = $row[2] - 19;
+		$dat[0] = complement($dat[0]);
+		$dat[1] = complement($dat[1]);
+		$seq = complement($seq);
+		$nuc = complement($nuc);
+		if ($nuc eq $dat[0]){
+		    print $fout "$row[1]\t$pos\t$seq\t$nuc\t$dat[0]\t$dat[1]\t$row[3]\t$dat[2]\t$dat[3]\t$dat[4]\t$dat[5]\t$dat[6]\t$dat[7]\t$dat[8]\t$dat[9]\n";
+		}
+	    }
+	}
+    }
+    close($fout);
+    close($fref);
+    $semaphore->up;
+}
 
-$semaphore->down;
-threads->new(\&index);
+sub joinKmer{
+    my ($tag, $nuca, $nucb, $nucc);
+   
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Detection SNPs between $target and $control. $tag");
+		threads->new(\&joinKmerSub, $tag);
+	    }
+	}
+    }
+    &joinAll;
+}
 
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-threads->new(\&svSort);
-&joinAll;
+sub joinKmerSub{
+    my $tag = shift;
+    $cutoff = 10 if $cutoff eq "";
+    my $fin = "join.in.$tag";
+    my $fout = "join.out.$tag";
+    system("zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
+    system("zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
 
-$semaphore->down;
-threads->new(\&svMkT);
-&joinAll;
+    open($fout, "> $tmpdir/$target.snp.$tag");
+    open($fin, "join $tmpdir/$control.lbc.$tag $tmpdir/$target.lbc.$tag |");
+    while(<$fin>){
+	my $rep = 0;
+	my $a = "";
+	my $b = "";
+	my $nohita = 0;
+	my $nohitb = 0;
+	my $pola = 0;
+	my $polb = 0;
+	my @row = split;
+	my $i;
+	for ($i = 1; $i <= 4; $i++){
+	    if($row[$i] > 100){
+		$rep++;
+	    }elsif ($row[$i] >= $cutoff){
+		$a .= $nuc[$i -1];
+		if ($row[$i + 4] <= 1){
+		    $pola++;
+		}
+	    }elsif($row[$i] <= 1){
+		$nohita++;
+	    }	
+	    
+	    if($row[$i + 4] > 100){
+		$rep++;    
+	    }elsif ($row[$i + 4] >= $cutoff){
+		$b .= $nuc[$i -1];
+		if ($row[$i] <= 1){
+		    $polb++;
+		}
+	    }elsif($row[$i + 4] <= 1){
+		$nohitb++;
+	    }
+	} 
+	
+	if ($a ne $b and $a ne "" and $b ne "" and $rep == 0 and $nohita >= 2 and $nohitb >= 2 and ($pola == 1 or  $polb == 1)){
+	    print $fout "$row[0]\t$a\t$b\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\n";
+	}
+    }
+    close($fin);
+    close($fout);
+    system("rm $tmpdir/$target.lbc.$tag $tmpdir/$control.lbc.$tag");
+    $semaphore->up;
+}
 
-&sortSeq;
+sub countKmer{
+    my $target = shift;
+    my ($tag, $nuca, $nucb, $nucc);
+    return if -e "$wd/$target/lbc/$target.lbc.TTT.gz";
+    if (! -e "$tmpdir"){
+	system("mkdir $tmpdir");
+    }
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		&report("Making kmer for $target. $tag");
+		&countKmerSub($target, $tag);
+	    }
+	}
+    }
+    &joinAll;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Making kmer for $target. Sorting of $tag subfiles");
+		threads->new(\&countKmerSort, $target, $tag);
+	    }
+	}
+    }
+    &joinAll;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&joinTarget;
+     foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Joining kmer for $target. $tag");
+		threads->new(\&countKmerJoin, $target, $tag);
+	    }
+	}
+    }
+    &joinAll;
 
-$semaphore->down;
-threads->new(\&svMkC);
-&joinAll;
+    system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$semaphore->down;
+		&report("Making last base counts for $target. $tag");
+		threads->new(\&countKmerLbc, $target, $tag);
+	    }
+	}
+    }
+    &joinAll;
+}
 
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&sortSeq;
+sub countKmerLbc{
+    my ($target, $tag) = @_;
+    my ($fin, $fout, $seq, $count, $head, $prev, $nuc, %count);
 
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&joinControl;
+    $fin = "$tag.lbc.in";
+    $fout = "$tag.lbc.out";
+    open($fout, "|gzip > $wd/$target/lbc/$target.lbc.$tag.gz");
+    open($fin, "$tmpdir/$tag.count");
+    while(<$fin>){
+	chomp;
+	($seq, $count) = split;
+        $head = substr($seq, 0, 19);
+        $nuc = substr($seq, 19, 1);
+        
+        if ($head ne $prev and $prev ne ""){
+            print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
+            $count{A} = 0;
+            $count{C} = 0;
+            $count{G} = 0;
+            $count{T} = 0;
+        }
+        $count{$nuc} = $count;
+        
+        $prev = $head;
+    }
+    print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
+    close($fin);
+    close($fout);
+    system("rm $tmpdir/$tag.count");
+    $semaphore->up;
+}
 
-&svReadCount;
+sub countKmerJoin{
+    my ($target, $parent) = @_;
+    my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count);
+    system("touch $tmpdir/$parent.count");
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		&report("Making kmer for $target. $parent Joining of $tag subfile");
+		$fin = "$parent.$tag.join.in";
+		$fout = "$parent.$tag.join.out";
+		open($fout, "> $tmpdir/$parent.count.tmp");
+		open($fin, "zcat $tmpdir/$parent.$tag.count.gz |join -a 1 -a 2 $tmpdir/$parent.count - |");
+		while(<$fin>){
+		    chomp;
+		    @row = split;
+		    $count = $row[1] + $row[2];
+		    print $fout "$row[0]\t$count\n";
+		}
+		close($fin);
+		close($fout);
+		system("mv $tmpdir/$parent.count.tmp $tmpdir/$parent.count && rm $tmpdir/$parent.$tag.count.gz");
+	    }
+	}
+    }
+    $semaphore->up;
+}
 
-$semaphore->down;
-threads->new(\&snpMkT);
-&joinAll;
+sub countKmerSort{
+    my ($target, $parent) = @_;
+    my ($nuca, $nucb, $nucc, $tag);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		&report("Making kmer for $target. Sorting of $parent.$tag subfile");
+		system("zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
+	    }
+	}
+    }
+    $semaphore->up;
+}
 
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&sortSeq;
-
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&joinTarget;
-
-$semaphore->down;
-threads->new(\&snpMkC);
-&joinAll;
-
-$semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&sortSeq;
-
-$semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
-&joinControl;
-
-&snpReadCount;
-
-&toVcf;
-system("rm -r $wd/$target/tmp");
-report("Job completed");
+sub countKmerSub{
+    my ($target, $parent) = @_;
+    my ($nuca, $nucb, $nucc, $fin, $fout, $length, $seq, $ktag, $i);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$fout = "$tag.$parent.out";
+		open($fout, "|gzip > $tmpdir/$tag.$parent.gz");
+	    }
+	}
+    }
+    $fin = "$parent.in";
+    if (-e "$wd/$target/sort_uniq/$target.sort_uniq.$parent.gz"){
+	open($fin, "zcat $wd/$target/sort_uniq/$target.sort_uniq.$parent.gz 2> /dev/null |");
+    }else{
+	open($fin, "zcat $wd/$target/sort_uniq/$target.$parent.gz 2> /dev/null |");
+    }
+    while(<$fin>){
+	chomp;
+	$length = length($_);
+	for ($i = 0; $i <= $length - 20; $i++){
+	    $seq = substr($_, $i, 20);
+	    if ($seq !~ /N/){
+		$ktag = substr($seq, 0, 3);
+		$fout = "$ktag.$parent.out";
+		print $fout "$seq\n";
+	    }
+	}
+    }
+    close($fin);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		$fout = "$tag.$parent.out";
+		close($fout);
+	    }
+	}
+    }
+}
 
 sub mkRef{
     my (@row, $i, $remote_file);
@@ -246,9 +569,9 @@ sub mkRef{
     }
     chdir "$wd/$ref";
     if ($file eq ""){
-	@row = split('/', $wget{$target});
+	@row = split('/', $wget{$ref});
 	$remote_file = $row[$#row];
-	if (! -e $remote_file and $wget{$ref} ne ""){
+	if (! -e "$wd/$ref/$remote_file" and $wget{$ref} ne ""){
 	    &report("Downloading $wget{$ref}");
 	    system("wget $wget{$ref}");
 	}
@@ -374,10 +697,8 @@ sub mkControlReadSub{
 sub mkUniq{
     my $tag = shift;
     &report("Making ref20_uniq.$tag.gz");
-    system("cat $wd/$ref/tmp/ref20.$tag.* | sort -T $tmpdir $sort_opt  > $wd/$ref/tmp/ref20_sort.$tag");
-    &waitFile("$wd/$ref/tmp/ref20_sort.$tag");
     open(OUT, "|gzip -f > $wd/$ref/ref20_uniq.$tag.gz");
-    open(IN, "$wd/$ref/tmp/ref20_sort.$tag");
+    open(IN, "cat $wd/$ref/tmp/ref20.$tag.* | sort -T $tmpdir $sort_opt |");
     while(<IN>){
 	chomp;
 	@row = split;
@@ -392,7 +713,7 @@ sub mkUniq{
     close(IN);
     close(OUT);
     &waitFile("$wd/$ref/ref20_uniq.$tag.gz");
-    system("rm $wd/$ref/tmp/ref20.$tag.* $wd/$ref/tmp/ref20_sort.$tag");
+    system("rm $wd/$ref/tmp/ref20.$tag.*");
     $semaphore->up;
 }
 
@@ -418,6 +739,7 @@ sub mk20mer{
     while(<IN>){
 	$data = $_;
     }
+    close(IN);
     $length = length($data);
     for ($i = 0; $i <= $length - 20; $i++){
 	$forward = substr($data, $i, 20);
@@ -561,9 +883,9 @@ sub mkChr{
 }
 
 sub mkSortUniq{
-    my $target = shift;
-    report("Making sort_uniq files for $target");
-    opendir(DIR, "$wd/$target/read");
+    my $subject = shift;
+    report("Making sort_uniq files for $subject");
+    opendir(DIR, "$wd/$subject/read");
     foreach (sort readdir(DIR)){
 	if (/gz$/){
 	    $gz_file .= "$_ ";
@@ -576,29 +898,29 @@ sub mkSortUniq{
 	}
     }
     close(DIR);
-    system("mkdir $wd/$target/sort_uniq") if ! -e "$wd/$target/sort_uniq";
+    system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $wd/$target/sort_uniq/$tag.tmp");
+		open($tag, "|gzip > $wd/$subject/sort_uniq/$tag.tmp.gz");
 	    }
 	}
     }
     if ($gz_file ne ""){
-	$cmd = "cd $wd/$target/read && zcat $gz_file |";
+	$cmd = "cd $wd/$subject/read && zcat $gz_file |";
 	&sortUniqSub($cmd);
     }
     if($bz_file ne ""){
-	$cmd = "cd $wd/$target/read && bzcat $gb_file |";
+	$cmd = "cd $wd/$subject/read && bzcat $gz_file |";
 	&sortUniqSub($cmd);
     }
     if($xz_file ne ""){
-	$cmd = "cd $wd/$target/read && xzcat $gb_file |";
+	$cmd = "cd $wd/$subject/read && xzcat $xz_file |";
 	&sortUniqSub($cmd);
     }
     if($fq_file ne ""){
-	$cmd = "cd $wd/$target/read && cat $fq_file |";
+	$cmd = "cd $wd/$subject/read && cat $fq_file |";
 	&sortUniqSub($cmd);
     }
     &closeTag;
@@ -608,7 +930,7 @@ sub mkSortUniq{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
-		threads->new(\&sortUniqSort, $tag, $target);
+		threads->new(\&sortUniqSort, $tag, $subject);
 	    }
 	}
     }
@@ -617,15 +939,16 @@ sub mkSortUniq{
 }
 
 sub sortUniqSort{
-    my ($tag, $target) = @_;
-    report("Making $target.sort_uniq files: Sorting for $target.sort_uniq.$tag.gz");
-    system("sort -T $wd/$target/sort_uniq/ $sort_opt $wd/$target/sort_uniq/$tag.tmp | uniq | gzip > $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz && rm $wd/$target/sort_uniq/$tag.tmp");
+    my ($tag, $subject) = @_;
+    report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
+    system("zcat $wd/$subject/sort_uniq/$tag.tmp.gz | sort -T $wd/$subject/sort_uniq/ $sort_opt  | uniq | gzip > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp.gz");
     $semaphore->up;
 }
 
 sub sortUniqSub{
     my $cmd = shift;
     my $count = 0;
+    my $total = 0;
     open(IN, $cmd);
     while(<IN>){
 	if ($count == 1 and !/N/){
@@ -647,18 +970,17 @@ sub sortUniqSub{
     close(IN);
 }
 
-sub joinAll{
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
-}
-
 sub toVcf{
     report("Convert to vcf format");
     my $fin = "in-vcf";
     my $fout ="out-vcf";
-    open($fin, "cat $wd/$target/$target.bi.snp|");
-    open($fout, "> $wd/$target/$target.bi.vcf");
+    if ($method eq "kmer"){
+	open($fin, "$wd/$target/$target.kmer.snp");
+	open($fout, "> $wd/$target/$target.kmer.vcf");
+    }else{
+	open($fin, "$wd/$target/$target.bi.snp");
+	open($fout, "> $wd/$target/$target.bi.vcf");
+    }
     print $fout "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
 ##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
@@ -675,13 +997,24 @@ sub toVcf{
 	if (length($row[0]) <= 3 or $row[0] =~ /^[0-9]+$/){
 	    $row[0] = "chr" . $row[0];
 	}
-	$dp = $row[7] + $row[8];
-	next if $dp == 0;
-	$af = int(1000 * $row[8]/$dp)/1000;
-	if (/M/){
-	    print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[7],$row[8]:$dp\n";
-	}elsif(/H/){
-	    print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[7],$row[8]:$dp\n";
+	if($method eq "kmer"){
+	    $dp = $row[17] + $row[18];
+	    next if $dp == 0;
+	    $af = int(1000 * $row[18]/$dp)/1000;
+	    if (/M/){
+		print $fout "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
+	    }elsif(/H/){
+		print $fout "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
+	    }
+	}else{
+	    $dp = $row[6] + $row[7];
+	    next if $dp == 0;
+	    $af = int(1000 * $row[7]/$dp)/1000;
+	    if (/M/){
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	    }elsif(/H/){
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+	    }
 	}
     }
 }
@@ -689,23 +1022,38 @@ sub toVcf{
 sub snpMkT{
     report("Making data for verification of snp. target");
     my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat);
-    my $s = {};
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $tmpdir/$tag.tmp");
+		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
     my $fin = "in-mkt";
     my $fout = "out-mkt";
-    open($fout, "|sort $sort_opt -T $tmpdir | uniq -c > $wd/$target/tmp/snp.list");
-    open($fin, "$wd/$target/$target.aln");
+    open($fout, "|sort $sort_opt -T $tmpdir | uniq -c > $tmpdir/snp.list");
+    if ($method eq "kmer"){
+	open($fin, "cat $tmpdir/$target.map.* |");
+    }else{
+	open($fin, "$wd/$target/$target.aln");
+    }
     while(<$fin>){
 	chomp;
-	if (/^#/ and /snp/){
+	if ($method eq "kmer"){
+	    @row = split;
+	    if ($row[0] !~/[IVXYZ]/){
+		$row[0] = "000" . $row[0];
+		$row[0] = substr($row[0], length($row[0]) -3, 3);
+	    }
+	    $row[1] = "000000000000" . $row[1];
+	    $row[1] = substr($row[1], length($row[1]) -11, 11);
+	    $ref = $row[4];
+	    $alt = $row[5];
+	    $alt =~ s/$ref//;
+	    print $fout "$row[0] $row[1] $ref $alt\n";
+	}elsif (/^#/ and /snp/){
 	    @row = split;
 	    if ($row[1] !~/[IVXYZ]/){
 		$row[1] = "000" . $row[1];
@@ -719,10 +1067,15 @@ sub snpMkT{
     close($fin);
     close($fout);
 
-    open($fin, "$wd/$target/tmp/snp.list");
+    open($fin, "$tmpdir/snp.list");
     while(<$fin>){
 	chomp;
-	($count, $chr, $pos, $ref, $alt) = split;
+	if ($method eq "kmer"){
+	    ($count, $chr, $pos, $ref, $alt) = split;
+	    $count = 25;
+	}else{
+	    ($count, $chr, $pos, $ref, $alt) = split;
+	}
 	$chr += 0 if $chr !~ /[IVXYZ]/;
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
@@ -773,27 +1126,30 @@ sub snpMkT{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub snpMkC{
     my (@row, $chr, $pos, $ref, $alt, $count, $chr_seq, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $cw, $cm, $tag, $nuca, $nucb, $nucc, @dat);
-    my $s = {};
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $tmpdir/$tag.tmp");
+		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
     my $fin = "in-mkc";
 
-    open($fin, "$wd/$target/tmp/snp.list");
+    open($fin, "$tmpdir/snp.list");
     while(<$fin>){
 	chomp;
-	($count, $chr, $pos, $ref, $alt) = split;
+	if ($method eq "kmer"){
+	    ($count, $chr, $pos, $ref, $alt) = split;
+	    $count = 25;
+	}else{
+	    ($count, $chr, $pos, $ref, $alt) = split;
+	}
 	$chr += 0 if $chr !~ /[IVXYZ]/;
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
@@ -845,7 +1201,6 @@ sub snpMkC{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub svReadCount{
@@ -878,7 +1233,7 @@ sub svReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "";
+	    $genotype = "_";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
@@ -887,7 +1242,7 @@ sub svReadCount{
 		}
 	    }
 	    @prev = split('\t', $prev);
-	    if ($prev[5] =~ /version/){
+	    if ($prev[5] =~ /translocation|inversion/){
 		$prev[7] = $prev[6];
 		$prev[6] = "_";
 	    }
@@ -903,6 +1258,131 @@ sub svReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
+    $genotype = "_";
+    if ($cw >= 5 and $cm <= 1){
+	if ($tm >= 5 and $tw <= 1){
+	    $genotype = 'M';
+	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
+	    $genotype = "H";
+	}
+    }
+    @prev = split('\t', $prev);
+    if ($prev[5] =~ /translocation|inversion/){
+	$prev[7] = $prev[6];
+	$prev[6] = "_";
+    }
+    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
+    close(OUT);
+}
+
+sub kmerReadCount{
+    my (@row, $dat, %count, $cm, $cw, $tm, $tw, $count, @prev, $prev, $genotype);
+    open(OUT, "| sort $sort_opt -T $tmpdir > $tmpdir/$target.map");
+    open(IN, "cat $tmpdir/$target.map.* |");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($row[0] !~/[IVXYZ]/){
+	    $row[0] = "000" . $row[0];
+	    $row[0] = substr($row[0], length($row[0]) -3, 3);
+	}
+	$row[1] = "000000000000" . $row[1];
+	$row[1] = substr($row[1], length($row[1]) -11, 11);
+	print OUT "$row[0]:$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\t$row[13]\t$row[14]\n";
+    }
+    close(IN);
+    close(OUT);
+
+    open(OUT, "> $tmpdir/$target.verify");
+    open(IN, "cat $tmpdir/*.target $tmpdir/*.control |");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($row[0] !~/[IVXYZ]/){
+	    $row[0] = "000" . $row[0];
+	    $row[0] = substr($row[0], length($row[0]) -3, 3);
+	}
+	$row[1] = "000000000000" . $row[1];
+	$row[1] = substr($row[1], length($row[1]) -11, 11);
+	$dat = join(" ", @row);
+	$count{$dat} ++;
+    }
+    close(IN);
+
+    $cm = 0;
+    $cw = 0;
+    $tm = 0;
+    $tw = 0;
+    foreach (sort keys %count){
+	$count = $count{$_};
+	@row = split;
+	if($row[0] !~/[IVXYZ]/){
+	    $row[0] += 0;
+	}
+	$row[1] += 0;
+	$dat = join("\t", @row[0 .. $#row -1]);
+	if($dat ne $prev){
+	    $genotype = "_";
+	    if ($cw >= 5 and $cm <= 1){
+		if ($tm >= 5 and $tw <= 1){
+		    $genotype = 'M';
+		}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
+		    $genotype = "H";
+		}
+	    }
+	    $_ = $prev;
+	    @prev = split;
+	    if ($prev[0] !~/[IVXYZ]/){
+		$prev[0] = "000" . $prev[0];
+		$prev[0] = substr($prev[0], length($prev[0]) -3, 3);
+	    }
+	    $prev[1] = "000000000000" . $prev[1];
+	    $prev[1] = substr($prev[1], length($prev[1]) -11, 11);
+	    print OUT "$prev[0]:$prev[1]\t$cw\t$cm\t$tw\t$tm\t$genotype\n" if $prev ne "";
+	    $cm = 0;
+	    $cw = 0;
+	    $tm = 0;
+	    $tw = 0;
+	}	
+	$cm = $count if $row[$#row] eq "cm";
+	$cw = $count if $row[$#row] eq "cw";
+	$tm = $count if $row[$#row] eq "tm";
+	$tw = $count if $row[$#row] eq "tw";
+	$prev = $dat;
+    }
+    $genotype = "_";
+    if ($cw >= 5 and $cm <= 1){
+	if ($tm >= 5 and $tw <= 1){
+	    $genotype = 'M';
+	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
+	    $genotype = "H";
+	}
+    }
+    $_ = $prev;
+    @prev = split;
+    if ($prev[0] !~/[IVXYZ]/){
+	$prev[0] = "000" . $prev[0];
+	$prev[0] = substr($prev[0], length($prev[0]) -3, 3);
+    }
+    $prev[1] = "000000000000" . $prev[1];
+    $prev[1] = substr($prev[1], length($prev[1]) -11, 11);
+    print OUT "$prev[0]:$prev[1]\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
+    close(OUT);
+    
+    open(IN, "join $tmpdir/$target.map $tmpdir/$target.verify|");
+    open(OUT, "> $wd/$target/$target.kmer.snp");
+    while(<IN>){
+	chomp;
+	@row = split;
+	($chr, $pos) = split(':', $row[0]);
+	if ($chr !~/[IVXYZ]/){
+	    $chr += 0;
+	}
+	$pos += 0;
+	print OUT "$chr\t$pos\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\t$row[13]\t$row[14]\t$row[15]\t$row[16]\t$row[17]\t$row[18]\n";
+    }
+    close(IN);
+    close(OUT);
 }
 
 sub snpReadCount{
@@ -935,7 +1415,7 @@ sub snpReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "";
+	    $genotype = "_";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
@@ -955,18 +1435,28 @@ sub snpReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
+    $genotype = "_";
+    if ($cw >= 5 and $cm <= 1){
+	if ($tm >= 5 and $tw <= 1){
+	    $genotype = 'M';
+	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
+	    $genotype = "H";
+	}
+    }
+    print OUT "$prev\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
+    close(OUT);
 }
 
 sub joinControlFunc{
     my $tag = shift;
     report("Selecting sequence data for verify. $tag");
     if (-e "$wd/$control/sort_uniq/$control.$tag.gz"){
-	system("zcat $wd/$control/sort_uniq/$control.$tag.gz 2> /dev/null | join - $tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control");
+	system("bash -c \"join <(zcat $wd/$control/sort_uniq/$control.$tag.gz) <(zcat $tmpdir/$tag.gz)$tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }else{
-	system("zcat $wd/$control/sort_uniq/$control.sort_uniq.$tag.gz 2> /dev/null | join - $tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control");
+	system("bash -c \"join <(zcat $wd/$control/sort_uniq/$control.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }
     &waitFile("$tmpdir/$tag.control");
-    system("rm $tmpdir/$tag");
+    system("rm $tmpdir/$tag.gz");
     $semaphore->up;
 }
 
@@ -981,15 +1471,13 @@ sub joinControl{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
 }
 
 sub joinTargetFunc{
     my $tag = shift;
     report("Selecting sequence data for verify. $tag");
-    system("zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz 2> /dev/null | join - $tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.target");
+    system("bash -c \"join <(zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     &waitFile("$tmpdir/$tag.target");
     system("rm $tmpdir/$tag");
     $semaphore->up;
@@ -1006,21 +1494,20 @@ sub joinTarget{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
 }
 
 sub sortSeqFunc{
     my $tag = shift;
     report("Sorting sequence data for verify. $tag");
-    system("cat $tmpdir/$tag.tmp | sort $sort_opt -T $tmpdir  > $tmpdir/$tag");
-    &waitFile("$tmpdir/$tag");
-    system("rm $tmpdir/$tag.tmp");
+    system("zcat $tmpdir/$tag.tmp.gz | sort $sort_opt -T $tmpdir |gzip > $tmpdir/$tag.gz");
+    &waitFile("$tmpdir/$tag.gz");
+    system("rm $tmpdir/$tag.tmp.gz");
     $semaphore->up;
 }
 
 sub sortSeq{
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1031,26 +1518,19 @@ sub sortSeq{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 }
 
 sub svMkC{
-    report("Making data for verification of sv");
-    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $posa, $posb, $inside, $head, $tail, $ref_seq, $ut_seq, $slength, $tw);
-    foreach $i (@chr){
-	my $chr_file = "$refdir/chr$i";
-	open (IN, $chr_file);
-	($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-	close(IN);
-    }
+    report("Making cotrol data for verification of sv");
+    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $tm, $tw, $hchr_seq);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $tmpdir/$tag.tmp");
+		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -1061,51 +1541,110 @@ sub svMkC{
 	@row = split('\t', $_);
 	($hchr, $hpos, $tchr, $tpos, $direction, $type, $size) = (split(' ', $row[0]))[1.. 7];
 	$hchr =~ s/^0+//;
+	$hpos += 0;
 	$current = "$hchr $hpos $tchr $tpos";
 	next if $current eq $prev;
+	if ($hchr ne $prev_hchr){
+	    my $chr_file = "$refdir/chr$hchr";
+	    open (IN, $chr_file);
+	    ($hchr_seq = <IN>) =~ y/a-z/A-Z/;
+	    close(IN);
+	}
 	$prev = $current;
+	$prev_hchr = $hchr;
 	$posa = length($row[2]);
 	$posb = length($row[8]);
-	
-	if ($posa <= $posb){
+	if ($posa < $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
-	    $head = substr($chr{$hchr}, $hpos - $clength + ($posb - $posa -1), $clength - ($posb - $posa -1) -1);
+	    $head = substr($hchr_seq, $hpos - $clength + ($posb - $posa -1), $clength - ($posb - $posa -1) -1);
 	    next if length($head) != $clength - ($posb - $posa -1) -1;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos, $clength - ($posb - $posa -1) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos, $clength - ($posb - $posa -1) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos, 0);
+		    read(IN, $tail, $clength - ($posb - $posa -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		}
+		next if length($tail) != $clength - ($posb - $posa -1) -1;
 	    }else{
-		$tail = &complement(substr($chr{$tchr}, $tpos - $clength + ($posb - $posa -1), $clength -($posb - $posa -1)-1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($hchr_seq, $tpos - $clength + ($posb - $posa -1), $clength -($posb - $posa -1)-1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $clength + ($posb - $posa -1), 0);
+		    read(IN, $tail, $clength - ($posb - $posa -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
+		next if length($tail) != $clength -($posb - $posa -1)-1;
 	    }
-	    next if length($tail) != $clength -($posb - $posa -1)-1;
-	    $ref_seq = substr($chr{$hchr}, $hpos - $clength, $clength * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $clength, $clength * 2 -1);
 	    next if length($ref_seq) != $clength * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}elsif($posa == $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
-	    $head = substr($chr{$hchr}, $hpos - $clength + ($posb - $posa), $clength - ($posb - $posa -1) -2);
+	    $head = substr($hchr_seq, $hpos - $clength + ($posb - $posa), $clength - ($posb - $posa -1) -2);
 	    next if length($head) != $clength - ($posb - $posa -1) -2;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos, $clength - ($posb - $posa) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos, $clength - ($posb - $posa) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos, 0);
+		    read(IN, $tail, $clength - ($posb - $posa) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+
+		}
+		next if length($tail) != $clength - ($posb - $posa) -1;
 	    }else{
-		$tail = &complement(substr($chr{$tchr}, $tpos - $clength + ($posb - $posa), $clength -($posb - $posa)-1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($chr{$tchr}, $tpos - $clength + ($posb - $posa), $clength -($posb - $posa)-1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $clength + ($posb - $posa), 0);
+		    read(IN, $tail, $clength -($posb - $posa)-1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
+		next if length($tail) != $clength -($posb - $posa)-1;
 	    }
-	    next if length($tail) != $clength -($posb - $posa)-1;
-	    $ref_seq = substr($chr{$hchr}, $hpos - $clength, $clength * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $clength, $clength * 2 -1);
 	    next if length($ref_seq) != $clength * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}else{
 	    $inside = substr($row[5], $posb, $posa - $posb -1);
-	    next if $clength - ($posa - $posb -1) -1 <= 0;
-	    $head = substr($chr{$hchr}, $hpos - $clength, $clength - ($posa - $posb -1) -1);
+	    $head = substr($hchr_seq, $hpos - $clength, $clength - ($posa - $posb -1) -1);
 	    next if length($head) != $clength - ($posa - $posb -1) -1;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos + ($posa - $posb -1), $clength - ($posa - $posb -1) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos + ($posa - $posb -1), $clength - ($posa - $posb -1) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos + ($posa - $posb -1), 0);
+		    read(IN, $tail, $clength - ($posa - $posb -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		}
 	    }else{
-		next if $clength - ($posa - $posb -1) -1 <= 0;
-		$tail = &complement(substr($chr{$tchr}, $tpos - $clength, $clength - ($posa - $posb -1) -1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($hchr_seq, $tpos - $clength, $clength - ($posa - $posb -1) -1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $clength, 0);
+		    read(IN, $tail, $clength - ($posa - $posb -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
 	    }
 	    next if length($tail) != $clength - ($posa - $posb -1) -1;
-	    $ref_seq = substr($chr{$hchr}, $hpos - $clength - ($posa - $posb), $clength * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $clength - ($posa - $posb), $clength * 2 -1);
 	    next if length($ref_seq) != $clength * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}
@@ -1130,25 +1669,18 @@ sub svMkC{
 	    }
 	}
     }
-    $semaphore->up;
-    report("Making data for verification of sv complete");
+    report("Making control data for verification of sv complete");
 }
 
 sub svMkT{
-    report("Making data for verification of sv");
-    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $posa, $posb, $inside, $head, $tail, $ref_seq, $ut_seq, $slength, $tw);
-    foreach $i (@chr){
-	my $chr_file = "$refdir/chr$i";
-	open (IN, $chr_file);
-	($chr{$i} = <IN>) =~ y/a-z/A-Z/;
-	close(IN);
-    }
+    report("Making target data for verification of sv");
+    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $tm, $tw, $hchr_seq);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "> $tmpdir/$tag.tmp");
+		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -1159,50 +1691,110 @@ sub svMkT{
 	 @row = split('\t', $_);
 	($hchr, $hpos, $tchr, $tpos, $direction, $type, $size) = (split(' ', $row[0]))[1.. 7];
 	$hchr =~ s/^0+//;
+	$hpos += 0;
 	$current = "$hchr $hpos $tchr $tpos";
 	next if $current eq $prev;
+	if ($hchr ne $prev_hchr){
+	    my $chr_file = "$refdir/chr$hchr";
+	    open (IN, $chr_file);
+	    ($hchr_seq = <IN>) =~ y/a-z/A-Z/;
+	    close(IN);
+	}
 	$prev = $current;
+	$prev_hchr = $hchr;
 	$posa = length($row[2]);
 	$posb = length($row[8]);
 	if ($posa < $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
-	    $head = substr($chr{$hchr}, $hpos - $length + ($posb - $posa -1), $length - ($posb - $posa -1) -1);
+	    $head = substr($hchr_seq, $hpos - $length + ($posb - $posa -1), $length - ($posb - $posa -1) -1);
 	    next if length($head) != $length - ($posb - $posa -1) -1;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos, $length - ($posb - $posa -1) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos, $length - ($posb - $posa -1) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos, 0);
+		    read(IN, $tail, $length - ($posb - $posa -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		}
 		next if length($tail) != $length - ($posb - $posa -1) -1;
 	    }else{
-		$tail = &complement(substr($chr{$tchr}, $tpos - $length + ($posb - $posa -1), $length -($posb - $posa -1)-1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($hchr_seq, $tpos - $length + ($posb - $posa -1), $length -($posb - $posa -1)-1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $length + ($posb - $posa -1), 0);
+		    read(IN, $tail, $length - ($posb - $posa -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
 		next if length($tail) != $length -($posb - $posa -1)-1;
 	    }
-	    $ref_seq = substr($chr{$hchr}, $hpos - $length, $length * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $length, $length * 2 -1);
 	    next if length($ref_seq) != $length * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}elsif($posa == $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
-	    $head = substr($chr{$hchr}, $hpos - $length + ($posb - $posa), $length - ($posb - $posa -1) -2);
+	    $head = substr($hchr_seq, $hpos - $length + ($posb - $posa), $length - ($posb - $posa -1) -2);
 	    next if length($head) != $length - ($posb - $posa -1) -2;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos, $length - ($posb - $posa) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos, $length - ($posb - $posa) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos, 0);
+		    read(IN, $tail, $length - ($posb - $posa) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+
+		}
 		next if length($tail) != $length - ($posb - $posa) -1;
 	    }else{
-		$tail = &complement(substr($chr{$tchr}, $tpos - $length + ($posb - $posa), $length -($posb - $posa)-1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($chr{$tchr}, $tpos - $length + ($posb - $posa), $length -($posb - $posa)-1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $length + ($posb - $posa), 0);
+		    read(IN, $tail, $length -($posb - $posa)-1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
 		next if length($tail) != $length -($posb - $posa)-1;
 	    }
-	    $ref_seq = substr($chr{$hchr}, $hpos - $length, $length * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $length, $length * 2 -1);
 	    next if length($ref_seq) != $length * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}else{
 	    $inside = substr($row[5], $posb, $posa - $posb -1);
-	    $head = substr($chr{$hchr}, $hpos - $length, $length - ($posa - $posb -1) -1);
+	    $head = substr($hchr_seq, $hpos - $length, $length - ($posa - $posb -1) -1);
 	    next if length($head) != $length - ($posa - $posb -1) -1;
 	    if ($direction eq "f"){
-		$tail = substr($chr{$tchr}, $tpos + ($posa - $posb -1), $length - ($posa - $posb -1) -1);
+		if ($tchr eq $hchr){
+		    $tail = substr($hchr_seq, $tpos + ($posa - $posb -1), $length - ($posa - $posb -1) -1);
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos + ($posa - $posb -1), 0);
+		    read(IN, $tail, $length - ($posa - $posb -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		}
 	    }else{
-		$tail = &complement(substr($chr{$tchr}, $tpos - $length, $length - ($posa - $posb -1) -1));
+		if ($tchr eq $hchr){
+		    $tail = &complement(substr($hchr_seq, $tpos - $length, $length - ($posa - $posb -1) -1));
+		}else{
+		    open(IN, "$refdir/chr$tchr");
+		    seek(IN, $tpos - $length, 0);
+		    read(IN, $tail, $length - ($posa - $posb -1) -1);
+		    close(IN);
+		    $tail =~ y/a-z/A-Z/;
+		    $tail = &complement($tail);
+		}
 	    }
 	    next if length($tail) != $length - ($posa - $posb -1) -1;
-	    $ref_seq = substr($chr{$hchr}, $hpos - $length - ($posa - $posb), $length * 2 -1);
+	    $ref_seq = substr($hchr_seq, $hpos - $length - ($posa - $posb), $length * 2 -1);
 	    next if length($ref_seq) != $length * 2 -1;
 	    $mut_seq = $head . $inside . $tail;
 	}
@@ -1229,8 +1821,7 @@ sub svMkT{
 	    }
 	}
     }
-    $semaphore->up;
-    report("Making data for verification of sv complete");
+    report("Making target data for verification of sv complete");
 }
     
 sub svSort{
@@ -1239,18 +1830,24 @@ sub svSort{
     my $fin = "in-sv";
     my $fout = "out-sv";
     open($fin, "$wd/$target/$target.aln");
-    open($fout, "|sort $sort_opt -T $tmpdir -k 1 -k 2 -n |uniq > $tmpdir/$target.sv.sort");
+    open($fout, "|sort $sort_opt -T $tmpdir |uniq > $tmpdir/$target.sv.sort");
     while(<$fin>){
 	chomp;
 	if (/ion/){
 	    $flag = 1;
 	    @row = split;
-	    $chr = "00$row[1]";
-	    $chr = substr($chr, length($chr) - 3, 3);
+	    if ($row[1] !~/[IVXYZ]/){
+		$chr = "000$row[1]";
+		$chr = substr($chr, length($chr) - 3, 3);
+	    }else{
+		$chr = $row[1];
+	    }
+	    $pos = "00000000000" . $row[2];
+	    $pos = substr($pos, length($pos) - 11, 11);
 	    if ($row[7] eq ""){
-            $out .= "$row[0] $chr $row[2] $row[3] $row[4] $row[5] $row[6]\t";
+            $out .= "$row[0] $chr $pos $row[3] $row[4] $row[5] $row[6]\t";
         }else{
-            $out .= "$row[0] $chr $row[2] $row[3] $row[4] $row[5] $row[6] $row[7]\t";
+            $out .= "$row[0] $chr $pos $row[3] $row[4] $row[5] $row[6] $row[7]\t";
         }
 	    $count = 0;
 	}elsif($flag and $count != 1){
@@ -1285,7 +1882,7 @@ sub index{
 		$row[1] = substr($row[1], length($row[1]) -3, 3);
 	    }
 	    $row[2] = "0000000000$row[2]";
-	    $row[2] = substr($row[2], length($row[2]) - 10, 10);
+	    $row[2] = substr($row[2], length($row[2]) - 11, 11);
 	    print INDEXOUT "$row[1] $row[2] S $pos\n";
 	}
 	$pos += $length;
@@ -1297,6 +1894,7 @@ sub index{
 }
 
 sub sortData4Map{ 
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1307,16 +1905,15 @@ sub sortData4Map{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
 }
 
 sub sortData4MapFunc{
     my $tag = shift;
     report("Sorting sequence data. $tag");
-    system("cat $tmpdir/$tag.tmp.* | sort $sort_opt -T $tmpdir  > $tmpdir/$tag");
-    &waitFile("$tmpdir/$tag");
+    system("cat $tmpdir/$tag.tmp.* | sort $sort_opt -T $tmpdir |gzip > $tmpdir/$tag.gz");
+    &waitFile("$tmpdir/$tag.gz");
     system("rm $tmpdir/$tag.tmp.*");
     $semaphore->up;
 }
@@ -1330,13 +1927,11 @@ sub mkData4MapF{
 		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
 		threads->new(\&mkData4MapFFunc, $tag);
-		report("Making data for first mapping. $tag");
+		report("Bidirectional alignment: Making data for first mapping. $tag");
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
 }
 
 sub mkData4MapFFunc{
@@ -1385,9 +1980,7 @@ sub mkData4MapR{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
 }
 
 sub mkData4MapRFunc{
@@ -1436,16 +2029,14 @@ sub map{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
 }
 
 sub mapFunc{
     my $tag = shift;
-    system("zcat $refdir/ref20_uniq.$tag.gz | join $tmpdir/$tag - |cut -c 22- > $tmpdir/$tag.map");
+    system("bash -c \"join <(zcat $tmpdir/$tag.gz) <(zcat $refdir/ref20_uniq.$tag.gz) |cut -c 22- > $tmpdir/$tag.map\"");
     &waitFile("$tmpdir/$tag.map");
-    system("rm $tmpdir/$tag");
+    system("rm $tmpdir/$tag.gz");
     $semaphore->up;
 }
 
@@ -1462,9 +2053,8 @@ sub align{
 	    }
 	}
     }
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
+    &joinAll;
+    system("cat $tmpdir/$target.aln.* > $wd/$target/$target.aln && rm $tmpdir/*");
 }
 
 sub alignFunc{
@@ -1659,6 +2249,12 @@ $tail_space Chr$tchr $tail_junction
     system("rm $tmpdir/$tag.map");
 }
 
+sub joinAll{
+    foreach my $thr (threads->list){
+	$thr->join;
+    }
+}
+
 sub report{
     my $message = shift;
     my $now = `date`;
@@ -1672,7 +2268,7 @@ sub waitFile{
     my $file = shift;
     while(1){
 	last if -e $file;
-	sleep 10;
+	sleep 1;
     }
     while(1){
 	$mtime = (stat($file))[9];
