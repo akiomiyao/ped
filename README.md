@@ -60,7 +60,11 @@ Torque with default setting works fine.  For the customized Torque, modification
   % perl download.pl ERR3063486  
   % perl download.pl ERR3063487  
   % perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
-  will return results of the bidirectional method in ERR3063487 directory.
+  will return results of the bidirectional method in ERR3063487 directory.  
+  % perl ped.pl  
+  Run without argument, simple tutorial will be shown.  
+  For analysis of human (ERR194146),  
+  % perl ped.pl target=ERR194146,ref=hg38  
 
 ## Instruction for bidirectional method  
 - At first, set up reference data is required.  
