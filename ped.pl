@@ -96,14 +96,10 @@ if ($thread ne ""){
 	}
 	close(IN);
     }
-    if ($processor > 8){
+    if ($processor >=6 ){
 	$processor -= 2;
 	$max_semaphore = $processor;
-	$semaphore4sort = 8 if $semaphore4sort eq "";
-    }elsif($precessor == 8){
-	$processor -= 2;
-	$max_semaphore = $processor;
-	$semaphore4sort = $max_semaphore if $semaphore4sort eq "";
+	$semaphore4sort = 4 if $semaphore4sort eq "";
     }else{
 	$max_semaphore = $processor;
 	$semaphore4sort = 1 if $semaphore4sort eq "";
@@ -626,9 +622,8 @@ sub mkControlRead{
 	next if $_ eq "NOP";
 	$semaphore->down;
 	&report("Processing Chr$_");
-	threads->new(\&mkControlReadChr, $_);
+	&mkControlReadChr($_);
     }
-    &joinAll;
 
     $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
     foreach $nuca (@nuc){
@@ -667,11 +662,10 @@ sub mkControlReadChr{
 	last if length($read) != 100;
 	if ($read !~ /[MRWSYKVHDBN]/){
 	    $tag = substr($read, 0, 3) . ".$chr";
-	    
 	    print $tag "$read\n";
 	    $read = &complement($read);
 	    $tag = substr($read, 0, 3) . ".$chr";
-		print $tag "$read\n";
+	    print $tag "$read\n";
 	}
 	$i += 2;
     }
@@ -684,13 +678,13 @@ sub mkControlReadChr{
 	    }
 	}
     }
-   
-    $semaphore->up;
 }
 
 sub mkControlReadSub{
     my $tag = shift;
-    system("cat $wd/$ref/tmp/$tag.* | sort -T $wd/$ref/tmp/ $sort_opt  | uniq | gzip > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz && rm $wd/$ref/tmp/$tag.*");
+    system("cat $wd/$ref/tmp/$tag.* | sort -T $wd/$ref/tmp/ $sort_opt  | uniq | gzip > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
+    &waitFile("$wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
+    system("rm $wd/$ref/tmp/$tag.*");
     $semaphore->up;
 }
 
@@ -1477,9 +1471,9 @@ sub joinControl{
 sub joinTargetFunc{
     my $tag = shift;
     report("Selecting sequence data for verify. $tag");
-    system("bash -c \"join <(zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
+    system("bash -c \"join <(zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     &waitFile("$tmpdir/$tag.target");
-    system("rm $tmpdir/$tag");
+    system("rm $tmpdir/$tag.gz");
     $semaphore->up;
 }
 
@@ -2013,7 +2007,8 @@ sub mkData4MapRFunc{
 	    }
 	}
     }
-     $semaphore->up;
+    system("rm $tmpdir/$tag.map");
+    $semaphore->up;
 }
 
 sub map{

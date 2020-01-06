@@ -31,8 +31,8 @@ if ($chr =~ /^[0-9]*$/){
     $chr = substr($chr, length($chr) - 3, 3);
 }
 
-$pos = "0000000000" . $pos;
-$pos = substr($pos, length($pos) - 10, 10);
+$pos = "00000000000" . $pos;
+$pos = substr($pos, length($pos) - 11, 11);
 
 $size = -s "$target/$target.index";
 open(INDEX, "$target/$target.index");
@@ -45,7 +45,7 @@ while($bottom - $top > 1){
     read(INDEX, $data, 1000);
     foreach (split('\n', $data)){
 	@row = split;
-	if ($row[1] =~ /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/){
+	if ($row[1] =~ /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/){
 	    $ichr = $row[0];
 	    $ipos = $row[1];
 	    if ($chr eq $ichr){

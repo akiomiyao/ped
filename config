@@ -41,7 +41,7 @@ Gmax275v2.0	wget	ftp://ftp.jgi-psf.org/pub/compgen/phytozome/v9.0/early_release/
 Gmax275v2.0	chromosome	1	20
 
 WBcel235	description	Caenorhabditis elegans WBcel235	
-WBcel235	wget	ftp://ftp.ensembl.org/pub/release-95/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
+WBcel235	wget	ftp://ftp.ensembl.org/pub/release-98/fasta/caenorhabditis_elegans/dna/Caenorhabditis_elegans.WBcel235.dna.toplevel.fa.gz
 WBcel235	chromosome	0	0	I	II	III	IV	V	X
 
 dmel626	description	Drosophila melanogaster	release 6.26
