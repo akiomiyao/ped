@@ -476,7 +476,7 @@ open(OUT, "> $cwd/$target/$target.indel.verify.$number");
 while(<IN>){
     chomp;
     @row = split;
-    $row[2] += 0;
+    $row[1] += 0;
     print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\n";
 }
 close(IN);
