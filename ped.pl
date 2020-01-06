@@ -877,6 +877,7 @@ sub mkChr{
 
 sub mkSortUniq{
     my $subject = shift;
+    my ($cmd, $gz_file, $bz_file, $xz_file, $fq_file);
     report("Making sort_uniq files for $subject");
     opendir(DIR, "$wd/$subject/read");
     foreach (sort readdir(DIR)){
@@ -902,19 +903,19 @@ sub mkSortUniq{
     }
     if ($gz_file ne ""){
 	$cmd = "cd $wd/$subject/read && zcat $gz_file |";
-	&sortUniqSub($cmd);
+	&sortUniqSub($cmd, $subject);
     }
     if($bz_file ne ""){
-	$cmd = "cd $wd/$subject/read && bzcat $gz_file |";
-	&sortUniqSub($cmd);
+	$cmd = "cd $wd/$subject/read && bzcat $bz_file |";
+	&sortUniqSub($cmd, $subject);
     }
     if($xz_file ne ""){
 	$cmd = "cd $wd/$subject/read && xzcat $xz_file |";
-	&sortUniqSub($cmd);
+	&sortUniqSub($cmd, $subject);
     }
     if($fq_file ne ""){
 	$cmd = "cd $wd/$subject/read && cat $fq_file |";
-	&sortUniqSub($cmd);
+	&sortUniqSub($cmd, $subject);
     }
     &closeTag;
     $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
@@ -939,7 +940,7 @@ sub sortUniqSort{
 }
 
 sub sortUniqSub{
-    my $cmd = shift;
+    my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
     open(IN, $cmd);
@@ -953,7 +954,7 @@ sub sortUniqSub{
 	    print $tag "$complement\n";
 	    $total ++;
 	    if ($total % 1000000 == 0){
-		report("Making $target.sort_uniq files: Split to subfiles. $total reads processed");
+		report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
 	    }
 	}elsif($count == 4){
 	    $count = 0;
