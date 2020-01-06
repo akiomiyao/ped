@@ -620,7 +620,6 @@ sub mkControlRead{
 
     for (@chr){
 	next if $_ eq "NOP";
-	$semaphore->down;
 	&report("Processing Chr$_");
 	&mkControlReadChr($_);
     }
