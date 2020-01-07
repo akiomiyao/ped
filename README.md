@@ -37,7 +37,7 @@ If you got scripts from github, update to newest version is very easy using pull
 % git pull  
 or  
 \# docker run -v /home/your_home/your_working_directory:/work -w /ped akiomiyao/ped perl ped.pl target=TARGET,control=CONTROL,ref=REFERENCE,wd=/work  
-See https://hub.docker.com/repository/docker/akiomiyao/ped  
+See https://hub.docker.com/r/akiomiyao/ped  
 The container includes the fastq-dump program.  
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
