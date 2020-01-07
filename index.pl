@@ -68,7 +68,7 @@ foreach  $margin (sort keys %margin){
 		$row[1] = substr($row[1], length($row[1]) -3, 3);
 	    }
 	    $row[2] = "0000000000$row[2]";
-	    $row[2] = substr($row[2], length($row[2]) - 10, 10);
+	    $row[2] = substr($row[2], length($row[2]) - 11, 11);
 	    print OUT "$row[1] $row[2] $margin $pos\n";
 	}
 	$pos += $length;
