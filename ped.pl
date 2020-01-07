@@ -620,9 +620,11 @@ sub mkControlRead{
 
     for (@chr){
 	next if $_ eq "NOP";
+	$semaphore->down;
 	&report("Processing Chr$_");
-	&mkControlReadChr($_);
+	threads->new(\&mkControlReadChr, $_);
     }
+    &joinAll;
 
     $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
     foreach $nuca (@nuc){
@@ -651,13 +653,14 @@ sub mkControlReadChr{
 	    }
 	}
     }
+
     $fin = $chr;
     open($fin, "$wd/$ref/chr$chr");
-    $data = <$fin>;
-    close(IN);
+    binmode($fin);
     $i = 0;
     while(1){
-	$read = substr($data, $i, 100);
+	seek($fin, $i, 0);
+	read($fin, $read, 100);
 	last if length($read) != 100;
 	if ($read !~ /[MRWSYKVHDBN]/){
 	    $tag = substr($read, 0, 3) . ".$chr";
@@ -669,14 +672,17 @@ sub mkControlReadChr{
 	$i += 2;
     }
     close($fin);
+
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
+		$fout = "$tag.$chr";
 		close($fout);
 	    }
 	}
     }
+    $semaphore->up;
 }
 
 sub mkControlReadSub{
