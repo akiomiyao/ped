@@ -15,8 +15,8 @@
       <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギの多型の検出も可能です。また、小規模なコンピュータリソースで動作が可能です。
 	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
 	 <ul>
-	  <li>ped.plは、マルチスレッドで高速化しています。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
-	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。ダウンロード等は「PEDのインストール」を参照してください。<br>
+	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
+	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。ダウンロード、DockerでのRun等は「PEDのインストール」を参照してください。<br>
 	  書式<br>
 	  perl ped.pl target=target,control=control,ref=reference<br>
 	  <ul>
@@ -24,17 +24,19 @@
 	  <li>以下に述べる「PEDのインストール」に従ってインストールしたpedのディレクトリで実行します。
 	  <li>ターゲットやコントロールのディレクトリをpedのディレクトリの中に作成し、それらのディレクトリの中に<br>
 	  さらにreadというディレクトリを作成して、作成したreadのディレクトリの中にfastqファイルを置きます。
+      <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型を検出します。
 	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
-	  <li>リファレンスデータが見つからない場合、ダウンロードして自動作成します。
+	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
 	  </ul>
 	  例<br>
 	  <ul>
 	  <li>perl ped.pl target=ERR194146,ref=hg38<br>
-	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)をマップする。
+	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)をマップします。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した多型の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=16,thread4sort=2<br>
-	  スレッドは、最大スレッド数とソート時のスレッド数の指定。CPUのスレッド数-2がデフォルト。ソート時のスレッドは4がデフォルト。通常指定する必要はない。
+	  スレッドは、最大スレッド数とソート時のスレッド数の指定。CPUのスレッド数-2がデフォルト。ソート時のスレッドは4がデフォルト。<br>
+      通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
@@ -43,16 +45,16 @@
 	 <li>結果はtargetのディレクトリにまとめて出力されます。
 	 <table>
 	 <tr><td>target.aln</td><td>双方向アライン法による整列データ</td></tr>
-	 <tr><td>target.bi.snp</td><td>双方向アライン法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされる</td></tr>
+	 <tr><td>target.bi.snp</td><td>双方向アライン法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
 	 <tr><td>target.bi.vcn</td><td>HとMでマークされたSNPをvcn形式で出力されたファイル</td></tr>
 	 <tr><td>target.kmer.snp</td><td><i>k</i>-mer法で検出されたSNP</td></tr>
 	 <tr><td>target.sv</td><td>双方向アライン法で検出された構造(挿入・欠失・逆位・転座)変異</td></tr>
 	 <tr><td>target.index</td><td>アラインメント検索用インデックスファイル</td></tr>
 	 </table>
-	 targetの部分はターゲットとして指定したディレクトリ名となる。
+	 targetの部分はターゲットとして指定したディレクトリ名となります。
 	 <li>検出された多型をアラインメントに戻って確認したい場合は、<br>
 	 perl search.pl target chr position<br>
-	 を実行する。<br>
+	 を実行します。<br>
 	 例<br>
 	 perl search.pl ERR3063487 II 948033
 	 </ul>
@@ -90,26 +92,26 @@
 	<h2>リファレンスゲノムデータセットの作成</h2>
 	<ul>
 	  <li>ped.plの場合は、実行初回に自動実行されるので、別途作成する必要はなくなりました。以下の作業は、ped.plではなく、bidirectional.plやkmer.plを実行する場合のみ必要です。
-	  <li>引数なしで実行するとヘルプと対応しているゲノムがリストされる。<br>
+	  <li>引数なしで実行するとヘルプと対応しているゲノムがリストされます。<br>
 	  perl mkref.pl<br>
 	  <li>イネ(日本晴)データセットは、<br>
 	  perl mkref.pl IRGSP1.0<br>
-	  を実行する。<br>
-	  <li>IRGSP1.0をhg38にするとヒトのデータセットができる。<br>
+	  を実行します。<br>
+	  <li>IRGSP1.0をhg38にするとヒトのデータセットができます。<br>
 	  perl mkref.pl hg38<br>
-	  ヒトの場合はサイズが大きいので、作成に1日程度かかる。<br>
-	  <li>サーバーがFTPで外部と接続できない場合は、公開サイトからゲノムデータをダウンロードできない場合がある。<br>
-      この場合は、ブラウザ経由で別途ゲノムデータをダウンロードして、リファレンス用のディレクトリに移して再実行すると処理を続けることができる。
+	  ヒトの場合はサイズが大きいので、作成に1日程度かかります。<br>
+	  <li>サーバーがFTPで外部と接続できない場合は、公開サイトからゲノムデータをダウンロードできない場合があります。<br>
+      この場合は、ブラウザ経由で別途ゲノムデータをダウンロードして、リファレンス用のディレクトリに移して再実行すると処理を続けることができます。
 	</ul>
 	<h2>fastq-dumpのインストール</h2>
 	<ul>
 	  <li><a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
-	  から、コンパイルされた実行ファイルのアーカイブをダウンロードする。<br>
-	  <li>OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードする。<br>
+	  から、コンパイルされた実行ファイルのアーカイブをダウンロードします。<br>
+	  <li>OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードします。<br>
 	  tar xvzf ファイル名<br>
-	  で展開できる。<br>
+	  で展開できます。<br>
 	  tar xvzf sratoolkit.2.10.0-centos_linux64.tar.gz<br>
-	  <li>展開されたディレクトリの中のbinの中にある、fastq-dump-orig.2.10.0をユーザのホームディレクトリのbinディレクトリにfastq-dumpというファイル名でコピーする。<br>
+	  <li>展開されたディレクトリの中のbinの中にある、fastq-dump-orig.2.10.0をユーザのホームディレクトリのbinディレクトリにfastq-dumpというファイル名でコピーします。<br>
 	  例<br>
 	  cp sratoolkit.2.10.0-centos_linux64/bin/fastq-dump-orig.2.10.0 ~/bin/fastq-dump
 	  </ul>
@@ -118,26 +120,26 @@
 	<li>解析対象のfastqデータ<br>
 	  日本晴 <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR099989" target = _blank">DRR099989</a><br>
 	  コシヒカリ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR054198" target = _blank">DRR054198</a><br>
-	<li>download.plを実行する。<br>
+	<li>download.plを実行します。<br>
 	  perl download.pl DRR099989<br>
 	  perl download.pl DRR054198<br>
-	<li>pedのディレクトリの中に、DRR054198とDRR099989のディレクトリが作成され、その中のreadのディレクトリの中にfastqファイルがダウンロードされる。<br>
-	  fastqファイルは、gz形式やbz2形式で圧縮されていても、そのまま解析が可能である。<br>
-	  ターゲット名のディレクトリ下のreadディレクトリの中に置いたファイルがまとめて解析される。<br>
-	  ペアエンドのデータでも複数のシングルエンドのデータでも解析されるが、ファイルの圧縮形式は揃っている必要がある。<br>
-	 <li>PEDではリード長が一定している必要がある。リード長がばらついているデータは、長さを揃える必要がある。
+	<li>pedのディレクトリの中に、DRR054198とDRR099989のディレクトリが作成され、その中のreadのディレクトリの中にfastqファイルがダウンロードされます。<br>
+	  fastqファイルは、gz形式やbz2形式で圧縮されていても、そのまま解析が可能です。<br>
+	  ターゲット名のディレクトリ下のreadディレクトリの中に置いたファイルがまとめて解析されます。<br>
+	  ペアエンドのデータでも複数のシングルエンドのデータでも解析されますが、ファイルの圧縮形式は揃っている必要があります。<br>
+	 <li>PEDではリード長が一定している必要があります。リード長がばらついているデータは、長さを揃える必要があります。
 	 </ul>
 	 
 	<h2>bidirectional法での多型の検出</h2>
-	  bidirectional法では、SNP以外に、挿入、欠失、逆位、転座等の構造変異も検出される。<br>
+	  bidirectional法では、SNP以外に、挿入、欠失、逆位、転座等の構造変異も検出されます。<br>
 	  <ul>
 	  <li>perl bidirectional.pl ターゲット コントロール リファレンス<br>
 	  例<br>
 	  perl bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
-	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
+	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされます。<br>
 	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
 	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
-	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
+	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られます。
 	  <li>DRR054198のディレクトリには、<br>
 	  DRR054198.aln.0<br>
 	  DRR054198.aln.5<br>
@@ -147,43 +149,43 @@
 	  DRR054198.bi.vcf<br>
 	  DRR054198.index<br>
 	  DRR054198.sv<br>
-	  が出力される。<br>
-	  snp情報は、DRR054198.bi.snpに独自フォーマットで出力され、確度の高いSNPがvcf形式でDRR054198.bi.vcfに出力される。<br>
-	  構造変異は、独自フォーマットでDRR054198.svに出力される。<br>
-	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上のの位置を求めている。<br>
+	  が出力されます。<br>
+	  snp情報は、DRR054198.bi.snpに独自フォーマットで出力され、確度の高いSNPがvcf形式でDRR054198.bi.vcfに出力されます。<br>
+	  構造変異は、独自フォーマットでDRR054198.svに出力されます。<br>
+	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上のの位置を求めています。<br>
 	  pedディレクトリで、<br>
 	  perl search.pl DRR054198 1 1369483<br>
 	  のように、perl search.pl target chr position<br>
-	  を実行すると対応するアラインメントが検索され表示される。<br>
+	  を実行すると対応するアラインメントが検索され表示されます。<br>
 	  </ul>
 	<h2><i>k</i>-mer法での多型の検出</h2>
-	  <i>k</i>-mer法は、SNPの検出のみとなる。
+	  <i>k</i>-mer法は、SNPの検出のみとなります。
 	  <ul>
 	  <li>perl kmer.pl ターゲット コントロール リファレンス<br>
 	  例<br>
 	  perl kmer.pl  DRR054198 DRR099989 IRGSP1.0<br>
-	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされる。<br>
+	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされます。<br>
 	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
 	  perl kmer.pl DRR054198 default IRGSP1.0<br>
-	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られる。
+	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られます。
 	  </ul>
 	<h2>グリッドエンジンを用いた並列計算</h2>
-	  Torqueをインストールする必要がある。<br>
+	  Torqueをインストールする必要があります。<br>
 	  <ul>
-	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも動作するが、十分なメモリを搭載する必要がある。<br>
-      メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要がある。<br>
-	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。yumで簡単にインストールできる。<br>
-      <li>CentOSを搭載した16CPU, 38GBのコンピュータにTorqueをインストールしてhg38ゲノムに対するヒトの多型データ検出に成功している。
+	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも動作しますが、十分なメモリを搭載する必要があります。<br>
+      メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要があります。<br>
+	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。yumで簡単にインストールできます。<br>
+      <li>CentOSを搭載した16CPU, 38GBのコンピュータにTorqueをインストールしてhg38ゲノムに対するヒトの多型データ検出に成功しています。
 	  <li>perl qsub_mkref.pl リファレンス<br>
 	  例 perl qsub_mkref.pl IRGSP1.0
 	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
 	  例 perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
-	  グリッドエンジンを用いて高速に計算することができる。
-      <li>各ノードに1TB程度のSSDを搭載してテンポラリーディレクトリに指定するとより高速に処理ができる。<br>
+	  グリッドエンジンを用いて高速に計算することができます。
+      <li>各ノードに1TB程度のSSDを搭載してテンポラリーディレクトリに指定するとより高速に処理ができます。<br>
       perl qsub_bidirectional.pl ターゲット コントロール リファレンス テンポラリーディレクトリ<br>
       perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0 /mnt/ssd<br>
-      のように実行する。リファレンスデータ等が /mnt/ssd にコピーされて保持されるのでマスター・ノード間のネットワークの負荷が軽減される。<br>
-      ヒトのデータしか解析しないような場合に利用すると効率的である。
+      のように実行します。リファレンスデータ等が /mnt/ssd にコピーされて保持されるのでマスター・ノード間のネットワークの負荷が軽減されます。<br>
+      ヒトのデータしか解析しないような場合に利用すると効率的です。
       </ul>
     <h2>解析事例</h2>
       <ul>
