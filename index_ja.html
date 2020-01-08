@@ -16,7 +16,7 @@
 	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
 	 <ul>
 	  <li>ped.plは、マルチスレッドで高速化しています。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
-	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。<br>
+	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。ダウンロード等は「PEDのインストール」を参照してください。<br>
 	  書式<br>
 	  perl ped.pl target=target,control=control,ref=reference<br>
 	  <ul>
@@ -58,30 +58,34 @@
 	 </ul>
       <h2>PEDのインストール</h2>
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
-      <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。
+      <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。<br>
+      Dockerのコンテナも準備しました。コンテナー利用すれば、プログラムのダウンロード・インストールをしないで直接実行できます。
       <ul>
 	<li>プログラムのダウンロード<br>
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
 	  Clone or downloadのプルダウンメニューよりzipファイルをダウンロードする。あるいは、<br>
 	  git clone https://github.com/akiomiyao/ped.git<br>
 	  を実行する。
-	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業する。git cloneで展開した場合は、展開したディレクトリで<br>
+	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業します。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
-	  を実行すると、最新のスクリプトに同期される。
+	  を実行すると、最新のスクリプトに同期されます。
 	<li>Dockerで実行する場合は、<br>
 		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a><br>
-		から最新版のイメージを公開している。Dockerファイルでは、PED以外に、fastq-dumpもセットアップ済みである。<br>
-		# docker run -v /home/your_account/data_dir:/work -it akiomiyao/ped<br>
-		で稼働できる。<br>
-		docker run した後、/ped を /workにmvして、<br>
-		cd /work/ped<br>
-		と、/workに移したpedのディレクトリの中で作業を行うと、dockerを終了しても実行結果が/home/your_account/data_dirに残り便利である。<br>
+		から最新版のコンテナを公開しています。Dockerのコンテナファイルでは、PED以外にfastq-dumpもセットアップ済みです。<br>
+        LinuxのコンピュータにDockerをインストール(方法は、dockerとCentOSやUbuntsu等のキーワードでサーチ)して、root権限で以下のコマンドを実行するだけで解析できます。<br>
+		# docker run -v /home/your_account/data:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work<br>
+		で稼働できます。上記実行例は、githubのPEDのREADME.mdに記載されたデモと同じです。<br>
+        この場合は、線虫のコントロール(ERR3063486)に対して、250世代後の線虫(ERR3063487)に生じた自然突然変異をWBcel235のリファレンスゲノムを用いてbidirctional法で検出しています。<br>
+		ホームディレクトリ(your_account、ディレクトリ名は適時修正する)のdataというディレクトリに解析データが出力されます。<br>
+        NCBIからのfastqのデータのダウンロードは、<br>
+        # docker run -v /home/your_account/data:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
+        でdataディレクトリの中に新たなディレクトリが作成され、アクセッション番号ERR3063487のfastqデータがダウンロードされます。
     <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
     common.pl の中の<br>
     # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
     の行のコメントアウトを外して、<br>
     $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
-    としてセーブしなおしてから実行する必要がある。
+    としてセーブしなおしてから実行する必要があります。
 	  </ul>
 	<h2>リファレンスゲノムデータセットの作成</h2>
 	<ul>
