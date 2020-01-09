@@ -28,16 +28,14 @@ $usage = '
  If you want to specify both the working directory and tmp directory,
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
- Muximam number of threads is adjusted to number of processor minus 2.
  If you want to set muximum number of threads,
  perl ped.pl target=ERR194147,ref=hg38,thread=16
+ In the case of file open error, reduce muximum number of threads.
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
  Results will be saved in the target directory.
-
-     Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
@@ -59,9 +57,17 @@ if ($ARGV[0] =~ /target|ref/){
     $control = $ARGV[1];
     $ref = $ARGV[2];
     $method = $ARGV[3];
+}elsif ($ENV{target} ne ""){
+    $target = $ENV{target};
+    $control = $ENV{control};
+    $ref = $ENV{ref};
+    $method = $ENV{method};
+    $wd = $ENV{wd};
+    $tmpdir = $ENV{tmpdir};
+    $max_semaphore = $ENV{thread};
+    $semaphore4sort = $ENV{thread4sort};
 }else{
     print $usage;
-    exit;
 }
 
 if ($wd eq ""){
@@ -73,11 +79,6 @@ $uname = `uname`;
 chomp($uname);
 
 $method = "bidirectional" if $method eq "";
-
-open(REPORT, "> $wd/$target/$target.log");
-print REPORT "# Log of ped.pl
-$log";
-report("Job begin: $method method");
 
 if ($thread ne ""){
     $max_semaphore = $thread;
@@ -99,11 +100,15 @@ if ($thread ne ""){
     if ($processor >=6 ){
 	$processor -= 2;
 	$max_semaphore = $processor;
-	$semaphore4sort = 4 if $semaphore4sort eq "";
+	$semaphore4sort = 4;
     }else{
 	$max_semaphore = $processor;
-	$semaphore4sort = 1 if $semaphore4sort eq "";
+	$semaphore4sort = 1;
     }
+}
+
+if ($thread4sort ne ""){
+    $semaphore4sort = $thread4sort;
 }
 
 my $semaphore = Thread::Semaphore->new($max_semaphore);
@@ -115,15 +120,14 @@ if ($tmpdir eq ""){
 }
 $control = $ref if $control eq "" or $control eq "default";
 
-if (! -e "$wd/config"){
-    chdir $wd;
+if (! -e "config"){
     system("wget https://raw.githubusercontent.com/akiomiyao/ped/master/config");
 }
 
-open(IN, "$wd/config");
+open(IN, "config");
 while(<IN>){
     chomp;
-    @row = split('\t', $_);
+    my @row = split('\t', $_);
     if ($row[1] eq "description"){
 	$desc{$row[0]} = $row[2];
     }elsif($row[1] eq "wget"){
@@ -145,6 +149,28 @@ while(<IN>){
     }
 }
 close(IN);
+
+if ($ARGV[0] eq ""){
+    print " Currently, reference genomes listed below are suported.
+
+  Name           Description\n";
+    foreach (sort keys %desc){
+	my $name = "$_                  ";
+	$name = substr($name, 0, 14);
+	print "  $name $desc{$_}\n";
+    }
+    print "
+ Author: Akio Miyao <miyao\@affrc.go.jp>
+
+";
+    exit;
+}
+
+open(REPORT, "> $wd/$target/$target.log");
+print REPORT "# Log of ped.pl
+$log";
+report("Job begin: $method method");
+
 
 if ($chr[0] eq ""){
     opendir(REF, $refdir);
@@ -758,8 +784,9 @@ sub mk20mer{
 	    $tag[1] = $nuc;
 	    foreach $nuc (@nuc){
 		$tag[2] = $nuc;
-		$tag = join('', @tag) . ".$chr";
-		close($tag);
+		$tag = join('', @tag);
+		$fout = "$tag.$chr";
+		close($fout);
 	    }
 	}
     }
@@ -1936,13 +1963,14 @@ sub mkData4MapF{
 
 sub mkData4MapFFunc{
     my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $margin, $head_pos, $head);
+    my ($nuca, $nucb, $nucc, $subtag, $margin, $head_pos, $head, $fout);
     my $fin = $tag . "IN";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$subtag = $nuca . $nucb . $nucc;
-		open($subtag, "> $tmpdir/$subtag.tmp.$tag")
+		$fout = $subtag . $tag;
+		open($fout, "> $tmpdir/$subtag.tmp.$tag")
 	    }
 	}
     }
@@ -1953,7 +1981,8 @@ sub mkData4MapFFunc{
 	    $head_pos = $margin + 1;
 	    $head = substr($_, $head_pos -1, 20);
 	    $subtag = substr($head, 0, 3);
-	    print $subtag "$head $_ $head_pos\n";
+	    $fout = $subtag . $tag;
+	    print $fout "$head $_ $head_pos\n";
 	}
     }
     close($fin);  
@@ -1961,7 +1990,8 @@ sub mkData4MapFFunc{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$subtag = $nuca . $nucb . $nucc;
-		close($subtag)
+		$fout = $subtag . $tag;
+		close($fout)
 	    }
 	}
     }
@@ -1985,13 +2015,14 @@ sub mkData4MapR{
 
 sub mkData4MapRFunc{
     my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $margin, $tail_pos, $tail);
+    my ($nuca, $nucb, $nucc, $subtag, $margin, $tail_pos, $tail, $fout);
     my $fin = $tag . "IN";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$subtag =  $nuca . $nucb . $nucc;
-		open($subtag, "> $tmpdir/$subtag.tmp.$tag")
+		$fout = $subtag . $tag;
+		open($fout, "> $tmpdir/$subtag.tmp.$tag")
 	    }
 	}
     }
@@ -2002,14 +2033,16 @@ sub mkData4MapRFunc{
 	$tail_pos = $length - 20 - $margin + 1;
 	$tail = substr($_, $tail_pos - 1, 20);
 	$subtag = substr($tail, 0, 3);
-	print $subtag "$tail $_ $tail_pos\n";
+	$fout = $subtag . $tag;
+	print $fout "$tail $_ $tail_pos\n";
     }
     close($fin);  
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$subtag = $nuca . $nucb . $nucc;
-		close($subtag)
+		$fout = $subtag . $tag;
+		close($fout);
 	    }
 	}
     }
@@ -2272,7 +2305,7 @@ sub waitFile{
 	sleep 1;
     }
     while(1){
-	$mtime = (stat($file))[9];
+	my $mtime = (stat($file))[9];
 	if (time > $mtime + 5){
 	    return;
 	}

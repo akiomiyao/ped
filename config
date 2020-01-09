@@ -24,6 +24,10 @@ hg38	description	Human (Homo sapiens) Genome Reference Consortium Human Build 38
 hg38	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
 hg38	chromosome	1	22	X	Y
 
+hg19	description	Human (Homo sapiens) Genome Reference Consortium Human Build 19
+hg19	wget	http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
+hg19	chromosome	1	22	X	Y
+
 IRGSP1.0	description	Rice (Olyza sativa L. cv. Nipponbare) version 1.0	
 IRGSP1.0	wget	https://rapdb.dna.affrc.go.jp/download/archive/irgsp1/IRGSP-1.0_genome.fasta.gz
 IRGSP1.0	chromosome	1	12
