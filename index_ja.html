@@ -10,7 +10,7 @@
       <p>次世代シーケンサーの配列を解析する場合、まず配列(ショートリード)をリファレンスゲノム配列にマップして、不一致の部分を抽出するのが一般的ですが、大部分のショートリードは多型を含まないため効率はあまりよくありません。
       <p>PEDでは、ショートリードから多型のエッジになる部分を早い段階で抽出するアルゴリズムで、これまでにない新しい手法です。
       <p>エッジを検出する方法として、ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
-      <p><i>k</i>-mer法はリファレンス配列がなくても、3'末端に多型を持つ<i>k</i>-merを抽出することができ、連鎖解析に利用可能です。
+      <p><i>k</i>-mer法はリファレンス配列がなくても、3'末端に多型を持つ<i>k</i>-merを抽出することができ、連鎖解析に利用できます。
       <p>双方向整列法は、SNPに加えて、挿入、欠失、逆位、転座などの構造変異が同時に検出されます。また、従来法に比べて正確かつ高速に処理することができ、特に数100kbを超えるような大きな欠失も正確に検出できる特徴があります。
       <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギの多型の検出も可能です。また、小規模なコンピュータリソースで動作が可能です。
 	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
@@ -19,6 +19,8 @@
 	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。ダウンロード、DockerでのRun等は「PEDのインストール」を参照してください。<br>
 	  書式<br>
 	  perl ped.pl target=target,control=control,ref=reference<br>
+      Dockerでの実行は、<br>
+      docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=target,control=control,ref=reference,wd=/work<br>
 	  <ul>
 	  <li>ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
 	  <li>以下に述べる「PEDのインストール」に従ってインストールしたpedのディレクトリで実行します。
@@ -34,6 +36,9 @@
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)をマップします。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した多型の検出の場合。
+	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
+      ショートリードデータやリファレンスデータの入ったディレクトリを置く作業ディレクトリを/home/your_id/dataに指定する場合です。<br>
+      指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=16,thread4sort=2<br>
 	  スレッドは、最大スレッド数とソート時のスレッド数の指定。CPUのスレッド数-2がデフォルト。ソート時のスレッドは4がデフォルト。<br>
       通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。
@@ -61,7 +66,7 @@
       <h2>PEDのインストール</h2>
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
       <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。<br>
-      Dockerのコンテナも準備しました。コンテナー利用すれば、プログラムのダウンロード・インストールをしないで直接実行できます。
+      Dockerのコンテナも準備しました。コンテナーを利用すれば、煩雑なプログラムのダウンロード・インストールの作業の必要はなく、直接実行できます。
       <ul>
 	<li>プログラムのダウンロード<br>
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
@@ -73,11 +78,20 @@
 	  を実行すると、最新のスクリプトに同期されます。
 	<li>Dockerで実行する場合は、<br>
 		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a><br>
-		から最新版のコンテナを公開しています。Dockerのコンテナファイルでは、PED以外にfastq-dumpもセットアップ済みです。<br>
+		から最新版のコンテナーを公開しています。Dockerのコンテナファイルでは、PED以外にfastq-dumpもセットアップ済みです。<br>
+        コンテナーの取得は、<br>
+        # docker pull akiomiyao/ped<br>
+        で出来ます。<br>
         LinuxのコンピュータにDockerをインストール(方法は、dockerとCentOSやUbuntsu等のキーワードでサーチ)して、root権限で以下のコマンドを実行するだけで解析できます。<br>
 		# docker run -v /home/your_account/data:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work<br>
 		で稼働できます。上記実行例は、githubのPEDのREADME.mdに記載されたデモと同じです。<br>
-        この場合は、線虫のコントロール(ERR3063486)に対して、250世代後の線虫(ERR3063487)に生じた自然突然変異をWBcel235のリファレンスゲノムを用いてbidirctional法で検出しています。<br>
+		# docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work<br>
+        とすると、現在の実行ディレクトリ上に存在するERR3063486、ERR3063487、WBcel235のディレクトリ内のファイルが解析対象になり、ERR3063487のディレクトリに結果が出力されます。<br>
+        ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
+        # docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work<br>
+        # docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
+        で出来ます。(アメリカからのダウンロードなので、数時間程度かかります。)<br>
+        上記の例では、線虫のコントロール(ERR3063486)に対して、250世代後の線虫(ERR3063487)に生じた自然突然変異をWBcel235のリファレンスゲノムを用いてbidirctional法で検出しています。<br>
 		ホームディレクトリ(your_account、ディレクトリ名は適時修正する)のdataというディレクトリに解析データが出力されます。<br>
         NCBIからのfastqのデータのダウンロードは、<br>
         # docker run -v /home/your_account/data:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
