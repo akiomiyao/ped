@@ -6,29 +6,31 @@
     <body>
       <h1>PEDを用いた多型検出</h1>
       <h2>PEDとは</h2>
-      <p>Polymorphic Edge Detection (PED)は、DNAの多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。
+      <p>Polymorphic Edge Detection (PED)は、DNAの多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。非常に正確にSNPとindel等構造変異を得ることができます。
       <p>次世代シーケンサーの配列を解析する場合、まず配列(ショートリード)をリファレンスゲノム配列にマップして、不一致の部分を抽出するのが一般的ですが、大部分のショートリードは多型を含まないため効率はあまりよくありません。
       <p>PEDでは、ショートリードから多型のエッジになる部分を早い段階で抽出するアルゴリズムで、これまでにない新しい手法です。
-      <p>エッジを検出する方法として、ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
+      <p>エッジを検出する方法として、<a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/1" target = "_blank">ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)</a>と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
       <p><i>k</i>-mer法はリファレンス配列がなくても、3'末端に多型を持つ<i>k</i>-merを抽出することができ、連鎖解析に利用できます。
-      <p>双方向整列法は、SNPに加えて、挿入、欠失、逆位、転座などの構造変異が同時に検出されます。また、従来法に比べて正確かつ高速に処理することができ、特に数100kbを超えるような大きな欠失も正確に検出できる特徴があります。
-      <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギの多型の検出も可能です。また、小規模なコンピュータリソースで動作が可能です。
+      <p><a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/2" target = "_blank">双方向整列法は、SNPに加えて、挿入、欠失、逆位、転座などの構造変異が同時に検出されます。</a>また、従来法に比べて正確かつ高速に処理することができ、特に数100kbを超えるような大きな欠失も正確に検出できる特徴があります。
+      <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。
 	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
 	 <ul>
 	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
 	  メモリーは8Gバイト以上、ディスクはヒトを解析する場合は1.5TB程度必要です。ダウンロード、DockerでのRun等は「PEDのインストール」を参照してください。<br>
 	  書式<br>
-	  perl ped.pl target=target,control=control,ref=reference<br>
-      Dockerでの実行は、<br>
-      docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=target,control=control,ref=reference,wd=/work<br>
-	  <ul>
+	  perl ped.pl target=target,control=control,ref=reference
+      <ul>
 	  <li>ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
-	  <li>以下に述べる「PEDのインストール」に従ってインストールしたpedのディレクトリで実行します。
-	  <li>ターゲットやコントロールのディレクトリをpedのディレクトリの中に作成し、それらのディレクトリの中に<br>
-	  さらにreadというディレクトリを作成して、作成したreadのディレクトリの中にfastqファイルを置きます。
+      <li>上記の場合は、ped.plがあるディレクトリにターゲットとコントロールのディレクトリを作成し、それぞれのディレクトリの中にreadというディレクトリを作成し、その中にfastqファイルを保存します。
       <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型を検出します。
 	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
+      </ul>
+      Dockerでの実行は、<br>
+      docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=target,control=control,ref=reference,wd=/work<br>
+	  <ul>
+	  <li>ターゲットやコントロールのディレクトリをカレントディレクトリの中に作成し、それらのディレクトリの中に<br>
+	  さらにreadというディレクトリを作成して、作成したreadのディレクトリの中にfastqファイルを置きます。
 	  </ul>
 	  例<br>
 	  <ul>
@@ -45,7 +47,7 @@
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
-	  <i>k</i>-mer法で解析する。デフォルトは双方向アライン法。
+	  <i>k</i>-mer法で解析する場合。デフォルトは双方向アライン法。
 	  </ul>
 	 <li>結果はtargetのディレクトリにまとめて出力されます。
 	 <table>
@@ -72,7 +74,7 @@
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
 	  Clone or downloadのプルダウンメニューよりzipファイルをダウンロードする。あるいは、<br>
 	  git clone https://github.com/akiomiyao/ped.git<br>
-	  を実行する。
+	  を実行します。
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業します。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
 	  を実行すると、最新のスクリプトに同期されます。
@@ -166,7 +168,7 @@
 	  が出力されます。<br>
 	  snp情報は、DRR054198.bi.snpに独自フォーマットで出力され、確度の高いSNPがvcf形式でDRR054198.bi.vcfに出力されます。<br>
 	  構造変異は、独自フォーマットでDRR054198.svに出力されます。<br>
-	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上のの位置を求めています。<br>
+	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上の位置を求めています。<br>
 	  pedディレクトリで、<br>
 	  perl search.pl DRR054198 1 1369483<br>
 	  のように、perl search.pl target chr position<br>
