@@ -41,8 +41,8 @@
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
       ショートリードデータやリファレンスデータの入ったディレクトリを置く作業ディレクトリを/home/your_id/dataに指定する場合です。<br>
       指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
-	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=16,thread4sort=2<br>
-	  スレッドは、最大スレッド数とソート時のスレッド数の指定。CPUのスレッド数-2がデフォルト。ソート時のスレッドは4がデフォルト。<br>
+	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=16,thread4sort=4<br>
+	  スレッドは、最大スレッド数とソート時のスレッド数の指定。CPUのスレッド数-2がデフォルト。ソート時のスレッドは8がデフォルト。<br>
       通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
@@ -81,6 +81,7 @@
 	<li>Dockerで実行する場合は、<br>
 		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a><br>
 		から最新版のコンテナーを公開しています。Dockerのコンテナファイルでは、PED以外にfastq-dumpもセットアップ済みです。<br>
+		上記サイトの閲覧には、Dockerのアカウントを作成(無料)してログインする必要があります。<br>
         コンテナーの取得は、<br>
         # docker pull akiomiyao/ped<br>
         で出来ます。<br>
