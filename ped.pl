@@ -97,13 +97,13 @@ if ($thread ne ""){
 	}
 	close(IN);
     }
-    if ($processor >=6 ){
+    if ($processor >=12 ){
 	$processor -= 2;
 	$max_semaphore = $processor;
-	$semaphore4sort = 4;
+	$semaphore4sort = 8;
     }else{
 	$max_semaphore = $processor;
-	$semaphore4sort = 1;
+	$semaphore4sort = $processor;
     }
 }
 
@@ -427,7 +427,7 @@ sub countKmer{
 	}
     }
     &joinAll;
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -439,7 +439,7 @@ sub countKmer{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 
      foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -602,7 +602,6 @@ sub mkRef{
 	&mkChrFromFile($file);
     }
     &mk20;
-    exit;
     &mkControlRead;
     system("rm -r $wd/$ref/tmp");
 }
@@ -653,7 +652,7 @@ sub mkControlRead{
     }
     &joinAll;
 
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -665,7 +664,7 @@ sub mkControlRead{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub mkControlReadChr{
@@ -714,8 +713,42 @@ sub mkControlReadChr{
 
 sub mkControlReadSub{
     my $tag = shift;
-    system("cat $wd/$ref/tmp/$tag.* | sort -T $wd/$ref/tmp/ $sort_opt  | uniq | gzip > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
-    &waitFile("$wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
+    my ($nuca, $nucb, $nucc, $subtag, $fin, $ftmp, $fout);
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$subtag = $nuca . $nucb . $nucc;
+		$ftmp = $tag . $subtag;
+		open($ftmp, "> $wd/$ref/tmp/tmp.$ftmp");
+	    }
+	}
+    }
+    $fin = $tag;
+    open($fin, "cat $wd/$ref/tmp/$tag.* |");
+    while(<$fin>){
+	$ftmp = substr($_, 0, 6);
+	print $ftmp $_;
+    }
+    close($fin);
+    $fout = "tmpout.$tag";
+    open($fout, "|uniq |gzip -f > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$subtag = $nuca . $nucb . $nucc;
+		$ftmp = $tag . $subtag;
+		close($ftmp);
+		$fin = "tmp.$tag";
+		open($fin, "sort $sort_opt -T $wd/$ref/tmp $wd/$ref/tmp/tmp.$ftmp |");
+		while(<$fin>){
+		    print $fout $_;
+		}
+		close($fin);
+		system("rm $wd/$ref/tmp/tmp.$ftmp");
+	    }
+	}
+    }
+    close($fout);
     system("rm $wd/$ref/tmp/$tag.*");
     $semaphore->up;
 }
@@ -835,7 +868,7 @@ sub mk20{
     }
     &joinAll;
     
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -849,7 +882,7 @@ sub mk20{
 	}
     }    
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub mkChr{
@@ -981,7 +1014,7 @@ sub mkSortUniq{
 	&sortUniqSub($cmd, $subject);
     }
     &closeTag;
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -992,7 +1025,7 @@ sub mkSortUniq{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub sortUniqSort{
@@ -1444,7 +1477,7 @@ sub kmerReadCount{
 
 sub snpReadCount{
     my (@row, $dat, %count, $cm, $cw, $tm, $tw, $count, @prev, $prev, $genotype);
-    open(OUT, "> $wd/$target/$target.bi.snp");
+    open(OUT, "| sort $sort_opt -T $tmpdir | uniq -c > $tmpdir/bi.snp");
     open(IN, "cat $tmpdir/*.target $tmpdir/*.control |");
     while(<IN>){
 	chomp;
@@ -1455,17 +1488,22 @@ sub snpReadCount{
 	}
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
-	$dat = join(" ", @row);
-	$count{$dat} ++;
+	$dat = join(":", @row);
+	print OUT "$dat\n";
     }
     close(IN);
+    close(OUT);
     $cm = 0;
     $cw = 0;
     $tm = 0;
     $tw = 0;
-    foreach (sort keys %count){
-	$count = $count{$_};
-	@row = split;
+    &waitFile("$tmpdir/bi.snp");
+    open(OUT, "> $wd/$target/$target.bi.snp");
+    open(IN, "$tmpdir/bi.snp");
+    while(<IN>){
+	chomp;
+	($count, $dat) = split;
+	@row = split(':', $dat);
 	if($row[0] !~/[IVXYZ]/){
 	    $row[0] += 0;
 	}
@@ -1502,6 +1540,7 @@ sub snpReadCount{
     }
     print OUT "$prev\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
     close(OUT);
+    system("$tmpdir/bi.snp");
 }
 
 sub joinControlFunc{
@@ -1590,7 +1629,7 @@ sub sortSeqFunc{
 }
 
 sub sortSeq{
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1602,7 +1641,7 @@ sub sortSeq{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub svMkC{
@@ -1977,7 +2016,7 @@ sub index{
 }
 
 sub sortData4Map{ 
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1989,13 +2028,48 @@ sub sortData4Map{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0;
+    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub sortData4MapFunc{
     my $tag = shift;
+    my ($nuca, $nucb, $nucc, $subtag, $fin, $ftmp, $fout);
     report("Sorting sequence data. $tag");
-    system("cat $tmpdir/$tag.tmp.* | sort $sort_opt -T $tmpdir |gzip > $tmpdir/$tag.gz");
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$subtag = $nuca . $nucb . $nucc;
+		$ftmp = $tag . $subtag;
+		open($ftmp, "> $tmpdir/tmp.$ftmp");
+	    }
+	}
+    }
+    $fin = $tag;
+    open($fin, "cat $tmpdir/$tag.tmp.* |");
+    while(<$fin>){
+	$ftmp = substr($_, 0, 6);
+	print $ftmp $_;
+    }
+    close($fin);
+    $fout = "tmpout.$tag";
+    open($fout, "|gzip -f > $tmpdir/$tag.gz");
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$subtag = $nuca . $nucb . $nucc;
+		$ftmp = $tag . $subtag;
+		close($ftmp);
+		$fin = "tmp.$tag";
+		open($fin, "sort $sort_opt -T $tmpdir $tmpdir/tmp.$ftmp |");
+		while(<$fin>){
+		    print $fout $_;
+		}
+		close($fin);
+		system("rm $tmpdir/tmp.$ftmp");
+	    }
+	}
+    }
+    close($fout);
     &waitFile("$tmpdir/$tag.gz");
     system("rm $tmpdir/$tag.tmp.*");
     $semaphore->up;
