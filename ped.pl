@@ -97,9 +97,8 @@ if ($thread ne ""){
 	}
 	close(IN);
     }
-    if ($processor >=12 ){
-	$processor -= 2;
-	$max_semaphore = $processor;
+    if ($processor > 14 ){
+	$max_semaphore = 14;
 	$semaphore4sort = 8;
     }else{
 	$max_semaphore = $processor;
@@ -111,7 +110,7 @@ if ($thread4sort ne ""){
     $semaphore4sort = $thread4sort;
 }
 
-my $semaphore = Thread::Semaphore->new($max_semaphore);
+$semaphore = Thread::Semaphore->new($max_semaphore);
 
 $refdir = "$wd/$ref";
 if ($tmpdir eq ""){
@@ -2103,8 +2102,8 @@ sub mkData4MapF{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
-		threads->new(\&mkData4MapFFunc, $tag);
 		report("Bidirectional alignment: Making data for first mapping. $tag");
+		threads->new(\&mkData4MapFFunc, $tag);
 	    }
 	}
     }
@@ -2124,7 +2123,7 @@ sub mkData4MapFFunc{
 	    }
 	}
     }
-    open($fin, "zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz 2> /dev/null |");
+    open($fin, "zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz |");
     while(<$fin>){
 	chomp;
 	foreach $margin ('0', '5', '10', '15'){
@@ -2243,7 +2242,7 @@ sub align{
 
 sub alignFunc{
     my $tag = shift;
-    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file);
+    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file, $prechr);
     $fin = $tag;
     $fout = "$tag-out";
     $chr_file = "$tag-chr";
@@ -2258,8 +2257,11 @@ sub alignFunc{
 	$hhit = 0;
 	$thit = 0;
 	$margin = $hpos -1;
-
-	open($chr_file, "$wd/$ref/chr$hchr");
+	
+	if ($hchr ne $prechr){
+	    open($chr_file, "$wd/$ref/chr$hchr");
+	}
+	$prechr = $hchr;
 	if ($head_direction eq "f"){
 	    seek($chr_file, $head_pos - $margin -1, 0);
 	    read($chr_file, $head_seq, $length);
@@ -2429,6 +2431,7 @@ $tail_space Chr$tchr $tail_junction
     }
     close($fin);
     close($fout);
+    close($chr_file);
     $semaphore->up;
     system("rm $tmpdir/$tag.map");
 }
