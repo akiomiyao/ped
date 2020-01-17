@@ -99,6 +99,9 @@ if ($thread ne ""){
     }
     if ($processor > 14 ){
 	$max_semaphore = 14;
+	$semaphore4sort = 12;
+    }elsif ($processor > 8 ){
+	$max_semaphore = $processor;
 	$semaphore4sort = 8;
     }else{
 	$max_semaphore = $processor;
@@ -2242,7 +2245,7 @@ sub align{
 
 sub alignFunc{
     my $tag = shift;
-    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file, $prechr);
+    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file);
     $fin = $tag;
     $fout = "$tag-out";
     $chr_file = "$tag-chr";
@@ -2258,10 +2261,7 @@ sub alignFunc{
 	$thit = 0;
 	$margin = $hpos -1;
 	
-	if ($hchr ne $prechr){
-	    open($chr_file, "$wd/$ref/chr$hchr");
-	}
-	$prechr = $hchr;
+	open($chr_file, "$wd/$ref/chr$hchr");
 	if ($head_direction eq "f"){
 	    seek($chr_file, $head_pos - $margin -1, 0);
 	    read($chr_file, $head_seq, $length);
