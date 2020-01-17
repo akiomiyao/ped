@@ -65,7 +65,6 @@ if ($ARGV[0] =~ /target|ref/){
     $wd = $ENV{wd};
     $tmpdir = $ENV{tmpdir};
     $max_semaphore = $ENV{thread};
-    $semaphore4sort = $ENV{thread4sort};
 }else{
     print $usage;
 }
@@ -99,18 +98,9 @@ if ($thread ne ""){
     }
     if ($processor > 14 ){
 	$max_semaphore = 14;
-	$semaphore4sort = 12;
-    }elsif ($processor > 8 ){
-	$max_semaphore = $processor;
-	$semaphore4sort = 8;
     }else{
 	$max_semaphore = $processor;
-	$semaphore4sort = $processor;
     }
-}
-
-if ($thread4sort ne ""){
-    $semaphore4sort = $thread4sort;
 }
 
 $semaphore = Thread::Semaphore->new($max_semaphore);
@@ -429,7 +419,6 @@ sub countKmer{
 	}
     }
     &joinAll;
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -441,7 +430,6 @@ sub countKmer{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 
      foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -654,7 +642,6 @@ sub mkControlRead{
     }
     &joinAll;
 
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -666,7 +653,6 @@ sub mkControlRead{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub mkControlReadChr{
@@ -870,7 +856,6 @@ sub mk20{
     }
     &joinAll;
     
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -884,7 +869,6 @@ sub mk20{
 	}
     }    
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub mkChr{
@@ -1016,7 +1000,6 @@ sub mkSortUniq{
 	&sortUniqSub($cmd, $subject);
     }
     &closeTag;
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -1027,7 +1010,6 @@ sub mkSortUniq{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub sortUniqSort{
@@ -1637,7 +1619,6 @@ sub sortSeqFunc{
 }
 
 sub sortSeq{
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1649,7 +1630,6 @@ sub sortSeq{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub svMkC{
@@ -2038,7 +2018,6 @@ sub index{
 }
 
 sub sortData4Map{ 
-    $semaphore->down($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
     my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -2050,7 +2029,6 @@ sub sortData4Map{
 	}
     }
     &joinAll;
-    $semaphore->up($max_semaphore - $semaphore4sort) if $semaphore4sort != 0 and $semaphore4sort != $max_semaphore;
 }
 
 sub sortData4MapFunc{
