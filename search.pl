@@ -11,20 +11,28 @@ $usage = '
      search.pl - search alignment of structural variation. 
 
 e.g. perl search.pl target chr pos
-       perl search.pl ERR194147 1 100631715
+     perl search.pl ERR194147 1 100631715
+or   perl search.pl target=ERR194147,chr=1,pos=100631715
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
-if ($ARGV[0] eq ""){
+if ($ARGV[0] =~ /target/){
+    my @arg = split(',', $ARGV[0]);
+    foreach (sort @arg){
+	next if $_ eq "";
+	my ($name, $val) = split('=', $_);
+	$$name = $val;
+    }
+}elsif ($ARGV[0] eq ""){
     print $usage;
     exit;
+}else{
+    $target = $ARGV[0];
+    $chr    = $ARGV[1];
+    $pos    = $ARGV[2];
 }
-
-$target = $ARGV[0];
-$chr    = $ARGV[1];
-$pos    = $ARGV[2];
 
 if ($chr =~ /^[0-9]*$/){
     $chr = "000$chr";
