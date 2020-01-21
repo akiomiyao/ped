@@ -29,8 +29,10 @@ $usage = '
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
  If you want to set muximum number of threads,
- perl ped.pl target=ERR194147,ref=hg38,thread=16
+ perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
+ Because default setting of ulimit is 1024, 14 threads is muximun for
+ defalt setting. 
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
@@ -418,7 +420,7 @@ sub countKmer{
 	    }
 	}
     }
-    &joinAll;
+
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -437,7 +439,7 @@ sub countKmer{
 		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
 		&report("Joining kmer for $target. $tag");
-		threads->new(\&countKmerJoin, $target, $tag);
+		threads->new(\&countKmerMerge, $target, $tag);
 	    }
 	}
     }
@@ -489,7 +491,7 @@ sub countKmerLbc{
     $semaphore->up;
 }
 
-sub countKmerJoin{
+sub countKmerMerge{
     my ($target, $parent) = @_;
     my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count);
     system("touch $tmpdir/$parent.count");
@@ -497,7 +499,7 @@ sub countKmerJoin{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		&report("Making kmer for $target. $parent Joining of $tag subfile");
+		&report("Making kmer for $target. $parent Merging of $tag subfile");
 		$fin = "$parent.$tag.join.in";
 		$fout = "$parent.$tag.join.out";
 		open($fout, "> $tmpdir/$parent.count.tmp");
@@ -795,7 +797,7 @@ sub mkUniq{
 }
 
 sub mk20mer{
-    my ($fin, $fout, $i, @tag, $tag, $data, $forward, $length, $comp, $fpos, $rpos, );
+    my ($fin, $fout, $i, @tag, $tag, $forward, $length, $comp, $fpos, $rpos);
     my $chr = shift;
 
     foreach $nuc (@nuc){
@@ -811,15 +813,13 @@ sub mk20mer{
 	}
     }
 
-    my $file = "chr$chr";
+    my $file = "$wd/$ref/chr$chr";
     open(IN, $file);
-    while(<IN>){
-	$data = $_;
-    }
-    close(IN);
-    $length = length($data);
+    binmode(IN);
+    $length = -s $file;
     for ($i = 0; $i <= $length - 20; $i++){
-	$forward = substr($data, $i, 20);
+	seek(IN, $i, 0);
+	read(IN, $forward, 20);
 	if ($forward !~ /[MRWSYKVHDBN]/){
 	    $comp = complement($forward);
 	    $fpos = $i + 1;
@@ -1154,8 +1154,6 @@ sub snpMkT{
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
-#	    ($chr_seq = <IN>) =~ y/a-z/A-Z/;
-#	    close(IN);
 	    @dat = ();
 	    report("Making data for verification of snp. target chr$chr");
 	}
@@ -1169,7 +1167,6 @@ sub snpMkT{
 	}
 	seek(IN, $pos - $length, 0);
 	read(IN, $ref_seq, $length * 2 -1);
-#	$ref_seq = substr($chr_seq, $pos - $length, $length * 2 -1);
 	next if length($ref_seq) != $length * 2 -1;
 	$head = substr($ref_seq, 0, $length-1);
 	$tail = substr($ref_seq, $length, $length);
@@ -1231,8 +1228,6 @@ sub snpMkC{
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
-#	    ($chr_seq = <IN>) =~ y/a-z/A-Z/;
-#	    close(IN);
 	    @dat = ();
 	    report("Making data for verification of snp. control chr$chr");
 	}
@@ -1244,7 +1239,6 @@ sub snpMkC{
 		shift(@dat);
 	    }
 	}
-#	$ref_seq = substr($chr_seq, $pos - $clength, $clength * 2 -1);
 	seek(IN, $pos - $clength, 0);
 	read(IN, $ref_seq, $clength * 2 -1);
 	next if length($ref_seq) != $clength * 2 -1;
