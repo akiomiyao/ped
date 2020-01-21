@@ -830,6 +830,7 @@ sub mk20mer{
 	    print $tag "$comp\t$chr\t$rpos\tr\n";
 	}
     }
+    close(IN);
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
