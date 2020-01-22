@@ -13,6 +13,8 @@ $usage = '
 e.g. perl search.pl target chr pos
      perl search.pl ERR194147 1 100631715
 or   perl search.pl target=ERR194147,chr=1,pos=100631715
+     perl search.pl target=ERR194147,chr=1,pos=100631715,wd=/work
+     wd (working directory) is optional.
 
 Author: Akio Miyao <miyao@affrc.go.jp>
 
@@ -42,8 +44,12 @@ if ($chr =~ /^[0-9]*$/){
 $pos = "00000000000" . $pos;
 $pos = substr($pos, length($pos) - 11, 11);
 
-$size = -s "$target/$target.index";
-open(INDEX, "$target/$target.index");
+if ($wd eq ""){
+    $wd = ".";
+}
+
+$size = -s "$wd/$target/$target.index";
+open(INDEX, "$wd/$target/$target.index");
 binmode(INDEX);
 $top = 0;
 $bottom = $size;
@@ -81,9 +87,9 @@ while($bottom - $top > 1){
 
 sub printData{
     if ($row[2] eq "S"){
-	open(IN, "$target/$target.aln");
+	open(IN, "$wd/$target/$target.aln");
     }else{
-	open(IN, "$target/$target.aln.$row[2]");
+	open(IN, "$wd/$target/$target.aln.$row[2]");
     }
     seek(IN, $row[3], 0);
     while(<IN>){
