@@ -15,14 +15,14 @@
       <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。
 	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
 	 <ul>
-	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
-	  メモリーは4Gバイト以上、ディスクはヒトを解析する場合は1TB程度必要です。コードはGithubから、実行に必要なファイル・設定ずみのDockerのコンテナーも公開しています。<br>
+	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。時間はかかりますが、シングルコアや2コアのCPUでも動作します。<br>
+	  メモリーは4Gバイト以上、ディスクはヒトを解析する場合は1TB程度必要です。コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみのDockerのコンテナも公開しています。<br>
 	  書式<br>
 	  perl ped.pl target=target,control=control,ref=reference
       <ul>
 	  <li>ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
       <li>上記の場合は、ped.plがあるディレクトリにターゲットとコントロールのディレクトリを作成し、それぞれのディレクトリの中にreadというディレクトリを作成し、その中にfastqファイルを保存します。
-      <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型を検出します。
+      <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型(リファレンスゲノムに対する多型)を検出します。
 	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       </ul>
@@ -31,38 +31,48 @@
 	  <ul>
 	  <li>ターゲットやコントロールのディレクトリをカレントディレクトリの中に作成し、それらのディレクトリの中に<br>
 	  さらにreadというディレクトリを作成して、作成したreadのディレクトリの中にfastqファイル(圧縮可)を置きます。
-	  <li>上記dockerコマンドをsudoあるいはroot権限で実行すれば、最新のコンテナーをdockerhubからダウンロードして全行程を自動実行します。結果は、ターゲットのディレクトリに出力されます。
-	  <li>最新のコンテナーに更新するためには、<br>
+	  <li>上記dockerコマンドをsudoあるいはroot権限で実行すれば、最新のコンテナをdockerhubからダウンロードして全行程を自動実行します。結果は、ターゲットのディレクトリに出力されます。
+	  <li>最新のコンテナに更新するためには、<br>
 	  sudo docker pull akiomiyao/ped<br>
-	  を実行する。
-	  <li>Docker自体のインストールは「Dockerのインストールを参照」のこと。
+	  を実行します。
+	  <li>Docker自体のインストールは以下の「Dockerのインストール」を参照してください。
 	  </ul>
 	  例<br>
 	  <ul>
 	  <li>perl ped.pl target=ERR194146,ref=hg38<br>
-	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)をマップします。
+	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
+      <li>sudo docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=DRR054198,ref=IRGSP1.0,wd=/work<br>
+      Dockerのコンテナを用いて、イネのIRGSP1.0のリファレンスに対するコシヒカリ(DRR054198)の多型を検出します。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した多型の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
       ショートリードデータやリファレンスデータの入ったディレクトリを置く作業ディレクトリを/home/your_id/dataに指定する場合です。<br>
       指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=14<br>
-	  スレッドは、最大スレッド数とソート時のスレッド数の指定。<br>
+	  最大スレッド数を指定する場合。<br>
       通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。<br>
-      デフォルト値は最大14スレッドです。
+      デフォルト値はLinux OSのデフォルトファイルオープン上限(1024)に収まる最大14スレッドです。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
-	  <i>k</i>-mer法で解析する場合。デフォルトは双方向アライン法。
+	  <i>k</i>-mer法で解析する場合。デフォルトは双方向整列法。
+      <li>オプションは,で区切って複数組み合わせて指定することができます。ただし、同じ名称のオプションの重複指定はできません。
 	  </ul>
-	 <li>デモ<br>
+	 <li>デモ　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。<br>
         ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
         sudo docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work<br>
         sudo docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
         で出来ます。(アメリカからのダウンロードなので、数時間程度かかります。)<br>
-        上記の例では、線虫のコントロール(ERR3063486)に対して、250世代後の線虫(ERR3063487)に生じた自然突然変異をWBcel235のリファレンスゲノムを用いてbidirctional法で検出しています。<br>
+        githubよりスクリプトをダウンロードして実行する場合は、pedのディレクトリ内で、<br>
+        perl download.pl accession=ERR3063486<br>
+        perl download.pl accession=ERR3063487<br>
+        を実行します。(下記に記載されている方法で、事前にfastq-dumpをインストールする必要があります。Dockerのコンテナ内には設定済みです)<br>
+        このデモでは、線虫のコントロール(ERR3063486)に対して、250世代後の線虫(ERR3063487)に生じた自然突然変異をWBcel235のリファレンスゲノムを用いてbidirctional法で検出しています。<br>
 	 sudo docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work<br>
         とすると、現在の実行ディレクトリ上に存在するERR3063486、ERR3063487、WBcel235のディレクトリ内のファイルが解析対象になり、ERR3063487のディレクトリに結果が出力されます。<br>
+        スクリプトを直接実行したい場合は<br>
+        perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
+        となります。
 	 <li>targetのディレクトリに以下の結果がまとめて出力されます。
 	 <table>
 	 <tr><td>target.aln</td><td>双方向アライン法による整列データ</td></tr>
@@ -77,17 +87,29 @@
 	 perl search.pl target=target,chr=chromosome,pos=position<br>
 	 を実行します。<br>
 	 例<br>
-	 sudo docker run -v `pwd`:/work -w /ped akiomiyao/ped perl search.pl target=ERR3063487,chr=II,pos=948033
+     perl search.pl target=ERR3063487,chr=II,pos=948033<br>
+     Dockerコマンドで実行する場合は、<br>
+	 sudo docker run -v `pwd`:/work -w /ped -t akiomiyao/ped perl search.pl target=ERR3063487,chr=II,pos=948033,wd=/work
 	 </ul>
 	 <h2>Dockerのインストール</h2>
 	 CentOSやUbuntuにインストールする場合<br>
-	 参照 https://docs.docker.com/install/linux/docker-ce/centos/<br>
-	 $ curl -fsSL https://get.docker.com -o get-docker.sh<br>
-     $ sudo sh get-docker.sh<br>
-     を実行する。
+     <ul>
+	 <li>参照 <a href = "https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script" target = "_blank">https://docs.docker.com/install/linux/docker-ce/ubuntu/</a><br>
+	 <li>curl -fsSL https://get.docker.com -o get-docker.sh<br>
+     sudo sh get-docker.sh<br>
+     を実行します。
+     <li>sudo docker pull akiomiyao/ped<br>
+     でコンテナをダウンロードすることができます。
+     <li>コンテナを起動した後、途中で止めたい場合は、<br>
+     sudo docker stats<br>
+     で、止めたいコンテナのCONTAINER IDを調べて、<br>
+     sudo docker kill CONTAINER_ID<br>
+     を実行します。
+     </ul>
       <h2>PEDのインストール</h2>
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
-      <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。<br>
+      <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。
+      <p>以下の説明は、ped.pl作成以前の説明です。ped.plを用いる場合は、上記の操作法「ped.plでの多型検出(簡単なチュートリアル)」ですべての解析ができます。
       <ul>
 	<li>プログラムのダウンロード<br>
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
@@ -97,15 +119,6 @@
 	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業します。git cloneで展開した場合は、展開したディレクトリで<br>
 	  git pull<br>
 	  を実行すると、最新のスクリプトに同期されます。
-	<li>Dockerで実行する場合は、<br>
-		<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">https://hub.docker.com/r/akiomiyao/ped</a><br>
-		から最新版のコンテナーを公開しています。Dockerのコンテナファイルでは、PED以外にfastq-dumpもセットアップ済みです。<br>
-		上記サイトの閲覧には、Dockerのアカウントを作成(無料)してログインする必要があります。<br>
-        コンテナーの取得は、<br>
-        # docker pull akiomiyao/ped<br>
-        で出来ます。<br>
-        LinuxのコンピュータにDockerをインストール(方法は、dockerとCentOSやUbuntsu等のキーワードでサーチ)して、root権限で以下のコマンドを実行するだけで解析できます。<br>
-    
 	  </ul>
 	<h2>リファレンスゲノムデータセットの作成</h2>
 	<ul>
