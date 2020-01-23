@@ -45,15 +45,15 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 ```
-For get or update the container,
+To get or update the container,
 ```
 sudo docker pull akiomiyao/ped
 ```
-For check running containers,
+To check running containers,
 ```
 sudo docker stats
 ```
-For kill running container,
+To kill running container,
 ```
 sudo docker kill Container_ID
 ```
