@@ -449,8 +449,7 @@ X       16964164        T       G       14      0       5       3       H
 ```
 I       834776  I       834746  f       deletion        -12     6       0       7       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
-I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTA
-ATCTACAGTAATCCTACAGTGCCCCTACA
+I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTAATCTACAGTAATCCTACAGTGCCCCTACA
 I       1560682 I       1560674 f       deletion        -1      17      0       0       19      M       TTTTTTTT
 I       1560682 I       1561254 r       inversion       _       13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
 I       2160919 I       2160898 f       deletion        -1      9       0       8       4       H       TTTTTTTTCAAAAAAAAAAAA
@@ -474,19 +473,16 @@ II      4895056 V       18778607        r       translocation   _       5       
 II      5473562 II      3675168 r       inversion       _       8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
 II      12746320        III     4520340 f       translocation   _       6       1       5       3       H       TGTAAAATTGTTTTTTTTT
 II      13112130        V       20740040        f       translocation   _       6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
-II      13327324        II      13327697        r       inversion       _       6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAA
-AATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
+II      13327324        II      13327697        r       inversion       _       6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
 III     1663181 III     1663357 f       deletion        -209    6       1       7       5       H       TTTTTTCCAGAAATTAATATTTCTAGAAAAAT
-III     2300741 X       15839886        r       translocation   _       19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATG
-GTACCACAATGACCAAATATCAT
+III     2300741 X       15839886        r       translocation   _       19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
 III     2520715 X       97782   f       translocation   _       7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
 III     2985966 IV      876821  f       translocation   _       5       1       6       3       H       AAAAAAATTTTTTTTTT
 III     3566956 III     3566962 f       deletion        -48     8       1       6       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 III     6231151 III     6231140 f       deletion        -1      14      0       6       3       H       AAAAAAAAAAA
 III     10402397        III     10402387        f       deletion        -2      5       1       7       4       H       TTTTTTTTTTT
 III     11280814        X       2272016 r       translocation   _       12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
-III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTC
-CGGCAAAT
+III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTCCGGCAAAT
 III     13419473        III     13419443        f       insertion       6       5       1       10      5       H       TGTGTGTGTGTGTGTGTGTGTGT
 IV      1786345 IV      1786337 f       deletion        -1      15      0       0       12      M       AAAAAAAA
 IV      2112309 IV      2112287 f       deletion        -1      7       1       5       3       H       TTTTTTGTTTTTTTTTTTTTTT
@@ -512,8 +508,7 @@ X       1522918 X       1522902 f       deletion        -1      6       1       
 X       2498483 X       2498466 f       deletion        -1      6       1       5       3       H       TTTTTTTTTTTTTTTTT
 X       3823840 X       3823828 f       deletion        -1      10      0       8       4       H       AAAAAAAAAAAA
 X       5885390 X       5885377 f       deletion        -1      11      0       10      5       H       TTTTTTTTTTTTT
-X       7312229 X       11435923        r       inversion       _       6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAA
-TCAAAGAATCGACGACCGCCTCCTGAA
+X       7312229 X       11435923        r       inversion       _       6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAATCAAAGAATCGACGACCGCCTCCTGAA
 X       10023790        III     7850798 r       translocation   _       5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
 X       14258766        III     303520  f       translocation   _       6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
 ```
