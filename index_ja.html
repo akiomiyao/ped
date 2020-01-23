@@ -75,11 +75,11 @@
         となります。
 	 <li>targetのディレクトリに以下の結果がまとめて出力されます。
 	 <table>
-	 <tr><td>target.aln</td><td>双方向アライン法による整列データ</td></tr>
-	 <tr><td>target.bi.snp</td><td>双方向アライン法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
+	 <tr><td>target.aln</td><td>双方向整列法による整列データ</td></tr>
+	 <tr><td>target.bi.snp</td><td>双方向整列法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
 	 <tr><td>target.bi.vcn</td><td>HとMでマークされたSNPをvcn形式で出力されたファイル</td></tr>
 	 <tr><td>target.kmer.snp</td><td><i>k</i>-mer法で検出されたSNP</td></tr>
-	 <tr><td>target.sv</td><td>双方向アライン法で検出された構造(挿入・欠失・逆位・転座)変異</td></tr>
+	 <tr><td>target.sv</td><td>双方向整列法で検出された構造(挿入・欠失・逆位・転座)変異</td></tr>
 	 <tr><td>target.index</td><td>アラインメント検索用インデックスファイル</td></tr>
 	 </table>
 	 targetの部分はターゲットとして指定したディレクトリ名となります。
@@ -105,6 +105,9 @@
      で、止めたいコンテナのCONTAINER IDを調べて、<br>
      sudo docker kill CONTAINER_ID<br>
      を実行します。
+     <li>suやsudoをしないでユーザの権限で実行したい場合は、<br>
+     sudo usermod -a -G docker username<br>
+     を実行(usernameは対象となるユーザのログイン時のIDになります)して、一旦ログアウトして、ログインしなおすとユーザ権限で実行できるようになります。<br>
      </ul>
       <h2>PEDのインストール</h2>
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
