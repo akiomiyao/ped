@@ -27,57 +27,93 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
           
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
+## Simplified instruction
+- ped.pl is a multithreaded script.  
+  Using the docker container is recommended.  
+  Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
+```
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
+```
+  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+  Results will be saved in ERR3063487 directory.
+  If control is ommitted, polymorphisms against reference genome will be saved in target directory.
+
+## Setup of Docker
+```
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+For get or update the container,
+```
+sudo docker pull akiomiyao/ped
+```
+For check running containers,
+```
+sudo docker stats
+```
+For kill running container,
+```
+sudo docker kill Container_ID
+```
+If you want run docker without sudo or su,
+```
+sudo usermod -a -G docker your_username
+```
+After the new login, docker commands can be execute.
+
 ## Installation
 
 - Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
-% git clone https://github.com/akiomiyao/ped.git  
+```
+git clone https://github.com/akiomiyao/ped.git  
+```
 If you got scripts from github, update to newest version is very easy using pull command of git.  
-% git pull  
-or  
-\# docker run -v /home/your_home/your_working_directory:/work -w /ped akiomiyao/ped perl ped.pl target=TARGET,control=CONTROL,ref=REFERENCE,wd=/work  
-See https://hub.docker.com/r/akiomiyao/ped  
-The container includes the fastq-dump program.  
+```
+git pull  
+```
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
 - To download reference data, wget is required.  
     If your machine do not have wget program, install wget from package.  
 - For FreeBSD users, install perl from the package.  
-\# pkg install perl5  
+```
+pkg install perl5  
+```
 perl will be installed to /usr/local/bin/  
-\# ln -s /usr/local/bin/perl5 /usr/bin/perl  
+```
+ln -s /usr/local/bin/perl5 /usr/bin/perl  
+```
 will be required, if you run the PED script on computer cluster with FreeBSD. 
 - If you want to run on computer cluster, Torque job scheduler is required.  
 Install method of Torque for CentOS 7 is described in the [Install of Torque grid engne](https://github.com/akiomiyao/ped/wiki/Install-of-Torque).  
 Torque with default setting works fine.  For the customized Torque, modification of script may be required.
 
-## Simplified instruction
-- ped.pl is a multithreaded script.  
-  Demonstration of SNPs and SVs detection from a *Caenorhabditis elegans* with repeated generations.  
-  % perl download.pl ERR3063486  
-  % perl download.pl ERR3063487  
-  % perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
-  will return results of the bidirectional method in ERR3063487 directory.  
-  % perl ped.pl  
-  Run without argument, simple tutorial will be shown.  
-  For analysis of human (ERR194146),  
-  % perl ped.pl target=ERR194146,ref=hg38  
-
 ## Instruction for bidirectional method  
 - At first, set up reference data is required.  
-  % perl mkref.pl reference  
-  For example,  
-  % perl mkref.pl WBcel235  
-  or  
-  % perl qsub_mkref.pl WBcel235 (For computer cluster)  
-  Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
-  If run without argument, help and suported reference will be listed.  
-  If you want to new reference, add the reference information to the config file.    
-  Format is described in the comment in config file.  
-  To make reference of human,  
-  % perl mkref.pl hg38  
+```
+perl mkref.pl reference  
+```
+For example,  
+```
+perl mkref.pl WBcel235  
+```
+or  
+```
+perl qsub_mkref.pl WBcel235 (For computer cluster)  
+```
+Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
+If run without argument, help and suported reference will be listed.  
+If you want to new reference, add the reference information to the config file.    
+Format is described in the comment in config file.  
+To make reference of human,  
+```
+perl mkref.pl hg38  
+```
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
@@ -96,6 +132,7 @@ Torque with default setting works fine.  For the customized Torque, modification
   WBcel235        Caenorhabditis elegans WBcel235
   danRer11        Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
   dmel626         Drosophila melanogaster
+  hg19            Human (Homo sapiens) Genome Reference Consortium Human Build 19
   hg38            Human (Homo sapiens) Genome Reference Consortium Human Build 38
 ```
   For building human reference data, it takes about two days.  
@@ -103,33 +140,49 @@ Torque with default setting works fine.  For the customized Torque, modification
   For building *Lotus japonicus* data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.
   If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory.  
 - Otherwise,  
-  % perl mkref.pl reference fasta_file_name  
-  For example,  
-  % mkdir IRGSP1.0  
-  % cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
-  % perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
-  or  
-  % qsub -v target=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz mkref.pl  
+```
+perl mkref.pl reference fasta_file_name  
+```
+For example,  
+```
+mkdir IRGSP1.0  
+cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
+perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
+```
+or  
+```
+qsub -v target=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz mkref.pl  
+```
 - If you want to analyze public data in SRA.  
-  % perl download.pl accession  
-  For example,  
-  % perl download.pl ERR3063486  
-  % perl download.pl ERR3063487   
+```
+perl download.pl accession  
+```
+For example,  
+```
+perl download.pl ERR3063486  
+perl download.pl ERR3063487   
+```
   Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
   ERR3063486 is the read data of *Caenorhabditis elegans* wild-type.  
   ERR3063487 is the read data of *Caenorhabditis elegans* mutant.  
   BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze local file,  
-  % mkdir mydata1  
-  % mkdir mydata1/read  
-  % cp somewhere/mydata1.fastq mydata1/read  
-  % perl bidirectional.pl mydata1 control reference  
-- % perl bidirectional.pl target control reference  
+```
+mkdir mydata1  
+mkdir mydata1/read  
+cp somewhere/mydata1.fastq mydata1/read  
+perl bidirectional.pl mydata1 control reference  
+```
+- perl bidirectional.pl target control reference  
   For example,  
-  % perl bidirectional.pl ERR3063487 default WBcel235  
-  or  
-  % qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
+```  
+perl bidirectional.pl ERR3063487 default WBcel235  
+```
+or  
+```
+qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
+```
    After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
@@ -139,13 +192,17 @@ Torque with default setting works fine.  For the customized Torque, modification
   Basically, counts are from target and reference.  
   If control is specified, counts from target and control will be listed.  
   For example,  
-  % perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
+```
+perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
+```
   returns 'M' or 'H' marked SNPs and structural variations of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
-  % perl search.pl target chr position  
+  perl search.pl target chr position  
   For example,  
-  % perl search.pl ERR3063487 II 948033  
-  Alignments will be selected by the search script.  
+```
+perl search.pl ERR3063487 II 948033  
+```
+Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
   % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
   qsub_bidirectional.pl will work with Torque installed with default settings.  
@@ -167,12 +224,18 @@ Torque with default setting works fine.  For the customized Torque, modification
 - Making reference data is same as the bidirectional method.  
 - % perl kmer.pl target control reference
   For example,  
-  % perl kmer.pl ERR3063487 ERR3063486 WBcel235  
+```
+perl kmer.pl ERR3063487 ERR3063486 WBcel235  
+```
 - if you want to run with computer cluster,  
-  % perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235   
+```
+perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235   
+```
   ERR3063487 specific SNPs will be detected.  
 - if you want to detect SNPs against reference genome,  
-  % perl kmer.pl ERR3063487 default WBcel235  
+```
+perl kmer.pl ERR3063487 default WBcel235  
+```
 - ERR3063487.kmer.snp is list of SNPs.  
   ERR3063487.kmer.vcf is the vcf file for SNPs.   
   Quality score in vcf file is fixed to 1000.  
@@ -182,10 +245,14 @@ Torque with default setting works fine.  For the customized Torque, modification
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  
   For example,  
-  % perl kmer.pl ERR3063487 ERR3063486  
-  or  
-  % perl qsub_kmer.pl ERR3063487 ERR3063486  
-  ERR3063487.kmer is list of polymorphic edge.  
+```
+perl kmer.pl ERR3063487 ERR3063486  
+```
+or  
+```
+perl qsub_kmer.pl ERR3063487 ERR3063486  
+```
+ERR3063487.kmer is list of polymorphic edge.  
   SNPs tagged with first 19-mer will be used for genetic analysis,  
   such as segregation analysis.  
   The 19-mer can be used for identifire (name) for analysis.  
@@ -278,132 +345,122 @@ Column 20: Genotype (M: homozygous, H: heterozygous)
 ## Detection of polymorphisms between control and target
 - SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
-I       27950   A       T       9       31      0       0       17      M
-I       892680  C       G       1       8       1       5       3       H
-I       1196268 T       A       1       9       0       8       4       H
-I       1380502 A       T       9       22      0       0       13      M
-I       1728826 T       G       1       8       0       6       3       H
-I       2276398 A       C       3       8       0       6       3       H
-I       3203676 T       G       3       16      1       11      5       H
-I       3407954 C       A       16      28      0       0       23      M
-I       3656814 A       C       3       8       1       8       4       H
-I       5001132 T       G       1       8       1       6       3       H
-I       6324213 G       T       9       24      0       0       21      M
-I       7249395 T       G       3       19      1       7       4       H
-I       7263091 T       G       4       14      1       9       6       H
-I       9136539 T       A       11      20      0       0       16      M
-I       10137843        T       G       3       6       0       9       4       H
-I       10316586        T       A       4       21      1       19      10      H
-I       10316589        A       G       3       21      1       19      9       H
-I       11168832        A       C       1       5       1       5       3       H
-I       14097862        A       T       6       17      1       9       13      H
-II      86891   A       G       2       7       0       8       4       H
-II      271122  C       A       1       16      0       6       3       H
-II      1179320 C       A       9       11      0       0       19      M
-II      2500482 C       A       13      15      0       0       24      M
-II      3552886 A       C       3       15      1       5       3       H
-II      3624396 A       C       2       12      1       9       5       H
-II      3648966 C       T       17      9       0       0       27      M
-II      3771956 G       C       11      19      0       0       16      M
-II      3935824 A       C       1       7       0       6       3       H
-II      3979685 T       G       2       9       0       5       3       H
-II      8284226 C       A       16      19      0       0       20      M
-II      8447001 T       G       1       10      0       9       4       H
-II      8553707 T       A       6       21      0       0       6       M
-II      9410187 C       T       9       23      0       0       18      M
-II      9937543 T       G       11      21      0       0       18      M
-II      10629519        A       C       6       17      1       12      8       H
-II      10685303        T       A       13      21      0       0       16      M
-II      12732768        A       C       2       13      1       6       3       H
-II      14096056        T       G       2       6       0       5       4       H
-III     198231  T       A       9       16      0       0       18      M
-III     2424391 T       G       3       6       1       5       3       H
-III     3091906 T       G       3       19      0       9       4       H
-III     3643248 G       C       1       6       0       6       3       H
-III     4824486 C       G       15      33      0       0       23      M
-III     6843317 T       G       2       5       0       7       4       H
-III     7532164 T       G       1       8       1       6       3       H
-III     9614422 T       G       2       6       0       6       3       H
-III     9723566 G       A       17      25      0       0       23      M
-III     11532166        C       T       6       15      0       1       18      M
-III     13092063        C       T       5       13      0       6       6       H
-III     13273147        A       T       1       15      1       6       4       H
-III     13350315        A       C       3       14      0       7       4       H
-IV      554740  A       C       5       11      1       9       4       H
-IV      876681  A       G       1       20      0       7       4       H
-IV      1159003 A       C       6       13      0       7       6       H
-IV      1327291 C       T       7       25      0       0       30      M
-IV      1327292 G       A       7       26      0       0       30      M
-IV      1327294 G       A       7       26      0       0       31      M
-IV      2417073 G       A       17      32      0       0       21      M
-IV      2858610 C       T       7       21      0       0       14      M
-IV      3931877 G       A       8       13      0       0       20      M
-IV      4298928 A       C       3       11      1       9       4       H
-IV      5200355 G       T       13      27      0       0       23      M
-IV      6005818 C       T       1       7       0       8       5       H
-IV      6481216 C       G       2       17      0       0       6       M
-IV      6796145 C       T       11      16      0       0       19      M
-IV      6967218 G       A       14      25      0       0       25      M
-IV      8053747 T       A       14      23      0       0       19      M
-IV      8951120 T       G       9       10      1       13      6       H
-IV      9709645 C       A       17      22      0       0       27      M
-IV      10195034        T       G       1       14      1       8       4       H
-IV      13672183        C       T       10      18      0       0       18      M
-IV      14217812        A       C       1       9       0       6       3       H
-IV      14760376        T       G       3       9       0       5       3       H
-IV      16870604        A       C       4       12      1       8       4       H
-V       7011    T       G       3       10      1       11      5       H
-V       974819  A       C       2       6       0       9       4       H
-V       3052728 A       C       1       9       1       10      5       H
-V       3277678 G       A       2       22      0       1       19      M
-V       3786240 T       A       9       23      0       0       17      M
-V       4261370 T       G       4       14      0       9       4       H
-V       5134172 C       T       6       19      0       17      10      H
-V       7816318 A       C       5       20      1       8       4       H
-V       9771516 A       T       7       25      0       18      12      H
-V       10513400        A       C       3       11      0       9       4       H
-V       11310419        G       T       9       15      0       0       18      M
-V       15880652        T       C       1       20      1       6       3       H
-V       19657843        T       A       10      25      0       0       24      M
-V       19718778        G       A       2       11      0       0       11      M
-V       19733914        A       C       1       6       0       6       3       H
-V       19742410        T       G       2       6       1       5       3       H
-V       20202209        T       G       3       5       0       5       3       H
-V       20413571        T       G       4       13      1       6       3       H
-X       2843588 A       C       4       13      0       9       4       H
-X       4194330 T       C       15      23      0       0       22      M
-X       4247242 T       G       2       7       1       6       3       H
-X       5446454 C       T       4       21      0       0       7       M
-X       6994561 A       T       20      29      0       0       29      M
-X       7299494 A       G       2       7       0       6       3       H
-X       7586849 T       G       1       8       1       8       4       H
-X       10134376        A       C       1       8       0       6       3       H
-X       10486673        A       T       12      31      0       0       23      M
-X       12500491        T       G       2       7       1       6       3       H
-X       14544549        A       G       21      13      0       0       30      M
-X       14632040        T       A       13      21      0       0       21      M
-X       14735899        T       G       2       8       0       5       3       H
-X       15162710        A       C       2       5       1       9       4       H
-X       15395882        A       G       3       17      0       13      6       H
-X       15815152        T       G       3       13      1       5       3       H
-X       16861146        C       T       6       9       0       0       17      M
-X       16964164        T       G       3       14      0       5       3       H
+I       27950   A       T       31      0       0       17      M
+I       892680  C       G       8       1       5       3       H
+I       1196268 T       A       9       0       8       4       H
+I       1380502 A       T       22      0       0       13      M
+I       1728826 T       G       8       0       6       3       H
+I       3203676 T       G       16      1       11      5       H
+I       3407954 C       A       28      0       0       23      M
+I       3656814 A       C       8       1       8       4       H
+I       5001132 T       G       8       1       6       3       H
+I       6324213 G       T       24      0       0       21      M
+I       7249395 T       G       19      1       7       4       H
+I       7263091 T       G       14      1       9       6       H
+I       9136539 T       A       20      0       0       16      M
+I       10137843        T       G       6       0       9       4       H
+I       11168832        A       C       5       1       5       3       H
+I       14097862        A       T       17      1       9       13      H
+II      86891   A       G       7       0       8       4       H
+II      271122  C       A       16      0       6       3       H
+II      1179320 C       A       11      0       0       17      M
+II      2500482 C       A       15      0       0       24      M
+II      3552886 A       C       15      1       5       3       H
+II      3624396 A       C       12      1       9       5       H
+II      3648966 C       T       9       0       0       27      M
+II      3771956 G       C       19      0       0       16      M
+II      3935824 A       C       7       0       6       3       H
+II      3979685 T       G       9       0       5       3       H
+II      8284226 C       A       19      0       0       20      M
+II      8447001 T       G       10      0       9       4       H
+II      8553707 T       A       21      0       0       6       M
+II      9410187 C       T       23      0       0       18      M
+II      9937543 T       G       21      0       0       18      M
+II      10629519        A       C       17      1       12      8       H
+II      10685303        T       A       21      0       0       16      M
+II      12732768        A       C       13      1       6       3       H
+II      14096056        T       G       6       0       5       4       H
+III     198231  T       A       16      0       0       18      M
+III     3091906 T       G       19      0       9       4       H
+III     3643248 G       C       6       0       6       3       H
+III     4824486 C       G       33      0       0       23      M
+III     7532164 T       G       8       1       6       3       H
+III     9723566 G       A       25      0       0       23      M
+III     11532166        C       T       15      0       1       18      M
+III     13092063        C       T       13      0       6       6       H
+III     13273147        A       T       15      1       6       4       H
+III     13350315        A       C       14      0       7       4       H
+IV      554740  A       C       11      1       9       4       H
+IV      876681  A       G       20      0       7       4       H
+IV      1159003 A       C       13      0       7       6       H
+IV      1327294 G       A       26      0       0       31      M
+IV      2417073 G       A       32      0       0       21      M
+IV      2858610 C       T       21      0       0       14      M
+IV      3931877 G       A       13      0       0       20      M
+IV      4298928 A       C       11      1       9       4       H
+IV      5200355 G       T       27      0       0       23      M
+IV      6481216 C       G       17      0       0       8       M
+IV      6796145 C       T       16      0       0       19      M
+IV      6967218 G       A       25      0       0       25      M
+IV      8053747 T       A       23      0       0       19      M
+IV      8951120 T       G       10      1       13      6       H
+IV      9709645 C       A       22      0       0       27      M
+IV      10195034        T       G       14      1       8       4       H
+IV      13672183        C       T       18      0       0       18      M
+IV      14217812        A       C       9       0       6       3       H
+IV      14760376        T       G       9       0       5       3       H
+IV      16870604        A       C       12      1       8       4       H
+V       7011    T       G       10      1       11      5       H
+V       974819  A       C       6       0       9       4       H
+V       3052728 A       C       9       1       10      5       H
+V       3277678 G       A       22      0       1       19      M
+V       3786240 T       A       23      0       0       17      M
+V       4261370 T       G       14      0       9       4       H
+V       5134172 C       T       19      0       17      10      H
+V       7816318 A       C       20      1       8       4       H
+V       9771516 A       T       25      0       18      12      H
+V       10513400        A       C       11      0       9       4       H
+V       11310419        G       T       15      0       0       18      M
+V       15880652        T       C       20      1       6       3       H
+V       19657843        T       A       25      0       0       24      M
+V       19718778        G       A       11      0       0       11      M
+V       19733914        A       C       6       0       6       3       H
+V       19742410        T       G       6       1       5       3       H
+V       20202209        T       G       5       0       5       3       H
+V       20413571        T       G       13      1       6       3       H
+X       2843588 A       C       13      0       9       4       H
+X       4194330 T       C       23      0       0       22      M
+X       4247242 T       G       7       1       6       3       H
+X       5446454 C       T       21      0       0       7       M
+X       6994561 A       T       29      0       0       29      M
+X       7299494 A       G       7       0       6       3       H
+X       7586849 T       G       8       1       8       4       H
+X       10486673        A       T       31      0       0       23      M
+X       12500491        T       G       7       1       6       3       H
+X       14544549        A       G       13      0       0       30      M
+X       14632040        T       A       21      0       0       21      M
+X       14735899        T       G       8       0       5       3       H
+X       15395882        A       G       17      0       13      6       H
+X       15815152        T       G       13      1       5       3       H
+X       16861146        C       T       9       0       0       11      M
+X       16964164        T       G       14      0       5       3       H
 ```
 - Structural variations between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
 I       834776  I       834746  f       deletion        -12     6       0       7       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
-I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTAATCTACAGTAATCCTACAGTGCCCCTACA
+I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTA
+ATCTACAGTAATCCTACAGTGCCCCTACA
 I       1560682 I       1560674 f       deletion        -1      17      0       0       19      M       TTTTTTTT
-I       1560682 I       1561254 r       inversion               13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
+I       1560682 I       1561254 r       inversion       _       13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
 I       2160919 I       2160898 f       deletion        -1      9       0       8       4       H       TTTTTTTTCAAAAAAAAAAAA
 I       2384261 I       2384244 f       insertion       1       14      1       8       4       H       CAAAAAAAAAAAAAA
-I       2715230 III     12981863        r       translocation           5       1       5       3       H       CGTATTGCACAGCACATTTGACGCGCAAAAT
+I       2715230 III     12981863        r       translocation   _       5       1       5       3       H       CGTATTGCACAGCACATTTGACGCGCAAAAT
 I       5081495 I       5081478 f       deletion        -2      7       1       6       4       H       TTTTTTTTTTTTTTTTTT
 I       8028077 I       8028066 f       deletion        -1      6       0       6       3       H       TTTTTTTTTTT
 I       8028078 I       8028065 f       insertion       1       6       0       6       3       H       TTTTTTTTTTT
 I       9825014 I       9825007 f       insertion       1       23      0       8       13      H       AAAAA
-I       10622455        IV      9192034 f       translocation           5       1       6       3       H       GTTCAAATAAAAATATTTTTTT
+I       10622455        IV      9192034 f       translocation   _       5       1       6       3       H       GTTCAAATAAAAATATTTTTTT
 I       10887954        I       10887958        f       deletion        -6      11      0       1       10      M       A
 I       11005509        I       11005489        f       deletion        -1      5       1       0       5       M       AAATTTTTTTTTTTTTTTTT
 I       12856424        I       12856415        f       deletion        -1      14      0       8       5       H       TTTTTTTTT
@@ -412,21 +469,24 @@ II      191614  II      191601  f       insertion       1       11      0       
 II      948033  II      948099  f       deletion        -69     20      0       1       15      M       AT
 II      1777672 II      1770125 f       insertion       7506    8       1       9       4       H       ATGGTGAGTAGCCGGTAATTTCATAGTTATTGAAATTTGA
 II      2361947 II      2361931 f       deletion        -1      10      1       0       15      M       TTTTTCTTTTTTTTTT
-II      4463297 V       1000739 r       translocation           6       0       6       4       H       TTTCGATTTTCCAGAAAATCAAAAAAAAA
-II      4895056 V       18778607        r       translocation           5       0       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
-II      5473562 II      3675168 r       inversion               8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
-II      12746320        III     4520340 f       translocation           6       1       5       3       H       TGTAAAATTGTTTTTTTTT
-II      13112130        V       20740040        f       translocation           6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
-II      13327324        II      13327697        r       inversion               6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
+II      4463297 V       1000739 r       translocation   _       6       0       6       4       H       TTTCGATTTTCCAGAAAATCAAAAAAAAA
+II      4895056 V       18778607        r       translocation   _       5       0       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
+II      5473562 II      3675168 r       inversion       _       8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
+II      12746320        III     4520340 f       translocation   _       6       1       5       3       H       TGTAAAATTGTTTTTTTTT
+II      13112130        V       20740040        f       translocation   _       6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
+II      13327324        II      13327697        r       inversion       _       6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAA
+AATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
 III     1663181 III     1663357 f       deletion        -209    6       1       7       5       H       TTTTTTCCAGAAATTAATATTTCTAGAAAAAT
-III     2300741 X       15839886        r       translocation           19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
-III     2520715 X       97782   f       translocation           7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
-III     2985966 IV      876821  f       translocation           5       1       6       3       H       AAAAAAATTTTTTTTTT
+III     2300741 X       15839886        r       translocation   _       19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATG
+GTACCACAATGACCAAATATCAT
+III     2520715 X       97782   f       translocation   _       7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
+III     2985966 IV      876821  f       translocation   _       5       1       6       3       H       AAAAAAATTTTTTTTTT
 III     3566956 III     3566962 f       deletion        -48     8       1       6       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 III     6231151 III     6231140 f       deletion        -1      14      0       6       3       H       AAAAAAAAAAA
 III     10402397        III     10402387        f       deletion        -2      5       1       7       4       H       TTTTTTTTTTT
-III     11280814        X       2272016 r       translocation           12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
-III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTCCGGCAAAT
+III     11280814        X       2272016 r       translocation   _       12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
+III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTC
+CGGCAAAT
 III     13419473        III     13419443        f       insertion       6       5       1       10      5       H       TGTGTGTGTGTGTGTGTGTGTGT
 IV      1786345 IV      1786337 f       deletion        -1      15      0       0       12      M       AAAAAAAA
 IV      2112309 IV      2112287 f       deletion        -1      7       1       5       3       H       TTTTTTGTTTTTTTTTTTTTTT
@@ -434,16 +494,16 @@ IV      2314588 IV      2314573 f       deletion        -1      10      1       
 IV      2445289 IV      2445276 f       deletion        -1      15      0       5       3       H       TTTTTTTTTTTTT
 IV      3192017 IV      3192001 f       deletion        -1      10      1       8       5       H       AAAAAAAAAAAAAAAA
 IV      3192018 IV      3192000 f       insertion       1       10      0       7       4       H       AAAAAAAAAAAAAAAA
-IV      3336297 IV      3336328 f       deletion        -31     21      1       0       23      M       A
+IV      3336297 IV      3336328 f       deletion        -31     21      0       0       23      M       A
 IV      3867139 IV      3867116 f       deletion        -2      11      1       6       3       H       ATATATATATATATATATATATAT
 IV      4399486 IV      4399441 f       insertion       2       8       0       10      6       H       GAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGAGA
 IV      4489131 IV      4489122 f       deletion        -1      16      0       1       17      M       TTTTTTTTT
 V       1027708 V       1027700 f       deletion        -39     9       1       10      5       H       GCCTATGGCCTACGCCTATGGCCTACGCCTATGGCCTACGCCTATG
 V       1989616 V       1989642 f       deletion        -3      6       1       6       3       H       GATAAAAACTACTTGGATAAATGA
 V       9026732 V       9026728 f       deletion        -3      6       1       7       4       H       ATTATT
-V       11884926        II      3151004 r       translocation           5       1       6       5       H       GTGCCGAGTGCCGATCGGCACAATGTG
-V       18672436        IV      2681633 r       translocation           7       1       5       3       H       GGGAAAATTGCTTTAAAACATGCCTATGGTACTACAA
-V       18890234        V       18892184        r       inversion               6       1       6       3       H       TTTTTATTGAAAACTAGTATAAAAATATA
+V       11884926        II      3151004 r       translocation   _       5       1       6       5       H       GTGCCGAGTGCCGATCGGCACAATGTG
+V       18672436        IV      2681633 r       translocation   _       7       1       5       3       H       GGGAAAATTGCTTTAAAACATGCCTATGGTACTACAA
+V       18890234        V       18892184        r       inversion       _       6       1       6       3       H       TTTTTATTGAAAACTAGTATAAAAATATA
 V       20123760        V       20123893        f       deletion        -150    12      0       7       4       H       GGGGTTCGAACCCCGG
 X       99547   X       99523   f       deletion        -1      8       1       9       5       H       AAAAAAAATTTTTTTTTTTTTTTT
 X       438457  X       438446  f       insertion       1       12      0       5       5       H       TTTTTTTTT
@@ -452,9 +512,10 @@ X       1522918 X       1522902 f       deletion        -1      6       1       
 X       2498483 X       2498466 f       deletion        -1      6       1       5       3       H       TTTTTTTTTTTTTTTTT
 X       3823840 X       3823828 f       deletion        -1      10      0       8       4       H       AAAAAAAAAAAA
 X       5885390 X       5885377 f       deletion        -1      11      0       10      5       H       TTTTTTTTTTTTT
-X       7312229 X       11435923        r       inversion               6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAATCAAAGAATCGACGACCGCCTCCTGAA
-X       10023790        III     7850798 r       translocation           5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
-X       14258766        III     303520  f       translocation           6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
+X       7312229 X       11435923        r       inversion       _       6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAA
+TCAAAGAATCGACGACCGCCTCCTGAA
+X       10023790        III     7850798 r       translocation   _       5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
+X       14258766        III     303520  f       translocation   _       6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
 ```
 
 ## Author
