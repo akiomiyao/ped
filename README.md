@@ -37,6 +37,8 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR30
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
   ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+  Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
+  Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
   Results will be saved in ERR3063487 directory.
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.
 
@@ -61,7 +63,7 @@ If you want run docker without sudo or su,
 ```
 sudo usermod -a -G docker your_username
 ```
-After the new login, docker commands can be execute.
+After the new login, docker commands can be execute with your account.
 
 ## Installation
 
