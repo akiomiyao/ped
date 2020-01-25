@@ -28,8 +28,8 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
 ## Simplified instruction
-- ped.pl is a multithreaded script.  
-  Using the docker container is recommended.  
+- The ped.pl is a multithreaded script, suitable for multi-core CPU like as 16 or 8 cores.  
+  Using the docker container is recommended, because program for downloading short read sequences and scripts have been set up in the container.  
   Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
 ```
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work
@@ -40,9 +40,11 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
   Results will be saved in ERR3063487 directory.
-  If control is ommitted, polymorphisms against reference genome will be saved in target directory.
+  If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
+  If script runs without arguments, description of how to use the script will be shown.  
 
 ## Setup of Docker
+https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ```
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
