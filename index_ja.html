@@ -12,12 +12,15 @@
       <p>エッジを検出する方法として、<a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/1" target = "_blank">ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)</a>と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
       <p><i>k</i>-mer法はリファレンス配列がなくても、3'末端に多型を持つ<i>k</i>-merを抽出することができ、連鎖解析に利用できます。
       <p><a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/2" target = "_blank">双方向整列法は、SNPに加えて、挿入、欠失、逆位、転座などの構造変異が同時に検出されます。</a>また、従来法に比べて正確かつ高速に処理することができ、特に数100kbを超えるような大きな欠失も正確に検出できる特徴があります。
-      <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。
-	<h2>ped.plでの多型検出(簡単なチュートリアル)</h2>
+      <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。<br>
+
+	<a name = "simple_tutorial">
+	<h2>ped.plでの多型検出 (簡単なチュートリアル)</h2>
 	 <ul>
-	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。時間はかかりますが、シングルコアや2コアのCPUでも動作します。<br>
+	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
+	  時間はかかりますが、シングルコアや2コアのCPUでも動作します。<br>
 	  メモリーは4Gバイト以上、ディスクはヒトを解析する場合は1TB程度必要です。コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみのDockerのコンテナも公開しています。<br>
-	  書式<br>
+	  <p><b>書式</b><br>
 	  perl ped.pl target=target,control=control,ref=reference
       <ul>
 	  <li>ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
@@ -26,25 +29,25 @@
 	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       </ul>
-      Dockerでの実行は、<br>
+      <p><b>Dockerでの実行は、</b><br>
       docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=target,control=control,ref=reference,wd=/work<br>
 	  <ul>
 	  <li>ターゲットやコントロールのディレクトリをカレントディレクトリの中に作成し、それらのディレクトリの中に<br>
 	  さらにreadというディレクトリを作成して、作成したreadのディレクトリの中にfastqファイル(圧縮可)を置きます。
-	  <li>上記dockerコマンドをsudoあるいはroot権限で実行すれば、最新のコンテナをdockerhubからダウンロードして全行程を自動実行します。結果は、ターゲットのディレクトリに出力されます。
-	  <li>最新のコンテナに更新するためには、<br>
+	  <li>上記dockerコマンドを最新のコンテナをdockerhubからダウンロードして全行程を自動実行します。結果は、ターゲットのディレクトリに出力されます。
+	  <li>最新のコンテナをダウンロード・更新するためには、<br>
 	  docker pull akiomiyao/ped<br>
 	  を実行します。
-	  <li>Docker自体のインストールは以下の「Dockerのインストール」を参照してください。
+	  <li>Docker自体のインストールは「<a href = "#Docker_install">Dockerのインストール</a>」を参照してください。
 	  </ul>
-	  例<br>
+	  <p><b>例</b>
 	  <ul>
 	  <li>perl ped.pl target=ERR194146,ref=hg38<br>
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
       <li>docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=DRR054198,ref=IRGSP1.0,wd=/work<br>
       Dockerのコンテナを用いて、イネのIRGSP1.0のリファレンスに対するコシヒカリ(DRR054198)の多型を検出します。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
-	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した多型の検出の場合。
+	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した自然突然変異の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
       ショートリードデータやリファレンスデータの入ったディレクトリを置く作業ディレクトリを/home/your_id/dataに指定する場合です。<br>
       指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
@@ -58,8 +61,9 @@
 	  <i>k</i>-mer法で解析する場合。デフォルトは双方向整列法。
       <li>オプションは,で区切って複数組み合わせて指定することができます。ただし、同じ名称のオプションの重複指定はできません。
 	  </ul>
-	 <li>デモ　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。<br>
-        ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
+	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。
+	 <ul>
+     <li>   ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
         docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work<br>
         docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
         で出来ます。(アメリカからのダウンロードなので、数時間程度かかります。)<br>
@@ -86,11 +90,14 @@
 	 <li>検出された多型をアラインメントに戻って確認したい場合は、<br>
 	 perl search.pl target=target,chr=chromosome,pos=position<br>
 	 を実行します。<br>
-	 例<br>
+	 <b>例</b><br>
      perl search.pl target=ERR3063487,chr=II,pos=948033<br>
      Dockerコマンドで実行する場合は、<br>
 	 docker run -v `pwd`:/work -w /ped -t akiomiyao/ped perl search.pl target=ERR3063487,chr=II,pos=948033,wd=/work
 	 </ul>
+	 </ul>
+
+
      <h2>結果のフォーマット</h2>
      <ul>
            <li>以下は、ヒト (イルミナ プラチナゲノムの配列データ ERR194146)の出力例です。<br>
@@ -142,12 +149,12 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
            <li>変異型のコントロールのリード数
            <li>リファレンス型のターゲットのリード数
            <li>変異型のターゲットのリード数
-           <li>ホモ・ヘテロ型判定です。
+           <li>ホモ・ヘテロ型判定です。一番右にMと表示されている行がホモ変異、Hがヘテロと判定しています。
            </ol>
-           一番右にMと表示されている行がホモ変異、Hがヘテロと判定しています。<br>
-           コントロールを指定しないで、リファレンスをコントロールとした場合は、<br>
-           コントロールのリード数は、リファレンスから作成した疑似リードでのデプスが値に入ります。<br>
-           双方向アライン法では、反復領域のアラインは最初から除外します。2行目は除外されなかった1つのアラインの変異情報からリードのデプスを検証したところ、ターゲット(ERR194146)では、19リードが変異型で検出されたことがわかります。
+           <p><ul>
+           <li>コントロールを指定しないで、リファレンスをコントロールとした場合、コントロールのリード数は、リファレンスから作成した疑似リードでのデプスが値に入ります。
+           <li>双方向整列法では、反復領域のアラインは最初から除外します。2行目は除外されなかった1つのアラインの変異情報からリードのデプスを検証したところ、ターゲット(ERR194146)では、19リードが変異型で検出されたことがわかります。
+           </ul>
            <li>構造変異は、ERR194146.sv<br>
            に出力されます。
            <pre>[miyao@cluster1 ERR194146]$ egrep 'M|H' ERR194146.sv|head  -n 30
@@ -205,6 +212,42 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
       </ul> 
 
      </ul>
+
+
+	 <h2>サポートしているリファレンスゲノム</h2>
+	 <ul>
+	 <li>perl ped.pl と引数なしに実行すると、使用法とサポートしているリファレンスゲノムが表示されます。<br>
+	 ref=nameのように表示されたゲノムの名前を指定すると、配列公開サイトから自動的にダウンロードして、データセットが生成されます。<br>
+	 一度作成されると次回以降の実行では、作成されたデータセットをもとに解析が進みます。
+	 <li>現在サポートしているリファレンスゲノムは以下の通りです。
+	 <pre>  Name           Description
+  B73v4          Corn (Zea mays B73) RefGen v4
+  Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+  GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
+  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 44
+  IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
+  IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  SScrofa11.1    Pig (Sus scrofa) Release-97
+  TAIR10         Arabidopsis thaliana version TAIR10
+  UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  WBcel235       Caenorhabditis elegans WBcel235
+  danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
+  dmel626        Drosophila melanogaster
+  hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
+  hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
+</pre>
+     <li>サポートされていないリファレンス配列で解析したい場合
+     <ul>
+     <li>任意のリファレンスの名称のディレクトリを作り、その中にfastaファイル(multi-fasta形式、圧縮可、名称は任意)を置きます。
+     <li>染色体名は、番号とX、Y、Zのように単純なものにした方が、後々の解析が楽になります。
+     <li>perl ped.pl target=target,control=control,ref=directory_name,file=file_name<br>
+     で任意のリファレンスのデータセットが生成されて解析が進みます。
+     </ul>
+	 </ul>
+	 <a name = "Docker_install">
 	 <h2>Dockerのインストール</h2>
 	 CentOSやUbuntuにインストールする場合<br>
      <ul>
@@ -223,10 +266,12 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
      sudo usermod -a -G docker username<br>
      を実行(usernameは対象となるユーザのログイン時のIDになります)して、一旦ログアウトして、ログインしなおすとユーザ権限で実行できるようになります。<br>
      </ul>
+
+
       <h2>PEDのインストール</h2>
+      <p>以下の説明は、マルチスレッドで動作するシングルコンピュータ用のped.pl作成以前の説明です。<br>
+      ped.plを用いる場合は、上記の操作法「<a href = "#simple_tutorial">ped.plでの多型検出 (簡単なチュートリアル)</a>」ですべての解析ができます。
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
-      <p>マルチスレッドで動作するシングルコンピュータ用のped.plが加わりました。通常はこのプログラムのみで多型検出ができます。
-      <p>以下の説明は、ped.pl作成以前の説明です。ped.plを用いる場合は、上記の操作法「ped.plでの多型検出(簡単なチュートリアル)」ですべての解析ができます。
       <ul>
 	<li>プログラムのダウンロード<br>
 	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
@@ -444,7 +489,7 @@ Wed Dec  4 19:21:32 JST 2019 bidirectional.pl complete.
       <li>つくば遺伝子研究所
       </ul>
      研究目的での利用はご自由に利用してもらって大丈夫ですが、企業の方で営利目的の場合は、農研機構知的財産部特許ライセンスチーム (電話 029-838-6465 メール <a href = "mailto:naro-kyodaku@naro.affrc.go.jp">naro-kyodaku@naro.affrc.go.jp</a>)にご連絡ください。
-    <h2>連絡先</h2>
+    <h2>お問い合わせ先</h2>
     〒305-8518<br>
     茨城県つくば市観音台2-1-2<br>
     <a href = "http://www.naro.affrc.go.jp/" target = "_blank">農研機構</a>次世代作物開発研究センター<br>
