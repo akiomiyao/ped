@@ -29,6 +29,8 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 
 ## Simplified instruction
 - The ped.pl is a multithreaded script, suitable for multi-core CPU like as 16 or 8 cores.  
+  Of course, the ped.pl can run with the 2 or single core machine, but slow.  
+  The ped.pl runs on Linux (FreeBSD) machine with at least 4 GB RAM and 1 TB hard disk (or SSD).  
   Using the docker container is recommended, because program for downloading short read sequences and scripts have been set up in the container.  
   Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
 ```
