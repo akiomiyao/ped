@@ -71,6 +71,7 @@ After the new login, docker commands can be execute with your account.
 
 ## Installation
 - Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
+- If you do not want to use the docker container, downloading of programs is required.   
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 ```
@@ -85,21 +86,20 @@ git pull
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
 - To download reference data, wget is required.  
     If your machine do not have wget program, install wget from package.  
-- For FreeBSD users, install perl from the package.  
-```
-pkg install perl5  
-```
-perl will be installed to /usr/local/bin/  
-```
-ln -s /usr/local/bin/perl5 /usr/bin/perl  
-```
-will be required, if you run the PED script on computer cluster with FreeBSD. 
-- If you want to run on computer cluster, Torque job scheduler is required.  
-Install method of Torque for CentOS 7 is described in the [Install of Torque grid engne](https://github.com/akiomiyao/ped/wiki/Install-of-Torque).  
-Torque with default setting works fine.  For the customized Torque, modification of script may be required.
 
 ## Instruction for bidirectional method  
-- At first, set up reference data is required.  
+```
+perl ped.pl target=target,control=control,ref=reference
+```
+If reference data is absent, ped.pl downloads the reference sequence and makes reference dataset.  
+```
+perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
+```
+  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+  Results will be saved in ERR3063487 directory.
+  If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
+  If script runs without arguments, description of how to use the script will be shown.  
+- If you want to make reference data separately,  
 ```
 perl mkref.pl reference  
 ```
@@ -140,10 +140,7 @@ perl mkref.pl hg38
   hg19            Human (Homo sapiens) Genome Reference Consortium Human Build 19
   hg38            Human (Homo sapiens) Genome Reference Consortium Human Build 38
 ```
-  For building human reference data, it takes about two days.  
-  For building wheat reference data, it takes more than one week, and 32GB memory and 3TB disk space are required for detection of polymorphism.  
-  For building *Lotus japonicus* data, download fasta file of reference separately, save into LJ3 directory, and then run 'perl mkref.pl LJ3'.
-  If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory.  
+  If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.  
 - Otherwise,  
 ```
 perl mkref.pl reference fasta_file_name  
@@ -160,19 +157,19 @@ qsub -v target=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz mkref.pl
 ```
 - If you want to analyze public data in SRA.  
 ```
-perl download.pl accession  
+perl download.pl accession=accession  
 ```
 For example,  
 ```
-perl download.pl ERR3063486  
-perl download.pl ERR3063487   
+perl download.pl accession=ERR3063486  
+perl download.pl accession=ERR3063487   
 ```
   Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
   ERR3063486 is the read data of *Caenorhabditis elegans* wild-type.  
   ERR3063487 is the read data of *Caenorhabditis elegans* mutant.  
   BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
-- If you want to analyze local file,  
+- If you want to analyze your private file,  
 ```
 mkdir mydata1  
 mkdir mydata1/read  
@@ -205,7 +202,7 @@ perl bidirectional.pl ERR3063487 ERR3063486 WBcel235
   perl search.pl target chr position  
   For example,  
 ```
-perl search.pl ERR3063487 II 948033  
+perl search.pl target=ERR3063487,chr=II<pos=948033  
 ```
 Alignments will be selected by the search script.  
 - if you want to run with computer cluster,  
