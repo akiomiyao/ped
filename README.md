@@ -91,6 +91,7 @@ git pull
 ```
 perl ped.pl target=target,control=control,ref=reference
 ```
+Run without argument, ped.pl returns the usage and options.  
 If reference data is absent, ped.pl downloads the reference sequence and makes reference dataset.  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
@@ -176,14 +177,22 @@ mkdir mydata1/read
 cp somewhere/mydata1.fastq mydata1/read  
 perl bidirectional.pl mydata1 control reference  
 ```
+or  
+```
+  perl ped.pl target=mydata1,control=control,ref=reference
+```
 - perl bidirectional.pl target control reference  
   For example,  
+```
+perl ped.pl target=ERR3063487,ref=WBcel235  
+```
+or  
 ```  
 perl bidirectional.pl ERR3063487 default WBcel235  
 ```
 or  
 ```
-qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl  
+qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl 
 ```
    After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
@@ -202,11 +211,13 @@ perl bidirectional.pl ERR3063487 ERR3063486 WBcel235
   perl search.pl target chr position  
   For example,  
 ```
-perl search.pl target=ERR3063487,chr=II<pos=948033  
+perl search.pl target=ERR3063487,chr=II,pos=948033  
 ```
 Alignments will be selected by the search script.  
-- if you want to run with computer cluster,  
-  % perl qsub_bidirectional.pl ERR3063487 default WBcel235  
+- if you want to run with computer cluster, 
+```
+perl qsub_bidirectional.pl ERR3063487 default WBcel235  
+```
   qsub_bidirectional.pl will work with Torque installed with default settings.  
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
@@ -224,8 +235,11 @@ Alignments will be selected by the search script.
 
 ## Instruction for *k*-mer method
 - Making reference data is same as the bidirectional method.  
-- % perl kmer.pl target control reference
-  For example,  
+- For example,  
+```
+perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer  
+```
+or  
 ```
 perl kmer.pl ERR3063487 ERR3063486 WBcel235  
 ```
@@ -233,8 +247,12 @@ perl kmer.pl ERR3063487 ERR3063486 WBcel235
 ```
 perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235   
 ```
-  ERR3063487 specific SNPs will be detected.  
+  ERR3063487 specific SNPs against ERR3063486 will be detected.  
 - if you want to detect SNPs against reference genome,  
+```
+perl ped.pl target=ERR3063487,ref=WBcel235,method=kmer  
+```
+or  
 ```
 perl kmer.pl ERR3063487 default WBcel235  
 ```
@@ -247,6 +265,10 @@ perl kmer.pl ERR3063487 default WBcel235
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  
   For example,  
+```
+perl ped.pl target=ERR3063487,control=ERR3063486,method=kmer  
+```
+or  
 ```
 perl kmer.pl ERR3063487 ERR3063486  
 ```
