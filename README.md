@@ -70,14 +70,14 @@ sudo usermod -a -G docker your_username
 After the new login, docker commands can be execute with your account.
 
 ## Installation
+- If you do not want to use the docker container, downloading of programs is required.  
 - Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
-- If you do not want to use the docker container, downloading of programs is required.   
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 ```
 git clone https://github.com/akiomiyao/ped.git  
 ```
-If you got scripts from github, update to newest version is very easy using pull command of git.  
+If you got scripts by clone command of git, update to newest version is very easy using pull command of git.  
 ```
 git pull  
 ```
@@ -97,7 +97,7 @@ If reference data is absent, ped.pl downloads the reference sequence and makes r
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
 ```
   ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
-  Results will be saved in ERR3063487 directory.
+  SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
 - If you want to make reference data separately,  
@@ -234,7 +234,6 @@ perl qsub_bidirectional.pl ERR3063487 default WBcel235
   I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
 ## Instruction for *k*-mer method
-- Making reference data is same as the bidirectional method.  
 - For example,  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer  
