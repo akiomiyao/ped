@@ -41,7 +41,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
-  Results will be saved in ERR3063487 directory.
+  SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
 
