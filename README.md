@@ -38,7 +38,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR30
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
-  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+-  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
@@ -94,12 +94,12 @@ git pull
 ```
 perl ped.pl target=target,control=control,ref=reference
 ```
-Run without argument, ped.pl returns the usage and options.  
+- Run without argument, ped.pl returns the usage and options.  
 If reference data is absent, ped.pl downloads the reference sequence and makes reference dataset.  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
 ```
-  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+- ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
@@ -115,7 +115,7 @@ or
 ```
 perl qsub_mkref.pl WBcel235 (For computer cluster)  
 ```
-Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
+- Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
 If run without argument, help and suported reference will be listed.  
 If you want to new reference, add the reference information to the config file.    
 Format is described in the comment in config file.  
@@ -168,7 +168,7 @@ For example,
 perl download.pl accession=ERR3063486  
 perl download.pl accession=ERR3063487   
 ```
-  Data directory of ERR3063486 and ERR3063487 will be created.  
+- Data directory of ERR3063486 and ERR3063487 will be created.  
   Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
   ERR3063486 is the read data of *Caenorhabditis elegans* wild-type.  
   ERR3063487 is the read data of *Caenorhabditis elegans* mutant.  
@@ -197,7 +197,7 @@ or
 ```
 qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl 
 ```
-   After four hours, you will find results in ERR3063487 directory.  
+-  After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
    ERR3063487.bi.vcf is the vcf file for SNPs.  
@@ -221,7 +221,7 @@ Alignments will be selected by the search script.
 ```
 perl qsub_bidirectional.pl ERR3063487 default WBcel235  
 ```
-  qsub_bidirectional.pl will work with Torque installed with default settings.  
+- qsub_bidirectional.pl will work with Torque installed with default settings.  
   If output format of qsub and qstat are customized, modification of the
   script will be required.  
   Run without arguments, help for script will be shown.  
@@ -278,7 +278,7 @@ or
 ```
 perl qsub_kmer.pl ERR3063487 ERR3063486  
 ```
-ERR3063487.kmer is list of polymorphic edge.  
+- ERR3063487.kmer is list of polymorphic edge.  
   SNPs tagged with first 19-mer will be used for genetic analysis,  
   such as segregation analysis.  
   The 19-mer can be used for identifire (name) for analysis.  
