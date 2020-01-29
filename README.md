@@ -44,6 +44,9 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
+- Options,  
+  thread=8 : specify the max thread number. Default is 14.  
+  tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
 
 ## Setup of Docker
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
