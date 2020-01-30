@@ -74,7 +74,7 @@ After the new login, docker commands can be execute with your account.
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
-- Programs run on Unix platforms (FreeBSD, Linux, MacOS).  
+- Programs run on Unix platforms (FreeBSD, Linux).  
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 ```
