@@ -80,6 +80,8 @@ chomp($uname);
 
 $method = "bidirectional" if $method eq "";
 
+$zcat = "zcat";
+
 if ($thread ne ""){
     $max_semaphore = $thread;
 }else{
@@ -92,6 +94,7 @@ if ($thread ne ""){
 	}
 	close(IN);
     }elsif($uname eq "Darwin"){
+	$zcat = "gzcat";
 	open(IN, "sysctl hw.logicalcpu |");
 	while(<IN>){
 	    chomp;
@@ -200,7 +203,7 @@ if ($control ne $ref && ! -e "$wd/$control/sort_uniq/$control.sort_uniq.TTT.gz")
     &mkSortUniq($control);
 }
 
-open(IN, "zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -208,7 +211,7 @@ while(<IN>){
 }
 close(IN);
 
-open(IN, "zcat $wd/$control/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat $wd/$control/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $clength = length($_);
@@ -314,7 +317,7 @@ sub mapKmerSub{
     }
     close($fin);
     open($fout, "> $tmpdir/$target.map.$tag");
-    open($fref, "zcat $wd/$ref/ref20_uniq.$tag.gz|");
+    open($fref, "$zcat $wd/$ref/ref20_uniq.$tag.gz|");
     while(<$fref>){
 	chomp;
 	@row = split;
@@ -365,8 +368,8 @@ sub joinKmerSub{
     $cutoff = 10 if $cutoff eq "";
     my $fin = "join.in.$tag";
     my $fout = "join.out.$tag";
-    system("zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
-    system("zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
+    system("$zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
+    system("$zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
 
     open($fout, "> $tmpdir/$target.snp.$tag");
     open($fin, "join $tmpdir/$control.lbc.$tag $tmpdir/$target.lbc.$tag |");
@@ -513,7 +516,7 @@ sub countKmerMerge{
 		$fin = "$parent.$tag.join.in";
 		$fout = "$parent.$tag.join.out";
 		open($fout, "> $tmpdir/$parent.count.tmp");
-		open($fin, "zcat $tmpdir/$parent.$tag.count.gz |join -a 1 -a 2 $tmpdir/$parent.count - |");
+		open($fin, "$zcat $tmpdir/$parent.$tag.count.gz |join -a 1 -a 2 $tmpdir/$parent.count - |");
 		while(<$fin>){
 		    chomp;
 		    @row = split;
@@ -537,7 +540,7 @@ sub countKmerSort{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&report("Making kmer for $target. Sorting of $parent.$tag subfile");
-		system("zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
+		system("$zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
 	    }
 	}
     }
@@ -558,9 +561,9 @@ sub countKmerSub{
     }
     $fin = "$parent.in";
     if (-e "$wd/$target/sort_uniq/$target.sort_uniq.$parent.gz"){
-	open($fin, "zcat $wd/$target/sort_uniq/$target.sort_uniq.$parent.gz 2> /dev/null |");
+	open($fin, "$zcat $wd/$target/sort_uniq/$target.sort_uniq.$parent.gz 2> /dev/null |");
     }else{
-	open($fin, "zcat $wd/$target/sort_uniq/$target.$parent.gz 2> /dev/null |");
+	open($fin, "$zcat $wd/$target/sort_uniq/$target.$parent.gz 2> /dev/null |");
     }
     while(<$fin>){
 	chomp;
@@ -614,7 +617,7 @@ sub mkChrFromFile{
     die "$file is not found in $wd/$ref." if ! -e "$wd/$ref/$file";
     @chr = ();
     if ($file =~ /gz$/){
-	open(IN, "zcat $wd/$ref/$file|");
+	open(IN, "$zcat $wd/$ref/$file|");
     }elsif($file =~ /bz2$/){
 	open(IN, "bzcat $wd/$ref/$file|");
     }else{
@@ -890,7 +893,7 @@ sub mkChr{
     my $i = 0;
     &report("Making chromosome file from $file.");
     if ($ref eq "hg38"){
-	open(IN, "zcat $file|");
+	open(IN, "$zcat $file|");
 	while(<IN>){
 	    chomp;
 	    if (/^>/){
@@ -925,7 +928,7 @@ sub mkChr{
 		&report("Downloading $file");
 		system("curl -O $file");
 		$file = "chr$i.fna.gz";
-		open(IN, "zcat $file|");
+		open(IN, "$zcat $file|");
 		open(OUT, "> chr$i");
 		while(<IN>){
 		    chomp;
@@ -941,7 +944,7 @@ sub mkChr{
 	}
 	
 	if ($file =~ /gz$/){
-	    open(IN, "zcat $file|");
+	    open(IN, "$zcat $file|");
 	}elsif ($file =~ /bz2$/){
 	    open(IN, "bzcat $file|");
 	}elsif ($file =~ /xz$/){
@@ -995,7 +998,7 @@ sub mkSortUniq{
 	}
     }
     if ($gz_file ne ""){
-	$cmd = "cd $wd/$subject/read && zcat $gz_file |";
+	$cmd = "cd $wd/$subject/read && $zcat $gz_file |";
 	&sortUniqSub($cmd, $subject);
     }
     if($bz_file ne ""){
@@ -1026,7 +1029,7 @@ sub mkSortUniq{
 sub sortUniqSort{
     my ($tag, $subject) = @_;
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
-    system("zcat $wd/$subject/sort_uniq/$tag.tmp.gz | sort -T $wd/$subject/sort_uniq/ $sort_opt  | uniq | gzip > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp.gz");
+    system("$zcat $wd/$subject/sort_uniq/$tag.tmp.gz | sort -T $wd/$subject/sort_uniq/ $sort_opt  | uniq | gzip > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp.gz");
     $semaphore->up;
 }
 
@@ -1542,9 +1545,9 @@ sub joinControlFunc{
     my $tag = shift;
     report("Selecting sequence data for verify. $tag");
     if (-e "$wd/$control/sort_uniq/$control.$tag.gz"){
-	system("bash -c \"join <(zcat $wd/$control/sort_uniq/$control.$tag.gz) <(zcat $tmpdir/$tag.gz)$tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
+	system("bash -c \"join <($zcat $wd/$control/sort_uniq/$control.$tag.gz) <($zcat $tmpdir/$tag.gz)$tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }else{
-	system("bash -c \"join <(zcat $wd/$control/sort_uniq/$control.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
+	system("bash -c \"join <($zcat $wd/$control/sort_uniq/$control.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }
     &waitFile("$tmpdir/$tag.control");
     system("rm $tmpdir/$tag.gz");
@@ -1568,7 +1571,7 @@ sub joinControl{
 sub joinTargetFunc{
     my $tag = shift;
     report("Selecting sequence data for verify. $tag");
-    system("bash -c \"join <(zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <(zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
+    system("bash -c \"join <($zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     &waitFile("$tmpdir/$tag.target");
     system("rm $tmpdir/$tag.gz");
     $semaphore->up;
@@ -1602,7 +1605,7 @@ sub sortSeqFunc{
 	}
     }
     $fin = $tag;
-    open($fin, "zcat $tmpdir/$tag.tmp.gz |");
+    open($fin, "$zcat $tmpdir/$tag.tmp.gz |");
     while(<$fin>){
 	$subtag = substr($_, 0, 6);
 	print $subtag $_;
@@ -2109,7 +2112,7 @@ sub mkData4MapFFunc{
 	    }
 	}
     }
-    open($fin, "zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz |");
+    open($fin, "$zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz |");
     while(<$fin>){
 	chomp;
 	foreach $margin ('0', '5', '10', '15'){
@@ -2203,7 +2206,7 @@ sub map{
 
 sub mapFunc{
     my $tag = shift;
-    system("bash -c \"join <(zcat $tmpdir/$tag.gz) <(zcat $refdir/ref20_uniq.$tag.gz) |cut -c 22- > $tmpdir/$tag.map\"");
+    system("bash -c \"join <($zcat $tmpdir/$tag.gz) <($zcat $refdir/ref20_uniq.$tag.gz) |cut -c 22- > $tmpdir/$tag.map\"");
     &waitFile("$tmpdir/$tag.map");
     system("rm $tmpdir/$tag.gz");
     $semaphore->up;
