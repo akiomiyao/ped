@@ -41,7 +41,6 @@ $usage = '
 
 ';
 
-my $max_semaphore = 14;
 my $sort_opt = "-S 1M";
 @nuc = ('A', 'C', 'G', 'T');
 $ENV{LANG} = "C";
@@ -85,25 +84,36 @@ if ($thread ne ""){
     $max_semaphore = $thread;
 }else{
     if ($uname eq "FreeBSD"){
+	die "curl not found. Please install curl." if ! -e "/usr/local/bin/curl";
 	open(IN, "sysctl kern.smp.cpus |");
 	while(<IN>){
 	    chomp;
 	    $processor = (split(': ', $_))[1];
 	}
 	close(IN);
-    }elsif($uname eq "Linux"){
+    }elsif($uname eq "Darwin"){
+	open(IN, "sysctl hw.logicalcpu |");
+	while(<IN>){
+	    chomp;
+	    $processor = (split(': ', $_))[1];
+	}
+	close(IN);
+     }elsif($uname eq "Linux"){
 	open(IN, "/proc/cpuinfo");
 	while(<IN>){
 	    $processor ++  if /processor/;
 	}
 	close(IN);
     }
-    if ($processor > 14 ){
-	$max_semaphore = 14;
-    }else{
-	$max_semaphore = $processor;
-    }
 }
+
+if ($processor > 14 ){
+    $max_semaphore = 14;
+}else{
+    $max_semaphore = $processor;
+}
+
+$max_semaphore = 4 if $max_semaphore eq "";
 
 $semaphore = Thread::Semaphore->new($max_semaphore);
 
@@ -115,7 +125,7 @@ if ($tmpdir eq ""){
 $control = $ref if $control eq "" or $control eq "default";
 
 if (! -e "config"){
-    system("wget https://raw.githubusercontent.com/akiomiyao/ped/master/config");
+    system("curl -O https://raw.githubusercontent.com/akiomiyao/ped/master/config");
 }
 
 open(IN, "config");
@@ -125,7 +135,7 @@ while(<IN>){
     if ($row[1] eq "description"){
 	$desc{$row[0]} = $row[2];
     }elsif($row[1] eq "wget"){
-	$wget{$row[0]} = $row[2];
+	$curl{$row[0]} = $row[2];
     }elsif($row[1] eq "file"){
 	$file{$row[0]} = $row[2];
     }elsif($row[0] eq $ref && $row[1] eq "chromosome"){
@@ -583,11 +593,11 @@ sub mkRef{
     }
     chdir "$wd/$ref";
     if ($file eq ""){
-	@row = split('/', $wget{$ref});
+	@row = split('/', $curl{$ref});
 	$remote_file = $row[$#row];
-	if (! -e "$wd/$ref/$remote_file" and $wget{$ref} ne ""){
-	    &report("Downloading $wget{$ref}");
-	    system("wget $wget{$ref}");
+	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
+	    &report("Downloading $curl{$ref}");
+	    system("curl -O $curl{$ref}");
 	}
 	&mkChr;
     }else{
@@ -874,7 +884,7 @@ sub mk20{
 
 sub mkChr{
     my $output;
-    my @file = split('/', $wget{$ref});
+    my @file = split('/', $curl{$ref});
     my $file = $file[$#file];
     $file =~ s/\ +$//g;
     my $i = 0;
@@ -911,9 +921,9 @@ sub mkChr{
 	    $file =~ s/\.tar\.gz//;
  	}elsif($ref =~ /^B73/){
 	    for ($i = 1; $i <= 10; $i++){
-		$file = $wget{$ref} . "chr$i.fna.gz";
+		$file = $curl{$ref} . "chr$i.fna.gz";
 		&report("Downloading $file");
-		system("wget $file");
+		system("curl -O $file");
 		$file = "chr$i.fna.gz";
 		open(IN, "zcat $file|");
 		open(OUT, "> chr$i");
