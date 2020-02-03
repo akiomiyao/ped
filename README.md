@@ -540,7 +540,7 @@ X       14258766        III     303520  f       translocation   _       6       
 ```
 
 ## Author
-Akio Miyao, Ph.D. miyao@affrc.go.jp  
+MIYAO Akio, Ph.D. miyao@affrc.go.jp  
 Institute of Crop Science / National Agriculture and Food Research Organization  
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 

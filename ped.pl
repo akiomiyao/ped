@@ -82,42 +82,41 @@ $method = "bidirectional" if $method eq "";
 
 $zcat = "zcat";
 
-if ($thread ne ""){
-    $max_semaphore = $thread;
-}else{
-    if ($uname eq "FreeBSD"){
-	die "curl not found. Please install curl." if ! -e "/usr/local/bin/curl";
-	open(IN, "sysctl kern.smp.cpus |");
-	while(<IN>){
-	    chomp;
-	    $processor = (split(': ', $_))[1];
-	}
-	close(IN);
-    }elsif($uname eq "Darwin"){
-	$zcat = "gzcat";
-	open(IN, "sysctl hw.logicalcpu |");
-	while(<IN>){
-	    chomp;
-	    $processor = (split(': ', $_))[1];
-	}
-	close(IN);
-     }elsif($uname eq "Linux"){
-	open(IN, "/proc/cpuinfo");
-	while(<IN>){
-	    $processor ++  if /processor/;
-	}
-	close(IN);
+if ($uname eq "FreeBSD"){
+    die "curl not found. Please install curl." if ! -e "/usr/local/bin/curl";
+    open(IN, "sysctl kern.smp.cpus |");
+    while(<IN>){
+	chomp;
+	$processor = (split(': ', $_))[1];
     }
+    close(IN);
+}elsif($uname eq "Darwin"){
+    $zcat = "gzcat";
+    open(IN, "sysctl hw.logicalcpu |");
+    while(<IN>){
+	chomp;
+	$processor = (split(': ', $_))[1];
+    }
+    close(IN);
+}elsif($uname eq "Linux"){
+    open(IN, "/proc/cpuinfo");
+    while(<IN>){
+	$processor ++  if /processor/;
+    }
+    close(IN);
+}else{
+    die "Operating system is unknown.\n";
 }
 
-if ($processor > 14 ){
+if ($uname eq "Darwin"){
+    $max_semaphore = 3;
+}elsif ($processor > 14 ){
     $max_semaphore = 14;
 }else{
     $max_semaphore = $processor;
 }
-
-$max_semaphore = 4 if $max_semaphore eq "";
-
+$max_semaphore = 3 if $max_semaphore eq "";
+$max_semaphore = $thread if $thread ne "";
 $semaphore = Thread::Semaphore->new($max_semaphore);
 
 $refdir = "$wd/$ref";
@@ -891,7 +890,7 @@ sub mkChr{
     my $file = $file[$#file];
     $file =~ s/\ +$//g;
     my $i = 0;
-    &report("Making chromosome file from $file.");
+    &report("Making chromosome file from $file");
     if ($ref eq "hg38"){
 	open(IN, "$zcat $file|");
 	while(<IN>){
