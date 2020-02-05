@@ -44,7 +44,7 @@ if($ENV{tag} ne ""){
     $workdir     = "$cwd/$target";
     $refdir      = "$cwd/$ref";
     $target_file = "$target.snp.$tag";
-    $ref_file    = "zcat $refdir/ref20_uniq.$tag.gz|";
+    $ref_file    = "$zcat $refdir/ref20_uniq.$tag.gz|";
     $output_file = "$target.map.$tag";
 }elsif($ARGV[0] ne ""){
     $cwd       = `pwd`;
@@ -55,7 +55,7 @@ if($ENV{tag} ne ""){
     $refdir      = "$cwd/$ref";
     $target_file = "cat $workdir/$target.snp.[ACGT][ACGT][ACGT]|";
     $output_file = "$target.map.AAA";
-    $ref_file    = "zcat $refdir/ref20_uniq.*.gz|";
+    $ref_file    = "$zcat $refdir/ref20_uniq.*.gz|";
 }else{
     print $usage;
     exit;

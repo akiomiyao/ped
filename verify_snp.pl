@@ -109,7 +109,7 @@ while(<IN>){
 }
 close(IN);
 
-open(IN, "zcat sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -194,7 +194,7 @@ close(IN);
 system("cat *.snp.sort.$number > target.snp.st.$number");
 &waitFile("target.snp.st.$number");
 system("rm *.snp.sort.$number");
-system("zcat sort_uniq/*.gz 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
+system("$zcat sort_uniq/*.gz 2> /dev/null |join - target.snp.st.$number | cut -d ' ' -f 2- > target.snp.$number");
 &waitFile("target.snp.$number");
 system("rm target.snp.st.$number");
 if($ARGV[0] ne ""){
@@ -217,7 +217,7 @@ if ($control eq "default" or $control eq "" or $control eq $ref){
     }
 }
 
-open(IN, "zcat $control 2> /dev/null |");
+open(IN, "$zcat $control 2> /dev/null |");
 while(<IN>){
     chomp;
     $clength = length($_);
@@ -303,7 +303,7 @@ if($ARGV[0] ne ""){
     &report("Verifying SNPs $number: Selecting reads with control allele");
 }
 system("cat *.snp.sort.$number > snp.sort.$number");
-system("zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
+system("$zcat $control 2> /dev/null | join - snp.sort.$number| cut -d ' ' -f 2- > control.snp.$number");
 &waitFile("control.snp.$number");
 system("rm *.snp.sort.$number");
 if($ARGV[0] ne ""){

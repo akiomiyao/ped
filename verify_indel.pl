@@ -127,7 +127,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "zcat sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -243,7 +243,7 @@ while(<IN>){
 system("cat *.indel_sort.$number > indel_target.st.$number");
 &waitFile("indel_target.st.$number");
 system("rm *.indel_sort.$number");
-system("zcat sort_uniq/*.gz 2> /dev/null | join - indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
+system("$zcat sort_uniq/*.gz 2> /dev/null | join - indel_target.st.$number | cut -d ' ' -f 2- > indel_target.$number");
 &waitFile("indel_target.$number");
 system("rm indel_target.st.$number");
 if ($ARGV[0] ne ""){
@@ -263,7 +263,7 @@ if ($control eq "default" or $control eq "" or $control eq $ref){
     }
 }
 
-open(IN, "zcat $control 2> /dev/null |");
+open(IN, "$zcat $control 2> /dev/null |");
 while(<IN>){
     chomp;
     $clength = length($_);
@@ -380,7 +380,7 @@ while(<IN>){
 &sortTag;
 
 system("cat *.indel_sort.$number > indel_sort.$number");
-system("zcat $control 2> /dev/null | join - indel_sort.$number | cut -d ' ' -f 2- > indel_control.$number");
+system("$zcat $control 2> /dev/null | join - indel_sort.$number | cut -d ' ' -f 2- > indel_control.$number");
 &waitFile("indel_control.$number");
 system("rm *.indel_sort.$number indel_sort.$number");
 if ($ARGV[0] ne ""){

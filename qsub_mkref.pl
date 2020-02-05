@@ -237,7 +237,7 @@ sub mkChr{
     $file =~ s/\ +$//g;
     my $i = 0;
     if ($target eq "hg38"){
-	open(IN, "zcat $file|");
+	open(IN, "$zcat $file|");
 	while(<IN>){
 	    chomp;
 	    if (/^>/){
@@ -272,7 +272,7 @@ sub mkChr{
 		&report("Downloading $file");
 		system("$wget -o wget-log $file");
 		$file = "chr$i.fna.gz";
-		open(IN, "zcat $file|");
+		open(IN, "$zcat $file|");
 		open(OUT, "> chr$i");
 		while(<IN>){
 		    chomp;
@@ -288,7 +288,7 @@ sub mkChr{
 	}
 	
 	if ($file =~ /gz$/){
-	    open(IN, "zcat $file|");
+	    open(IN, "$zcat $file|");
 	}elsif ($file =~ /bz2$/){
 	    open(IN, "bzcat $file|");
 	}elsif ($file =~ /xz$/){
@@ -323,7 +323,7 @@ sub mkChrFromFile{
 	$file = $file[$#file];
     }
     if ($file =~ /gz$/){
-	open(IN, "zcat $file|");
+	open(IN, "$zcat $file|");
     }elsif($file =~ /bz2$/){
 	open(IN, "bzcat $file|");
     }else{

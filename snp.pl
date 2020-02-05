@@ -26,6 +26,20 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$zcat = "zcat";
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $wget = "/usr/local/bin/curl -O";
+    $rsync = "/usr/local/bin/rsync";
+}elsif ($uname eq "Darwin"){
+     $wget = "/usr/bin/curl -O";
+     $zcat = "gzcat";
+}else{
+    $wget = "/usr/bin/curl -O";
+    $rsync = "/usr/bin/rsync";
+}
+
 if($ENV{target} ne ""){
     $target    = $ENV{target};
     $control   = $ENV{control};
@@ -59,8 +73,8 @@ if($ENV{target} ne ""){
     if ($tmpdir eq ""){
 	$tmpdir = $workdir;
 	chdir $tmpdir;
-	system("zcat $controldir/$control.lbc.$tag.gz > $control.lbc.$tag");
-	system("zcat $target.lbc.$tag.gz > $target.lbc.$tag");
+	system("$zcat $controldir/$control.lbc.$tag.gz > $control.lbc.$tag");
+	system("$zcat $target.lbc.$tag.gz > $target.lbc.$tag");
     }else{
 	$tmpdir = "$tmpdir/$target";
 	if (-e $tmpdir){
@@ -87,7 +101,7 @@ if($ENV{target} ne ""){
 	    foreach $c (sort @nuc){
 		$tag = $a . $b. $c;
 		open(OUT, "> $target/$target.snp.$tag");
-		open(IN, "zcat $controldir/$control.lbc.$tag.gz |join - $target/$target.lbc.$tag |");
+		open(IN, "$zcat $controldir/$control.lbc.$tag.gz |join - $target/$target.lbc.$tag |");
 		&snp;
 	    }
 	}

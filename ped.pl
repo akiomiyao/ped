@@ -109,7 +109,7 @@ if ($uname eq "FreeBSD"){
 }
 
 if ($uname eq "Darwin"){
-    $max_semaphore = 3;
+    $max_semaphore = 1;
 }elsif ($processor > 14 ){
     $max_semaphore = 14;
 }else{

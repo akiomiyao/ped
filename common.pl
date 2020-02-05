@@ -16,13 +16,17 @@ if ($cwd eq ""){
     chomp($cwd);
 }
 
+$zcat = "zcat";
 $uname = `uname`;
 chomp($uname);
 if ($uname eq "FreeBSD"){
-    $wget = "/usr/local/bin/wget";
+    $wget = "/usr/local/bin/curl -O";
     $rsync = "/usr/local/bin/rsync";
+}elsif ($uname eq "Darwin"){
+     $wget = "/usr/bin/curl -O";
+     $zcat = "gzcat";
 }else{
-    $wget = "/usr/bin/wget";
+    $wget = "/usr/bin/curl -O";
     $rsync = "/usr/bin/rsync";
 }
 

@@ -43,7 +43,7 @@ foreach(sort grep(! /^\.|download.sh/, readdir(DIR))){
 	    print "Different compression format in read directory is not acceptable.";
 	    exit;
 	}
-	$cmd = "zcat $target/read/* 2> /dev/null |";
+	$cmd = "$zcat $target/read/* 2> /dev/null |";
 	$type = "gz";
     }elsif(/bz2$/){
 	if ($type ne "" and $type ne "bz2"){

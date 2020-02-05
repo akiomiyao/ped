@@ -19,6 +19,20 @@ Author: Akio Miyao <miyao@affrc.go.jp>
 
 ';
 
+$zcat = "zcat";
+$uname = `uname`;
+chomp($uname);
+if ($uname eq "FreeBSD"){
+    $wget = "/usr/local/bin/curl -O";
+    $rsync = "/usr/local/bin/rsync";
+}elsif ($uname eq "Darwin"){
+     $wget = "/usr/bin/curl -O";
+     $zcat = "gzcat";
+}else{
+    $wget = "/usr/bin/curl -O";
+    $rsync = "/usr/bin/rsync";
+}
+
 if ($ARGV[0] ne ""){
     print $usage;
     exit;
@@ -49,7 +63,7 @@ sub cluster{
     
     $output_file = "$target.lbc.$tag";
     
-    open(IN, "/usr/bin/zcat $target.count.$tag.gz|");
+    open(IN, "$zcat $target.count.$tag.gz|");
     open(OUT, "> $output_file");
     while(<IN>){
 	chomp;

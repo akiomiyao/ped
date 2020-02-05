@@ -28,9 +28,9 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
 ## Simplified instruction
-- The ped.pl is a multithreaded script, suitable for multi-core CPU like as 16 or 8 cores.  
+- The ped.pl is a multithreaded script, suitable for the multi-core CPU like as 16 or 8 cores.  
   Of course, the ped.pl can run with the 2 or single core machine, but slow.  
-  The ped.pl runs on Linux (FreeBSD) machine with at least 4 GB RAM and 1 TB hard disk (or SSD).  
+  The ped.pl runs on Linux (FreeBSD) machine and Mac with at least 4 GB RAM and 1 TB hard disk (or SSD).  
   Using the docker container is recommended, because programs for downloading short read sequences and scripts have been set up in the container.  
   Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
 ```
@@ -66,7 +66,7 @@ To kill running container,
 ```
 sudo docker kill Container_ID
 ```
-If you want run docker without sudo or su,
+If you want run the docker container without sudo or su,
 ```
 sudo usermod -a -G docker your_username
 ```
@@ -74,7 +74,7 @@ After the new login, docker commands can be execute with your account.
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
-- Programs run on Unix platforms (FreeBSD, Linux).  
+- Programs run on Unix platforms (FreeBSD, Linux) and Mac.  
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 ```
@@ -87,8 +87,8 @@ git pull
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
-- To download reference data, wget is required.  
-    If your machine do not have wget program, install wget from package.  
+- To download reference data, curl is required.  
+    If your machine do not have curl program, install curl from package.  
 
 ## Instruction for bidirectional method  
 ```
@@ -258,12 +258,12 @@ or
 ```
 perl kmer.pl ERR3063487 default WBcel235  
 ```
-- ERR3063487.kmer.snp is list of SNPs.  
+- ERR3063487.kmer.snp is the list of SNPs.  
   ERR3063487.kmer.vcf is the vcf file for SNPs.   
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
   Please check quarity of polymorphism with depth (DP) in vcf file.  
-- The *k*-mer method is able to detect polymorphisms by direct comparison between two short read data.  
+- The *k*-mer method is able to detect polymorphisms by the direct comparison between two short read data.  
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  
   For example,  
@@ -278,13 +278,13 @@ or
 ```
 perl qsub_kmer.pl ERR3063487 ERR3063486  
 ```
-- ERR3063487.kmer is list of polymorphic edge.  
-  SNPs tagged with first 19-mer will be used for genetic analysis,  
+- ERR3063487.kmer is the list of polymorphic edge.  
+  SNPs tagged with first 19-mer will be used for the genetic analysis,  
   such as segregation analysis.  
-  The 19-mer can be used for identifire (name) for analysis.  
+  The 19-mer can be used as the identifire (*i.e.* name) for analysis.  
 
 ## Examples of result
-A part of SNP list of bidirectional method is  
+A part of SNP list of the bidirectional method is  
 ```
 1       994949  C       T       11      50      0       21      17      H
 1       994962  G       T       1       50      0       21      0       
@@ -306,7 +306,7 @@ Column 9: Number of reads in the target sort_uniq file with target type polymorp
 Column 10: Genotype (M: homozygous, H: heterozygous)
 ```
 
-- A part of structural variation result is
+- A part of the structural variation result is
 ```
 1       923312  1       923312  f       deletion        -1      50      0       0       31      M
 1       931147  1       931131  f       insertion       4       50      0       5       19              CCCTCCCTCCC
@@ -332,7 +332,7 @@ Column 12: Genotype (M: homozygous, H: heterozygous)
 Column 13: Sequence between junctions
 ```
 
-- A part of SNP result by *k*-mer method is
+- A part of SNP result by the *k*-mer method is
 ```
 X       54009891        AAAAAAAAAAGTGGCTCTT     T       T       GT      f       0       0       0       40      1       1       17      21      50      0       12      0       
 6       112904084       AAACGACACTTTTTTTTTT     C       C       AC      r       0       0       40      0       0       1       31      22      50      0       30      0       

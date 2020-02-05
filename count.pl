@@ -65,7 +65,7 @@ sub cluster{
 
     chdir $tmpdir;
     
-    open(IN, "zcat $input_file 2> /dev/null |");
+    open(IN, "$zcat $input_file 2> /dev/null |");
     open(OUT, "|sort $sort_opt -T $tmpdir | uniq -c | awk '{print \$2 \"\t\" \$1}' | /usr/bin/perl $cwd/split_count.pl");
     while(<IN>){
 	chomp;
@@ -90,7 +90,7 @@ sub standalone{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$j++;
-		open(IN, "zcat sort_uniq/$target.sort_uniq.$tag.gz 2> /dev/null |");
+		open(IN, "$zcat sort_uniq/$target.sort_uniq.$tag.gz 2> /dev/null |");
 		$number = "000$j";
 		$number = substr($number, length($number) -4, 4);
 		&report("$target.sort_uniq.$tag.gz $j/64 is processing.");

@@ -115,7 +115,7 @@ foreach $i (@chr){
     close(IN);
 }
 
-open(IN, "zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $length = length($_);
@@ -129,7 +129,7 @@ if($ARGV[0] ne ""){
     &report("Aligning of $target sequence to $ref genome. margin = $margin: Dividing the sort_uniq sequence");
 }
 
-open(IN, "zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
+open(IN, "$zcat $targetdir/sort_uniq/*.gz 2> /dev/null |");
 while(<IN>){
     chomp;
     $head_pos = $margin + 1;
@@ -194,7 +194,7 @@ sub map{
 		}
 		system("sort $sort_opt -T $targetdir $targetdir/$tag.tmp.$margin > $targetdir/$tag.$margin");
 		&waitFile("$targetdir/$tag.$margin");
-		system("zcat $refdir/ref20_uniq.$tag.gz | join $targetdir/$tag.$margin - |cut -c 22- > $targetdir/$tag.map.$margin");
+		system("$zcat $refdir/ref20_uniq.$tag.gz | join $targetdir/$tag.$margin - |cut -c 22- > $targetdir/$tag.map.$margin");
 		&waitFile("$targetdir/$tag.map.$margin");
 		system("rm $targetdir/$tag.tmp.$margin $targetdir/$tag.$margin");
 	    }
