@@ -444,7 +444,7 @@ foreach $dat (sort keys %all){
     $cm += 0;
     $tw += 0;
     $tm += 0;
-    $genotype = "";
+    $genotype = "_";
     if ($cw >= 5 and $cm <= 1){
         if ($tm >= 5 and $tw <= 1){
             $genotype = 'M';
@@ -457,8 +457,7 @@ foreach $dat (sort keys %all){
 	print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$row[4]\n";
     }else{
 	if ($row[5] =~ /inv|trans/){
-	    $row[7] = $row[6];
-	    $row[6] = "";
+	    $row[6] = "_";
 	}
 	print OUT "$row[0]\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$row[7]\n";
     }

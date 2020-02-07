@@ -223,6 +223,7 @@ if ($method eq "kmer"){
 }else{
     &bidirectional;
 }
+
 if ($tmpdir eq "$wd/$target/tmp"){
     system("rm -r $tmpdir");
 }else{
@@ -248,6 +249,7 @@ sub kmer{
     &sortSeq;
     &joinControl;
     &kmerReadCount;
+    &primer;
     &toVcf;
 }
 
@@ -273,6 +275,7 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &svReadCount;
+    &primer(sv);
     &snpMkT;
     &sortSeq;
     &joinTarget;
@@ -280,7 +283,133 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &snpReadCount;
+    &primer;
     &toVcf;
+}
+
+sub primer{
+    report("Output primer sequences.");
+    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $fpos, $rpos, $length, $tg, $head, $tail, $type);
+    $type = shift;
+    if ($type eq "sv"){
+	open(IN, "$wd/$target/$target.sv");
+	open(OUT, "> $wd/$target/$target.sv.primer");
+    }else{
+	if ($method eq "kmer"){
+	    open(IN, "$wd/$target/$target.kmer.snp");
+	    open(OUT, "> $wd/$target/$target.kmer.primer");
+	}else{
+	    open(IN, "$wd/$target/$target.bi.snp");
+	    open(OUT, "> $wd/$target/$target.bi.primer");
+	}
+    }
+    while(<IN>){
+	next if ! /H|M/;
+	@row = split('\t', $_);
+	$dat = $_;
+	chomp($dat);
+	if ($prev_chr ne $row[0]){
+	    open(CHR, "$wd/$ref/chr$row[0]");
+	    binmode(CHR);
+	}
+	$prev_chr = $row[0];
+	@f = ();
+	@r = ();
+	
+	if ($type eq "sv"){
+	    seek(CHR, $row[1] - 250, 0);
+	    read(CHR, $head, 250);
+	    if ($row[0] ne $row[2]){
+		open(CHRT, "$wd/$ref/chr$row[2]");
+		binmode(CHRT);
+		seek(CHRT, $row[3], 0);
+		read(CHRT, $tail, 250);
+		close(CHRT);
+	    }
+	    for($i = 0; $i < 200; $i++){
+		$f = substr($head, $i, 20);
+		($gc = $f) =~ y/AT//d;
+		if (length($gc) == 11){
+		    push(@f, $f);
+		}
+	    }
+	    for($i = 50; $i < 230; $i++){
+		$r = substr($tail, $i, 20);
+		($gc = $r) =~ y/AT//d;
+		if (length($gc) == 11){
+		    push(@r, &complement($r));
+		}
+	    }
+	}else{
+	    seek(CHR, $row[1] - 250, 0);
+	    read(CHR, $seq, 500);
+	    
+	    for($i = 0; $i < 180; $i++){
+		$f = substr($seq, $i, 20);
+		($gc = $f) =~ y/AT//d;
+		if (length($gc) == 11){
+		    push(@f, $f);
+		}
+	    }
+	    for($i = 300; $i < 480; $i++){
+		$r = substr($seq, $i, 20);
+		($gc = $r) =~ y/AT//d;
+		if (length($gc) == 11){
+		    push(@r, &complement($r));
+		}
+	    }
+	}
+
+	$flag = 0;
+	foreach $f (reverse @f){
+	    last if $flag;
+	    foreach $r (@r){
+		if (&checkDimer($f, $r)){
+		    if ($type eq "sv"){
+			$fpos = index($head, $f, 0);
+			$rpos = index($tail, complement($r), 0);
+			$length = 250 - $fpos + $rpos - length($row[12]);
+			$tg = substr($head, 229, 20) . " " . substr($tail, 0, 20);
+		    }else{
+			$fpos = index($seq, $f, 0);
+			$rpos = index($seq, complement($r), 0);
+			$length = $rpos - $fpos + 20;
+			$tg = substr($seq, 229, 40);
+		    }
+		    print OUT "$dat\t$f\t$r\t$length\t$tg\n";
+		    $flag = 1;
+		    last;
+		}	   
+	    }
+	}
+	if (! $flag){
+	    print OUT "$dat\n";
+	}
+    }
+    close(IN);
+    close(CHR);
+    close(OUT);
+    report("Output primer sequences. complete");
+}
+
+sub checkDimer{
+    my ($f, $r) = @_;
+    my @f = split('', $f);
+    my @r = split('', $r);
+    for ($i = 3; $i < 20; $i++){
+        my $match = 0;
+        for ($j = 0; $j < $i; $j++){
+            my $fn = $f[20 - $i + $j];
+            my $rn = &complement($r[19 - $j]);
+            if ($fn eq $rn){
+                $match ++;
+            }
+        }
+        if ($match >= $i - 1){
+            return 0;
+        }
+    }
+    return 1;
 }
 
 sub mapKmer{
@@ -1333,6 +1462,7 @@ sub svReadCount{
 		$prev[7] = $prev[6];
 		$prev[6] = "_";
 	    }
+	    $prev[7] = "_" if $prev[7] eq "";
 	    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n" if $prev ne "";
 	    $cm = 0;
 	    $cw = 0;
@@ -1358,6 +1488,7 @@ sub svReadCount{
 	$prev[7] = $prev[6];
 	$prev[6] = "_";
     }
+    $prev[7] = "_" if $prev[7] eq "";
     print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
     close(OUT);
 }

@@ -380,7 +380,7 @@ while(<IN>){
     $cm += 0;
     $tw += 0;
     $tm += 0;
-    $genotype = "";
+    $genotype = "_";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
