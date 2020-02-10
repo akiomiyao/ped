@@ -289,7 +289,7 @@ sub bidirectional{
 
 sub primer{
     report("Output primer sequences.");
-    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $fpos, $rpos, $length, $tg, $head, $tail, $type);
+    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $type);
     $type = shift;
     if ($type eq "sv"){
 	open(IN, "$wd/$target/$target.sv");
@@ -317,7 +317,19 @@ sub primer{
 	@r = ();
 	
 	if ($type eq "sv"){
-	    seek(CHR, $row[1] - 250, 0);
+	    if($row[5] =~/ins|del/){
+		if ($row[1] <= $row[3]){
+		    $hpos = $row[1];
+		    $tpos = $row[3]
+		}else{
+		    $hpos = $row[3];
+		    $tpos = $row[1]
+		}
+	    }else{
+		    $hpos = $row[1];
+		    $tpos = $row[3]
+	    }
+	    seek(CHR, $hpos - 250, 0);
 	    read(CHR, $head, 250);
 	    if ($row[0] ne $row[2]){
 		open(CHRT, "$wd/$ref/chr$row[2]");
@@ -325,6 +337,13 @@ sub primer{
 		seek(CHRT, $row[3], 0);
 		read(CHRT, $tail, 250);
 		close(CHRT);
+	    }elsif($row[5] =~/inversion/){
+		seek(CHR, $tpos, 0);
+		read(CHR, $tail, 250);
+		$tail = &complement($tail);
+	    }else{
+		seek(CHR, $tpos, 0);
+		read(CHR, $tail, 250);
 	    }
 	    for($i = 0; $i < 200; $i++){
 		$f = substr($head, $i, 20);
@@ -359,7 +378,6 @@ sub primer{
 		}
 	    }
 	}
-
 	$flag = 0;
 	foreach $f (reverse @f){
 	    last if $flag;
@@ -381,9 +399,6 @@ sub primer{
 		    last;
 		}	   
 	    }
-	}
-	if (! $flag){
-	    print OUT "$dat\n";
 	}
     }
     close(IN);
@@ -1292,7 +1307,7 @@ sub snpMkT{
 	}else{
 	    ($count, $chr, $pos, $ref, $alt) = split;
 	}
-	$chr += 0 if $chr !~ /[IVXYZ]/;
+	$chr =~ s/^0+//g;
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
@@ -1366,7 +1381,7 @@ sub snpMkC{
 	}else{
 	    ($count, $chr, $pos, $ref, $alt) = split;
 	}
-	$chr += 0 if $chr !~ /[IVXYZ]/;
+	$chr =~ s/^0+//g;
 	if ($prev_chr ne $chr){
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
@@ -1871,6 +1886,7 @@ sub svMkC{
 	}else{
 	    $inside = substr($row[5], $posb, $posa - $posb -1);
 	    seek(HIN, $hpos - $clength, 0);
+	    next if $clength - ($posa - $posb -1) -1 <= 0;
 	    read(HIN, $head, $clength - ($posa - $posb -1) -1);
 	    next if length($head) != $clength - ($posa - $posb -1) -1;
 	    if ($direction eq "f"){
