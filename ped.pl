@@ -81,6 +81,7 @@ chomp($uname);
 $method = "bidirectional" if $method eq "";
 
 $zcat = "zcat";
+$zcat = "unpigz -c" if -e "/usr/bin/unpigz"; 
 
 if ($uname eq "FreeBSD"){
     die "curl not found. Please install curl." if ! -e "/usr/local/bin/curl";
@@ -762,7 +763,11 @@ sub mkChrFromFile{
     if ($file =~ /gz$/){
 	open(IN, "$zcat $wd/$ref/$file|");
     }elsif($file =~ /bz2$/){
-	open(IN, "bzcat $wd/$ref/$file|");
+	if (-e "/usr/bin/pbzip2"){
+	    open(IN, "pbzip2 -cd $wd/$ref/$file|");
+	}else{
+	    open(IN, "bzcat $wd/$ref/$file|");
+	}
     }else{
 	open(IN, "$wd/$ref/$file");
     }
@@ -1089,7 +1094,11 @@ sub mkChr{
 	if ($file =~ /gz$/){
 	    open(IN, "$zcat $file|");
 	}elsif ($file =~ /bz2$/){
-	    open(IN, "bzcat $file|");
+	    if (-e "/usr/bin/pbzip2"){
+		open(IN, "pbzip2 -cd $wd/$ref/$file|");
+	    }else{
+		open(IN, "bzcat $file|");
+	    }
 	}elsif ($file =~ /xz$/){
 	    open(IN, "xzcat $file|");
 	}else{
@@ -1131,21 +1140,17 @@ sub mkSortUniq{
 	}
     }
     close(DIR);
-    system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip > $wd/$subject/sort_uniq/$tag.tmp.gz");
-	    }
-	}
-    }
+
     if ($gz_file ne ""){
 	$cmd = "cd $wd/$subject/read && $zcat $gz_file |";
 	&sortUniqSub($cmd, $subject);
     }
     if($bz_file ne ""){
-	$cmd = "cd $wd/$subject/read && bzcat $bz_file |";
+	if (-e "/usr/bin/pbzip2"){
+	    $cmd = "cd $wd/$subject/read && pbzip2 -cd $bz_file |";
+	}else{
+	    $cmd = "cd $wd/$subject/read && bzcat $bz_file |";
+	}
 	&sortUniqSub($cmd, $subject);
     }
     if($xz_file ne ""){
@@ -1156,7 +1161,7 @@ sub mkSortUniq{
 	$cmd = "cd $wd/$subject/read && cat $fq_file |";
 	&sortUniqSub($cmd, $subject);
     }
-    &closeTag;
+
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -1171,8 +1176,18 @@ sub mkSortUniq{
 
 sub sortUniqSort{
     my ($tag, $subject) = @_;
+    my ($nuca, $nucb, $nucc, $subtag);
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
-    system("$zcat $wd/$subject/sort_uniq/$tag.tmp.gz | sort -T $wd/$subject/sort_uniq/ $sort_opt  | uniq | gzip > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp.gz");
+    system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$subtag = $tag . $nuca . $nucb . $nucc;
+		system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$subtag.tmp | uniq >> $wd/$subject/sort_uniq/$subject.sort_uniq.$tag && rm $wd/$subject/sort_uniq/$subtag.tmp");
+	    }
+	}
+    }
+    system("gzip $wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
     $semaphore->up;
 }
 
@@ -1180,6 +1195,16 @@ sub sortUniqSub{
     my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
+    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $subtag, $count, $complement, $total);
+    system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		open($tag, " > $wd/$subject/sort_uniq/$tag.tmp");
+	    }
+	}
+    }
     open(IN, $cmd);
     while(<IN>){
 	if ($count == 1 and !/N/){
@@ -1199,6 +1224,37 @@ sub sortUniqSub{
 	$count++;
     }
     close(IN);
+    &closeTag;
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		open($tag, "$wd/$subject/sort_uniq/$tag.tmp");
+		foreach $nucd (@nuc){
+		    foreach $nuce (@nuc){
+			foreach $nucf (@nuc){
+			    $subtag = $tag . $nucd . $nuce . $nucf;
+			    open ($subtag, "> $wd/$subject/sort_uniq/$subtag.tmp");
+			}
+		    }
+		}
+		while(<$tag>){
+		    $subtag = substr($_, 0, 6);
+		    print $subtag $_;
+		}
+		close($tag);
+		system("rm $wd/$subject/sort_uniq/$tag.tmp");
+		foreach $nucd (@nuc){
+		    foreach $nuce (@nuc){
+			foreach $nucf (@nuc){
+			    $subtag = $tag. $nucd . $nuce . $nucf;
+			    close($subtag);
+			}
+		    }
+		}
+	    }
+	}
+    }
 }
 
 sub toVcf{
@@ -1274,10 +1330,8 @@ sub snpMkT{
 	chomp;
 	if ($method eq "kmer"){
 	    @row = split;
-	    if ($row[0] !~/[IVXYZ]/){
-		$row[0] = "000" . $row[0];
-		$row[0] = substr($row[0], length($row[0]) -3, 3);
-	    }
+	    $row[0] = "000" . $row[0];
+	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	    $row[1] = "000000000000" . $row[1];
 	    $row[1] = substr($row[1], length($row[1]) -11, 11);
 	    $ref = $row[4];
@@ -1286,10 +1340,8 @@ sub snpMkT{
 	    print $fout "$row[0] $row[1] $ref $alt\n";
 	}elsif (/^#/ and /snp/){
 	    @row = split;
-	    if ($row[1] !~/[IVXYZ]/){
-		$row[1] = "000" . $row[1];
-		$row[1] = substr($row[1], length($row[1]) -3, 3);
-	    }
+	    $row[1] = "000" . $row[1];
+	    $row[1] = substr($row[1], length($row[1]) -3, 3);
 	    $row[2] = "000000000000" . $row[2];
 	    $row[2] = substr($row[2], length($row[2]) -11, 11);
 	    print $fout "$row[1] $row[2] $row[4] $row[5]\n";
@@ -1441,10 +1493,8 @@ sub svReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
-	    $row[0] = "000" . $row[0];
-	    $row[0] = substr($row[0], length($row[0]) -3, 3);
-	}
+	$row[0] = "000" . $row[0];
+	$row[0] = substr($row[0], length($row[0]) -3, 3);
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(" ", @row);
@@ -1458,9 +1508,7 @@ sub svReadCount{
     foreach (sort keys %count){
 	$count = $count{$_};
 	@row = split;
-	if($row[0] !~/[IVXYZ]/){
-	    $row[0] += 0;
-	}
+	$row[0] =~ s/^0+//g;
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
@@ -1625,10 +1673,8 @@ sub snpReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
-	    $row[0] = "000" . $row[0];
-	    $row[0] = substr($row[0], length($row[0]) -3, 3);
-	}
+	$row[0] = "000" . $row[0];
+	$row[0] = substr($row[0], length($row[0]) -3, 3);
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(":", @row);
@@ -1647,9 +1693,7 @@ sub snpReadCount{
 	chomp;
 	($count, $dat) = split;
 	@row = split(':', $dat);
-	if($row[0] !~/[IVXYZ]/){
-	    $row[0] += 0;
-	}
+	$row[0] =~ s/^0+//g;
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
@@ -2114,12 +2158,8 @@ sub svSort{
 	if (/ion/){
 	    $flag = 1;
 	    @row = split;
-	    if ($row[1] !~/[IVXYZ]/){
-		$chr = "000$row[1]";
-		$chr = substr($chr, length($chr) - 3, 3);
-	    }else{
-		$chr = $row[1];
-	    }
+	    $chr = "000$row[1]";
+	    $chr = substr($chr, length($chr) - 3, 3);
 	    $pos = "00000000000" . $row[2];
 	    $pos = substr($pos, length($pos) - 11, 11);
 	    if ($row[7] eq ""){
