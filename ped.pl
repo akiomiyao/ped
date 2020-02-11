@@ -81,7 +81,6 @@ chomp($uname);
 $method = "bidirectional" if $method eq "";
 
 $zcat = "zcat";
-$zcat = "unpigz -c" if -e "/usr/bin/unpigz"; 
 
 if ($uname eq "FreeBSD"){
     die "curl not found. Please install curl." if ! -e "/usr/local/bin/curl";
@@ -763,11 +762,7 @@ sub mkChrFromFile{
     if ($file =~ /gz$/){
 	open(IN, "$zcat $wd/$ref/$file|");
     }elsif($file =~ /bz2$/){
-	if (-e "/usr/bin/pbzip2"){
-	    open(IN, "pbzip2 -cd $wd/$ref/$file|");
-	}else{
-	    open(IN, "bzcat $wd/$ref/$file|");
-	}
+	open(IN, "bzcat $wd/$ref/$file|");
     }else{
 	open(IN, "$wd/$ref/$file");
     }
@@ -1094,11 +1089,7 @@ sub mkChr{
 	if ($file =~ /gz$/){
 	    open(IN, "$zcat $file|");
 	}elsif ($file =~ /bz2$/){
-	    if (-e "/usr/bin/pbzip2"){
-		open(IN, "pbzip2 -cd $wd/$ref/$file|");
-	    }else{
-		open(IN, "bzcat $file|");
-	    }
+	    open(IN, "bzcat $file|");
 	}elsif ($file =~ /xz$/){
 	    open(IN, "xzcat $file|");
 	}else{
