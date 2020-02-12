@@ -392,7 +392,8 @@ sub primer{
 			$fpos = index($seq, $f, 0);
 			$rpos = index($seq, complement($r), 0);
 			$length = $rpos - $fpos + 20;
-			$tg = substr($seq, 229, 40);
+			@row = split('\t', $dat);
+			$tg = substr($seq, 99, 150) . "[$row[3]/$row[2]]" . substr($seq, 250, 149);
 		    }
 		    print OUT "$dat\t$f\t$r\t$length\t$tg\n";
 		    $flag = 1;
