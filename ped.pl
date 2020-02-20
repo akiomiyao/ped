@@ -738,13 +738,12 @@ sub mkRef{
     if (! -e "$wd/$ref"){
 	system("mkdir $wd/$ref");
     }
-    chdir "$wd/$ref";
     if ($file eq ""){
 	@row = split('/', $curl{$ref});
 	$remote_file = $row[$#row];
 	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
 	    &report("Downloading $curl{$ref}");
-	    system("curl -O $curl{$ref}");
+	    system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
 	}
 	&mkChr;
     }else{
@@ -1854,15 +1853,18 @@ sub svMkC{
 	if ($posa < $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
 	    seek(HIN, $hpos - $clength + ($posb - $posa -1), 0);
+	    next if $clength - ($posb - $posa -1) -1 < 0;
 	    read(HIN, $head, $clength - ($posb - $posa -1) -1);
 	    next if length($head) != $clength - ($posb - $posa -1) -1;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos, 0);
+		    next if $clength - ($posb - $posa -1) -1 < 0;
 		    read(HIN, $tail, $clength - ($posb - $posa -1) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos, 0);
+		    next if $clength - ($posb - $posa -1) -1 < 0;
 		    read(IN, $tail, $clength - ($posb - $posa -1) -1);
 		    close(IN);
 		}
@@ -1870,16 +1872,18 @@ sub svMkC{
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos - $clength + ($posb - $posa -1), 0);
-		    read(HIN, $tail, $clength -($posb - $posa -1)-1);
+		    next if $clength - ($posb - $posa -1) -1 < 0;
+		    read(HIN, $tail, $clength - ($posb - $posa -1) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $clength + ($posb - $posa -1), 0);
+		    next if $clength - ($posb - $posa -1) -1 < 0;
 		    read(IN, $tail, $clength - ($posb - $posa -1) -1);
 		    close(IN);
 		    $tail = &complement($tail);
 		}
-		next if length($tail) != $clength -($posb - $posa -1)-1;
+		next if length($tail) != $clength - ($posb - $posa -1) -1;
 	    }
 	    seek(HIN, $hpos - $clength, 0);
 	    read(HIN, $ref_seq, $clength * 2 -1);
@@ -1888,15 +1892,18 @@ sub svMkC{
 	}elsif($posa == $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
 	    seek(HIN, $hpos - $clength + ($posb - $posa), 0);
+	    next if $clength - ($posb - $posa -1) -2 < 0;
 	    read(HIN, $head, $clength - ($posb - $posa -1) -2);
 	    next if length($head) != $clength - ($posb - $posa -1) -2;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos, 0);
+		    next if $clength - ($posb - $posa) -1 < 0;
 		    read(HIN, $tail, $clength - ($posb - $posa) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos, 0);
+		    next if $clength - ($posb - $posa) -1 < 0;
 		    read(IN, $tail, $clength - ($posb - $posa) -1);
 		    close(IN);
 		}
@@ -1904,16 +1911,18 @@ sub svMkC{
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos- $clength + ($posb - $posa), 0);
-		    read(HIN, $tail, length -($posb - $posa)-1);
+		    next if $clength - ($posb - $posa) -1 < 0;
+		    read(HIN, $tail, $clength - ($posb - $posa) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $clength + ($posb - $posa), 0);
-		    read(IN, $tail, $clength -($posb - $posa)-1);
+		    next if $clength - ($posb - $posa) -1;
+		    read(IN, $tail, $clength - ($posb - $posa) -1);
 		    close(IN);
 		    $tail = &complement($tail);
 		}
-		next if length($tail) != $clength -($posb - $posa)-1;
+		next if length($tail) != $clength - ($posb - $posa) -1;
 	    }
 	    seek(HIN, $hpos - $clength, 0);
 	    read(HIN, $ref_seq, $clength * 2 -1);
@@ -1922,27 +1931,31 @@ sub svMkC{
 	}else{
 	    $inside = substr($row[5], $posb, $posa - $posb -1);
 	    seek(HIN, $hpos - $clength, 0);
-	    next if $clength - ($posa - $posb -1) -1 <= 0;
+	    next if $clength - ($posa - $posb -1) -1 < 0;
 	    read(HIN, $head, $clength - ($posa - $posb -1) -1);
 	    next if length($head) != $clength - ($posa - $posb -1) -1;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos + ($posa - $posb -1), 0);
+		    next if $clength - ($posa - $posb -1) -1 < 0;
 		    read(HIN, $tail, $clength - ($posa - $posb -1) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos + ($posa - $posb -1), 0);
+		    next if $clength - ($posa - $posb -1) -1 < 0;
 		    read(IN, $tail, $clength - ($posa - $posb -1) -1);
 		    close(IN);
 		}
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos - $clength, 0);
+		    next if $clength - ($posa - $posb -1) -1 < 0;
 		    read(HIN, $tail, $clength - ($posa - $posb -1) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $clength, 0);
+		    next if  $clength - ($posa - $posb -1) -1 < 0;
 		    read(IN, $tail, $clength - ($posa - $posb -1) -1);
 		    close(IN);
 		    $tail = &complement($tail);
@@ -2013,15 +2026,18 @@ sub svMkT{
 	if ($posa < $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
 	    seek(HIN, $hpos - $length + ($posb - $posa -1), 0);
+	    next if $length - ($posb - $posa -1) -1 < 0;
 	    read(HIN, $head, $length - ($posb - $posa -1) -1);
 	    next if length($head) != $length - ($posb - $posa -1) -1;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos, 0);
+		    next if $length - ($posb - $posa -1) -1 < 0;
 		    read(HIN, $tail, $length - ($posb - $posa -1) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos, 0);
+		    next if $length - ($posb - $posa -1) -1 < 0;
 		    read(IN, $tail, $length - ($posb - $posa -1) -1);
 		    close(IN);
 		}
@@ -2029,16 +2045,18 @@ sub svMkT{
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos - $length + ($posb - $posa -1), 0);
-		    read(HIN, $tail, $length -($posb - $posa -1)-1);
+		    next if $length - ($posb - $posa -1) -1 < 0;
+		    read(HIN, $tail, $length - ($posb - $posa -1) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $length + ($posb - $posa -1), 0);
+		    next if $length - ($posb - $posa -1) -1 < 0;
 		    read(IN, $tail, $length - ($posb - $posa -1) -1);
 		    close(IN);
 		    $tail = &complement($tail);
 		}
-		next if length($tail) != $length -($posb - $posa -1)-1;
+		next if length($tail) != $length - ($posb - $posa -1) -1;
 	    }
 	    seek(HIN, $hpos - $length, 0);
 	    read(HIN, $ref_seq, $length * 2 -1);
@@ -2047,15 +2065,18 @@ sub svMkT{
 	}elsif($posa == $posb){
 	    $inside = substr($row[5], $posa -1, $posb - $posa + 1);
 	    seek(HIN, $hpos - $length + ($posb - $posa), 0);
+	    next if $length - ($posb - $posa -1) -2 < 0;
 	    read(HIN, $head, $length - ($posb - $posa -1) -2);
 	    next if length($head) != $length - ($posb - $posa -1) -2;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos, 0);
+		    next if $length - ($posb - $posa) -1 < 0;
 		    read(HIN, $tail, $length - ($posb - $posa) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos, 0);
+		    next if $length - ($posb - $posa) -1 < 0;
 		    read(IN, $tail, $length - ($posb - $posa) -1);
 		    close(IN);
 		}
@@ -2063,16 +2084,18 @@ sub svMkT{
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos- $length + ($posb - $posa), 0);
-		    read(HIN, $tail, length -($posb - $posa)-1);
+		    next if $length - ($posb - $posa) -1 < 0;
+		    read(HIN, $tail, $length - ($posb - $posa) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $length + ($posb - $posa), 0);
-		    read(IN, $tail, $length -($posb - $posa)-1);
+		    next if $length - ($posb - $posa) -1 < 0;
+		    read(IN, $tail, $length - ($posb - $posa) -1);
 		    close(IN);
 		    $tail = &complement($tail);
 		}
-		next if length($tail) != $length -($posb - $posa)-1;
+		next if length($tail) != $length - ($posb - $posa) -1;
 	    }
 	    seek(HIN, $hpos - $length, 0);
 	    read(HIN, $ref_seq, $length * 2 -1);
@@ -2081,26 +2104,31 @@ sub svMkT{
 	}else{
 	    $inside = substr($row[5], $posb, $posa - $posb -1);
 	    seek(HIN, $hpos - $length, 0);
+	    next if $length - ($posa - $posb -1) -1 < 0;
 	    read(HIN, $head, $length - ($posa - $posb -1) -1);
 	    next if length($head) != $length - ($posa - $posb -1) -1;
 	    if ($direction eq "f"){
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos + ($posa - $posb -1), 0);
+		    next if $length - ($posa - $posb -1) -1 < 0;
 		    read(HIN, $tail, $length - ($posa - $posb -1) -1);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos + ($posa - $posb -1), 0);
+		    next if $length - ($posa - $posb -1) -1 < 0;
 		    read(IN, $tail, $length - ($posa - $posb -1) -1);
 		    close(IN);
 		}
 	    }else{
 		if ($tchr eq $hchr){
 		    seek(HIN, $tpos - $length, 0);
+		    next if $length - ($posa - $posb -1) -1 < 0;
 		    read(HIN, $tail, $length - ($posa - $posb -1) -1);
 		    $tail = &complement($tail);
 		}else{
 		    open(IN, "$refdir/chr$tchr");
 		    seek(IN, $tpos - $length, 0);
+		    next if $length - ($posa - $posb -1) -1 < 0;
 		    read(IN, $tail, $length - ($posa - $posb -1) -1);
 		    close(IN);
 		    $tail = &complement($tail);
