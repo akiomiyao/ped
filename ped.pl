@@ -757,6 +757,7 @@ sub mkRef{
 sub mkChrFromFile{
     &report("Making chromosome file.");
     my $out;
+    chdir "$wd/$ref";
     die "$file is not found in $wd/$ref." if ! -e "$wd/$ref/$file";
     @chr = ();
     if ($file =~ /gz$/){
@@ -784,6 +785,7 @@ sub mkChrFromFile{
     }
     close(IN);
     close(OUT);
+    chdir $wd;
 }
 
 sub mkControlRead{
@@ -1034,6 +1036,7 @@ sub mkChr{
     my $file = $file[$#file];
     $file =~ s/\ +$//g;
     my $i = 0;
+    chdir "$wd/$ref";
     &report("Making chromosome file from $file");
     if ($ref eq "hg38"){
 	open(IN, "$zcat $file|");
@@ -1083,6 +1086,7 @@ sub mkChr{
 		close(IN);
 		close(OUT);
 	    }
+	    chdir $wd;
 	    return;
 	}
 	
@@ -1112,6 +1116,7 @@ sub mkChr{
 	close(IN);
 	close(OUT);
     }
+    chdir $wd;
 }
 
 sub mkSortUniq{
