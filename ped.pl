@@ -190,7 +190,7 @@ if ($chr[0] eq ""){
     closedir(REF);
 }
 
-if (! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
+if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
     &mkRef;
 }
 
@@ -218,7 +218,7 @@ while(<IN>){
 }
 close(IN);
 
-if ($method eq "kmer"){
+if ($method eq "kmer" or $ref eq ""){
     &kmer;
 }else{
     &bidirectional;
@@ -1142,11 +1142,7 @@ sub mkSortUniq{
 	&sortUniqSub($cmd, $subject);
     }
     if($bz_file ne ""){
-	if (-e "/usr/bin/pbzip2"){
-	    $cmd = "cd $wd/$subject/read && pbzip2 -cd $bz_file |";
-	}else{
-	    $cmd = "cd $wd/$subject/read && bzcat $bz_file |";
-	}
+	$cmd = "cd $wd/$subject/read && bzcat $bz_file |";
 	&sortUniqSub($cmd, $subject);
     }
     if($xz_file ne ""){
