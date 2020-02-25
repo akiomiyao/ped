@@ -30,8 +30,8 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 ## Simplified instruction
 - The ped.pl is a multithreaded script, suitable for the multi-core CPU like as 16 or 8 cores.  
   Of course, the ped.pl can run with the 2 or single core machine, but slow.  
-  The ped.pl runs on Linux (FreeBSD) machine and Mac with at least 4 GB RAM and 1 TB hard disk (or SSD).  
-  Using the docker container is recommended, because programs for downloading short read sequences and scripts have been set up in the container.  
+  The ped.pl runs on Linux (or FreeBSD) machine and Mac with at least 4 GB RAM and 1 TB hard disk (or SSD).  
+  Using the docker container for Linux is recommended, because programs for downloading short read sequences and scripts have been set up in the container.  
   Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
 ```
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work
@@ -45,7 +45,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
 - Options,  
-  thread=8 : specify the max thread number. Default is 14.  
+  thread=8 : specify the max thread number. Default is the number of logical core or 14.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
 
 ## Setup of Docker
@@ -74,7 +74,7 @@ After the new login, docker commands can be execute with your account.
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
-- Programs run on Unix platforms (FreeBSD, Linux) and Mac.  
+- Programs run on Unix platforms (FreeBSD or Linux) and Mac.  
 - Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
 or  
 ```
@@ -201,13 +201,21 @@ qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
    ERR3063487.bi.vcf is the vcf file for SNPs.  
-    
+   ERR3063487.sv.primer is the list of primers to detect stuructural varilations.  
+   ERR3063487.bi.primer is the list of primers to detect SNPs.  
+   Primer files are experimental.  
+   The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
+   
 - Our verify process counts reads containing polymorphic region.  
   Basically, counts are from target and reference.  
   If control is specified, counts from target and control will be listed.  
   For example,  
 ```
-perl bidirectional.pl ERR3063487 ERR3063486 WBcel235  
+perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
+```
+or  
+```
+perl bidirectional.pl ERR3063487 ERR3063486 WBcel235 
 ```
   returns 'M' or 'H' marked SNPs and structural variations of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
@@ -260,6 +268,9 @@ perl kmer.pl ERR3063487 default WBcel235
 ```
 - ERR3063487.kmer.snp is the list of SNPs.  
   ERR3063487.kmer.vcf is the vcf file for SNPs.   
+  ERR3063487.kmer.primer is the list of primer sequence to detect SNPs.   
+  Primer files are experimental.  
+  The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
   Please check quarity of polymorphism with depth (DP) in vcf file.  
@@ -286,13 +297,18 @@ perl qsub_kmer.pl ERR3063487 ERR3063486
 ## Examples of result
 A part of SNP list of the bidirectional method is  
 ```
-1       994949  C       T       11      50      0       21      17      H
-1       994962  G       T       1       50      0       21      0       
-1       994997  C       T       11      50      0       21      23      H
-1       995371  C       G       5       50      0       15      24      H
-1       995450  A       G       1       50      0       22      0       
-1       995512  T       C       6       50      0       0       22      M
-1       995543  A       G       6       50      0       0       22      M
+1       3189273 T       C       50      0       15      9       H
+1       3189333 T       C       50      0       14      0       _
+1       3189345 A       G       50      0       13      17      H
+1       3189429 G       A       50      0       15      0       _
+1       3189498 G       A       50      0       0       39      M
+1       3189503 T       G       50      0       2       1       _
+1       3189527 T       G       50      0       10      0       _
+1       3189609 T       A       50      0       41      1       _
+1       3189704 C       G       50      0       0       11      M
+1       3189741 A       G       50      0       0       23      M
+1       3189819 A       G       50      0       0       4       _
+1       3189833 C       T       50      0       0       46      M
 
 Column 1: Chromosome number
 Column 2: Position of SNP
@@ -303,19 +319,23 @@ Column 6: Number of reads in the control sort_uniq file with control type polymo
 Column 7: Number of reads in the control sort_uniq file with target type polymorphism
 Column 8: Number of reads in the target sort_uniq file with control type polymorphism
 Column 9: Number of reads in the target sort_uniq file with target type polymorphism
-Column 10: Genotype (M: homozygous, H: heterozygous)
+Column 10: Genotype (M: homozygous, H: heterozygous, _: reference type)
+Following columns will be appeared in the primer file.
+Column 11: Left primer sequence 
+Column 12: Right primer sequence
+Column 13: Estimated size of the amplified fragment
+Column 14: Upstream and downstream sequence around the SNP
+Primer files are experimental.  
+The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
 ```
-
 - A part of the structural variation result is
 ```
-1       923312  1       923312  f       deletion        -1      50      0       0       31      M
-1       931147  1       931131  f       insertion       4       50      0       5       19              CCCTCCCTCCC
-1       932618  1       932617  f       deletion        -4      50      0       0       25      M       TTTC
-1       933555  1       933548  f       insertion       1       50      0       0       0               GGGGG
-1       933750  1       933741  f       insertion       1       50      0       4       20              GGGGGGG
-1       937406  1       937398  f       deletion        -2      50      0       6       11      H       CCCCCCCCC
-1       939490  1       939445  f       insertion       36      50      0       32      1               ATCTCCCC
-1       939575  1       939570  f       insertion       12      50      0       23      15      H       GGAGGACC
+1       902788  1       902774  f       deletion        -1      50      0       10      9       H       AAAAAAAAAAAAAA
+1       907869  1       907835  f       insertion       32      50      0       19      11      H       C
+1       911222  1       911221  f       deletion        -1      50      0       21      15      H       T
+1       923312  1       923312  f       deletion        -1      50      0       0       34      M       _
+1       931147  1       931131  f       insertion       4       50      0       7       19      _       CCCTCCCTCCC
+1       932618  1       932617  f       deletion        -4      50      0       1       32      M       TTTC
 
 Column 1: Chromosome number of junction detected by 5' to 3' matching
 Column 2: Position of junction detected by 5' to 3' matching
@@ -328,23 +348,30 @@ Column 8: Number of reads in the control sort_uniq file with control type polymo
 Column 9: Number of reads in the control sort_uniq file with target type polymorphism
 Column 10: Number of reads in the target sort_uniq file with control type polymorphism
 Column 11: Number of reads in the target sort_uniq file with target type polymorphism
-Column 12: Genotype (M: homozygous, H: heterozygous)
+Column 12: Genotype (M: homozygous, H: heterozygous, _: reference type)
 Column 13: Sequence between junctions
+Following columns will be appeared in the primer file.
+Column 14: Left primer sequence 
+Column 15: Right primer sequence
+Column 16: Estimated size of the amplified fragment
+Column 17: Upstream and downstream sequences around the junction
+Primer files are experimental.  
+The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
 
 - A part of SNP result by the *k*-mer method is
 ```
-X       54009891        AAAAAAAAAAGTGGCTCTT     T       T       GT      f       0       0       0       40      1       1       17      21      50      0       12      0       
-6       112904084       AAACGACACTTTTTTTTTT     C       C       AC      r       0       0       40      0       0       1       31      22      50      0       30      0       
-3       125369417       AAAAAAAAAAGTGTGCCTC     T       T       AT      f       0       0       0       40      19      1       0       17      50      0       12      0       
-X       154687353       AAAAAAAAAAGTGTTAGGC     C       C       CT      f       0       40      0       0       1       21      1       21      50      0       1       0       
-3       139458183       CGCCAACACTTTTTTTTTT     T       T       CT      r       41      0       0       0       46      1       12      0       50      0       20      0       
-6       147492241       AAAAAAAAAAGTTATGATC     G       G       C       f       0       0       40      0       7       28      0       1       50      0       0       34      M
-8       10651787        AAAAAAAAAAGTTATGCTC     A       A       AT      f       40      0       0       0       35      0       0       17      50      0       12      0       
-1       155410117       AAAAAAAAAAGTTCGTATT     A       A       AT      f       40      0       0       0       44      1       0       10      50      0       33      0       
-14      100919244       TAAACGAACTTTTTTTTTT     A       A       AT      r       0       0       0       40      11      1       0       44      50      0       12      0       
-5       59826499        ATCGAGAACTTTTTTTTTT     A       A       AC      r       0       0       0       41      0       0       27      47      50      0       25      0       
-5       164623412       AAAAAAAAAAGTTGCCACT     G       G       GT      f       0       0       41      0       1       0       15      46      50      0       4       0       
+X       14544549        ACAGTTGTATTTTTCAATT     A       A       G       r       0       0       0       13      0       27      0       0       13      0       0       30      M
+X       14544549        TACACCACTGTAAGTCAAC     A       A       G       f       13      0       0       0       0       0       27      0       13      0       0       30      M
+X       14592687        AAAAATTTGGATTTTTGGA     G       G       GT      r       0       15      0       0       20      20      0       1       5       0       10      0       _
+X       14592707        AAAAATTTGGATTTTTGGA     G       G       AG      f       0       0       15      0       20      0       20      0       5       0       10      0       _
+X       14615799        ACCCCTATATATAGTGTTT     T       T       AT      r       25      0       0       0       16      0       0       12      26      0       18      0       _
+X       14615819        ACCCCTATATATAGTGTTT     T       T       AT      f       0       0       0       25      12      0       0       16      26      0       23      0       _
+X       14624654        GTTGTGCTTTATTTATTTG     A       A       AT      r       0       0       0       19      15      0       0       20      19      0       19      0       _
+X       14624674        GTTGTGCTTTATTTATTTG     A       A       AG      f       18      0       0       0       18      0       16      0       19      0       17      0       _
+X       14632040        ATTTTTTTCACAAACAAGG     T       T       A       r       26      0       0       0       0       0       0       23      21      0       0       21      M
+X       14632040        CTTAAATCGGAGAACAAAT     T       T       A       f       0       0       0       25      22      0       0       0       21      0       0       21      M
+X       14682371        TCAGTTCAATCACGATAAA     A       A       AT      r       0       0       0       19      10      0       0       19      24      0       20      0       _
 
 Column 1: Chromosome number
 Column 2: Position of SNP
@@ -365,9 +392,15 @@ Column 16: Number of reads in the control sort_uniq file with control type base
 Column 17: Number of reads in the control sort_uniq file with target type base
 Column 18: Number of reads in the target sort_uniq file with control type base
 Column 19: Number of reads in the target sort_uniq file with target type base
-Column 20: Genotype (M: homozygous, H: heterozygous)
+Column 20: Genotype (M: homozygous, H: heterozygous, _: reference type)
+Following columns will be appeared in the primer file.
+Column 21: Left primer sequence 
+Column 22: Right primer sequence
+Column 23: Estimated size of the amplified fragment
+Column 24: Upstream and downstream sequence around the SNP```
+Primer files are experimental.  
+The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
-
 ## Detection of polymorphisms between control and target
 - SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
