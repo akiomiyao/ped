@@ -295,7 +295,7 @@ sub bidirectional{
 
 sub primer{
     report("Output primer sequences.");
-    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $type);
+    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $minimum_length, $out);
     $type = shift;
     if ($type eq "sv"){
 	open(IN, "$wd/$target/$target.sv");
@@ -384,9 +384,9 @@ sub primer{
 		}
 	    }
 	}
-	$flag = 0;
+	$minimum_length = 10000;
+	$out = "";
 	foreach $f (reverse @f){
-	    last if $flag;
 	    foreach $r (@r){
 		if (&checkDimer($f, $r)){
 		    if ($type eq "sv"){
@@ -394,6 +394,10 @@ sub primer{
 			$rpos = index($tail, complement($r), 0);
 			$length = 250 - $fpos + $rpos - length($row[12]);
 			$tg = substr($head, 229, 20) . " " . substr($tail, 0, 20);
+			if ($minimum_length > $length){
+			    $minimum_length = $length;
+			    $out = "$dat\t$f\t$r\t$length\t$tg\n";
+			}
 		    }else{
 			$fpos = index($seq, $f, 0);
 			$rpos = index($seq, complement($r), 0);
@@ -401,11 +405,15 @@ sub primer{
 			@row = split('\t', $dat);
 			$tg = substr($seq, 99, 150) . "[$row[3]/$row[2]]" . substr($seq, 250, 149);
 		    }
-		    print OUT "$dat\t$f\t$r\t$length\t$tg\n";
-		    $flag = 1;
-		    last;
+		    if ($minimum_length > $length){
+			$minimum_length = $length;
+			$out = "$dat\t$f\t$r\t$length\t$tg\n";
+		    }
 		}	   
 	    }
+	}
+	if ($out ne ""){
+	    print OUT $out;
 	}
     }
     close(IN);
