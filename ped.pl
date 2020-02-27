@@ -1499,8 +1499,10 @@ sub svReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	$row[0] = "000" . $row[0];
-	$row[0] = substr($row[0], length($row[0]) -3, 3);
+	if ($row[0] !~/[IVXYZ]/){
+	    $row[0] = "000" . $row[0];
+	    $row[0] = substr($row[0], length($row[0]) -3, 3);
+	}
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(" ", @row);
@@ -1603,9 +1605,7 @@ sub kmerReadCount{
     foreach (sort keys %count){
 	$count = $count{$_};
 	@row = split;
-	if($row[0] !~/[IVXYZ]/){
-	    $row[0] += 0;
-	}
+	$row[0] =~ s/^0+//g;
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
@@ -1662,9 +1662,7 @@ sub kmerReadCount{
 	chomp;
 	@row = split;
 	($chr, $pos) = split(':', $row[0]);
-	if ($chr !~/[IVXYZ]/){
-	    $chr += 0;
-	}
+	$chr =~ s/^0+//g;
 	$pos += 0;
 	print OUT "$chr\t$pos\t$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\t$row[13]\t$row[14]\t$row[15]\t$row[16]\t$row[17]\t$row[18]\n";
     }
@@ -1679,8 +1677,10 @@ sub snpReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	$row[0] = "000" . $row[0];
-	$row[0] = substr($row[0], length($row[0]) -3, 3);
+	if ($row[0] !~/[IVXYZ]/){
+	    $row[0] = "000" . $row[0];
+	    $row[0] = substr($row[0], length($row[0]) -3, 3);
+	}
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(":", @row);
@@ -1733,7 +1733,7 @@ sub snpReadCount{
     }
     print OUT "$prev\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
     close(OUT);
-    system("$tmpdir/bi.snp");
+    system("rm $tmpdir/bi.snp");
 }
 
 sub joinControlFunc{
