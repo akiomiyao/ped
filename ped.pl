@@ -78,7 +78,13 @@ if ($wd eq ""){
 $uname = `uname`;
 chomp($uname);
 
-$method = "bidirectional" if $method eq "";
+if ($method eq ""){
+    if ($ref eq ""){
+	$method = "kmer";
+    }else{
+	$method = "bidirectional";
+    }
+}
 
 $zcat = "zcat";
 
@@ -218,7 +224,7 @@ while(<IN>){
 }
 close(IN);
 
-if ($method eq "kmer" or $ref eq ""){
+if ($method eq "kmer"){
     &kmer;
 }else{
     &bidirectional;
