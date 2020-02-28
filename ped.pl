@@ -8,7 +8,7 @@
 #
 # License: refer to https://github.com/akiomiyao/ped
 #
-# Author: Akio Miyao <miyao@affrc.go.jp>
+# Author: MIYAO Akio <miyao@affrc.go.jp>
 #
 
 use threads;
@@ -172,7 +172,7 @@ if ($ARGV[0] eq ""){
 	print "  $name $desc{$_}\n";
     }
     print "
- Author: Akio Miyao <miyao\@affrc.go.jp>
+ Author: MIYAO Akio <miyao\@affrc.go.jp>
 
 ";
     exit;
@@ -255,8 +255,8 @@ sub kmer{
     &sortSeq;
     &joinControl;
     &kmerReadCount;
-    &primer;
     &toVcf;
+    &primer;
 }
 
 sub bidirectional{
@@ -281,7 +281,6 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &svReadCount;
-    &primer(sv);
     &snpMkT;
     &sortSeq;
     &joinTarget;
@@ -289,34 +288,71 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &snpReadCount;
-    &primer;
     &toVcf;
+    &primer(sv);
+    &primer;
 }
 
 sub primer{
-    report("Output primer sequences.");
-    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $minimum_length, $out);
-    $type = shift;
+    my $type = shift;
+    my $count = "0001";
+    my $line = 0;
+    my $num;
     if ($type eq "sv"){
 	open(IN, "$wd/$target/$target.sv");
-	open(OUT, "> $wd/$target/$target.sv.primer");
+	open(OUT, "> $wd/$target/tmp/$target.$count");
     }else{
 	if ($method eq "kmer"){
 	    open(IN, "$wd/$target/$target.kmer.snp");
-	    open(OUT, "> $wd/$target/$target.kmer.primer");
+	    open(OUT, "> $wd/$target/tmp/$target.$count");
+	    $type = "kmer";
 	}else{
 	    open(IN, "$wd/$target/$target.bi.snp");
-	    open(OUT, "> $wd/$target/$target.bi.primer");
+	    open(OUT, "> $wd/$target/tmp/$target.$count");
+	    $type = "bi";
 	}
     }
     while(<IN>){
 	next if ! /H|M/;
+	$line++;
+	print OUT;
+	if ($line == 10000){
+	    $line = 0;
+	    close(OUT);
+	    $count++;
+	    $num = "000$count";
+	    $num = substr($num, length($num) - 4, 4);
+	    open(OUT, "> $wd/$target/tmp/$target.$num");
+	}
+    }
+    close(OUT);
+    for ($i = 1; $i <= $count; $i++){
+	$semaphore->down;
+	$num = "000$i";
+	$num = substr($num, length($num) - 4, 4);
+	&report("Output primer sequences. $num");
+	threads->new(\&primerFunc, $num, $type);
+    }
+    &joinAll;
+    system("cat $wd/$target/tmp/primer.* > $wd/$target/$target.$type.primer && rm $wd/$target/tmp/*");
+}
+
+sub primerFunc{
+    my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $minimum_length, $out, $fin, $fout, $fchr, $fchrt);
+    my ($num, $type) = @_;
+    $fin = "in.$num";
+    $fout = "out.$num";
+    $fchr = "chr.$num";
+    $fchrt = "chrt.$num";
+    open($fin, "$wd/$target/tmp/$target.$num");
+    open($fout, "> $wd/$target/tmp/primer.$num");
+    while(<$fin>){
 	@row = split('\t', $_);
 	$dat = $_;
 	chomp($dat);
 	if ($prev_chr ne $row[0]){
-	    open(CHR, "$wd/$ref/chr$row[0]");
-	    binmode(CHR);
+	    open($fchr, "$wd/$ref/chr$row[0]");
+	    binmode($fchr);
 	}
 	$prev_chr = $row[0];
 	@f = ();
@@ -335,30 +371,30 @@ sub primer{
 		    $hpos = $row[1];
 		    $tpos = $row[3]
 	    }
-	    seek(CHR, $hpos - 250, 0);
-	    read(CHR, $head, 250);
+	    seek($fchr, $hpos - 250, 0);
+	    read($fchr, $head, 250);
 	    if ($row[0] ne $row[2]){
-		open(CHRT, "$wd/$ref/chr$row[2]");
-		binmode(CHRT);
-		seek(CHRT, $row[3], 0);
-		read(CHRT, $tail, 250);
-		close(CHRT);
+		open($fchrt, "$wd/$ref/chr$row[2]");
+		binmode($fchrt);
+		seek($fchrt, $row[3], 0);
+		read($fchrt, $tail, 250);
+		close($fchrt);
 	    }elsif($row[5] =~/inversion/){
-		seek(CHR, $tpos, 0);
-		read(CHR, $tail, 250);
+		seek($fchr, $tpos, 0);
+		read($fchr, $tail, 250);
 		$tail = &complement($tail);
 	    }else{
-		seek(CHR, $tpos, 0);
-		read(CHR, $tail, 250);
+		seek($fchr, $tpos, 0);
+		read($fchr, $tail, 250);
 	    }
-	    for($i = 0; $i < 200; $i++){
+	    for($i = 0; $i < 230; $i++){
 		$f = substr($head, $i, 20);
 		($gc = $f) =~ y/AT//d;
 		if (length($gc) == 11){
 		    push(@f, $f);
 		}
 	    }
-	    for($i = 50; $i < 230; $i++){
+	    for($i = 0; $i < 230; $i++){
 		$r = substr($tail, $i, 20);
 		($gc = $r) =~ y/AT//d;
 		if (length($gc) == 11){
@@ -366,17 +402,17 @@ sub primer{
 		}
 	    }
 	}else{
-	    seek(CHR, $row[1] - 250, 0);
-	    read(CHR, $seq, 500);
+	    seek($fchr, $row[1] - 250, 0);
+	    read($fchr, $seq, 500);
 	    
-	    for($i = 0; $i < 180; $i++){
+	    for($i = 0; $i < 230; $i++){
 		$f = substr($seq, $i, 20);
 		($gc = $f) =~ y/AT//d;
 		if (length($gc) == 11){
 		    push(@f, $f);
 		}
 	    }
-	    for($i = 300; $i < 480; $i++){
+	    for($i = 250; $i < 480; $i++){
 		$r = substr($seq, $i, 20);
 		($gc = $r) =~ y/AT//d;
 		if (length($gc) == 11){
@@ -386,40 +422,48 @@ sub primer{
 	}
 	$minimum_length = 10000;
 	$out = "";
+	$minimum_count = 0;
 	foreach $f (reverse @f){
 	    foreach $r (@r){
 		if (&checkDimer($f, $r)){
 		    if ($type eq "sv"){
 			$fpos = index($head, $f, 0);
 			$rpos = index($tail, complement($r), 0);
-			$length = 250 - $fpos + $rpos - length($row[12]);
+			$length = 250 - $fpos + $rpos + length($row[12]);
 			$tg = substr($head, 229, 20) . " " . substr($tail, 0, 20);
+			next if $length < 70;
 			if ($minimum_length > $length){
 			    $minimum_length = $length;
 			    $out = "$dat\t$f\t$r\t$length\t$tg\n";
+			    $minimum_count ++;
+			    last if $minimum_count >= 3;
 			}
 		    }else{
 			$fpos = index($seq, $f, 0);
 			$rpos = index($seq, complement($r), 0);
 			$length = $rpos - $fpos + 20;
+			next if $length < 70;
 			@row = split('\t', $dat);
 			$tg = substr($seq, 99, 150) . "[$row[3]/$row[2]]" . substr($seq, 250, 149);
 		    }
 		    if ($minimum_length > $length){
 			$minimum_length = $length;
 			$out = "$dat\t$f\t$r\t$length\t$tg\n";
+			$minimum_count ++;
+			last if $minimum_count >= 3;
 		    }
 		}	   
 	    }
+	    last if $minimum_count >= 3;
 	}
 	if ($out ne ""){
-	    print OUT $out;
+	    print $fout $out;
 	}
     }
-    close(IN);
-    close(CHR);
-    close(OUT);
-    report("Output primer sequences. complete");
+    close($fin);
+    close($fchr);
+    close($fout);
+    $semaphore->up;
 }
 
 sub checkDimer{
@@ -788,7 +832,7 @@ sub mkChrFromFile{
 	    $out = (split)[0];
 	    $out =~ s/>//;
 	    $out =~ s/^chr//i;
-	    $out += 0 if $out =~ /^[0-9]*$/;
+	    $out += 0 if $out =~ /^[0-9]+$/;
 	    push(@chr, $out) if ! $chr_flag;
 	    $out = "chr$out";
 	    open(OUT, "> $out");
@@ -1065,7 +1109,7 @@ sub mkChr{
 		}else{
 		    $flag = 0;
 		    $output =~ s/chr//i;
-		    $output += 0 if $output =~ /^[0-9]*$/;
+		    $output += 0 if $output =~ /^[0-9]+$/;
 		    $output = "chr$output";
 		    open(OUT, "> $output");
 		}
@@ -1336,8 +1380,10 @@ sub snpMkT{
 	chomp;
 	if ($method eq "kmer"){
 	    @row = split;
-	    $row[0] = "000" . $row[0];
-	    $row[0] = substr($row[0], length($row[0]) -3, 3);
+	    if ($row[0] =~ /^[0-9]+$/){
+		$row[0] = "000" . $row[0];
+		$row[0] = substr($row[0], length($row[0]) -3, 3);
+	    }
 	    $row[1] = "000000000000" . $row[1];
 	    $row[1] = substr($row[1], length($row[1]) -11, 11);
 	    $ref = $row[4];
@@ -1346,8 +1392,10 @@ sub snpMkT{
 	    print $fout "$row[0] $row[1] $ref $alt\n";
 	}elsif (/^#/ and /snp/){
 	    @row = split;
-	    $row[1] = "000" . $row[1];
-	    $row[1] = substr($row[1], length($row[1]) -3, 3);
+	    if ($row[1] =~ /^[0-9]+$/){
+		$row[1] = "000" . $row[1];
+		$row[1] = substr($row[1], length($row[1]) -3, 3);
+	    }
 	    $row[2] = "000000000000" . $row[2];
 	    $row[2] = substr($row[2], length($row[2]) -11, 11);
 	    print $fout "$row[1] $row[2] $row[4] $row[5]\n";
@@ -2193,8 +2241,12 @@ sub svSort{
 	if (/ion/){
 	    $flag = 1;
 	    @row = split;
-	    $chr = "000$row[1]";
-	    $chr = substr($chr, length($chr) - 3, 3);
+	    if ($row[1] =~ /^[0-9]+$/){
+		$chr = "000$row[1]";
+		$chr = substr($chr, length($chr) - 3, 3);
+	    }else{
+		$chr = $row[1];
+	    }
 	    $pos = "00000000000" . $row[2];
 	    $pos = substr($pos, length($pos) - 11, 11);
 	    if ($row[7] eq ""){
@@ -2230,7 +2282,7 @@ sub index{
 	$length = length($_);
 	if(/^#/){
 	    @row = split;
-	    if ($row[1] =~ /^[0-9]*$/){
+	    if ($row[1] =~ /^[0-9]+$/){
 		$row[1] = "000$row[1]";
 		$row[1] = substr($row[1], length($row[1]) -3, 3);
 	    }
