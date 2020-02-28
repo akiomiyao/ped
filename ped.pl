@@ -359,7 +359,7 @@ sub primerFunc{
 	@r = ();
 	
 	if ($type eq "sv"){
-	    if($row[5] =~/ins|del/){
+	    if($row[5] =~ /ins|del/){
 		if ($row[1] <= $row[3]){
 		    $hpos = $row[1];
 		    $tpos = $row[3]
@@ -379,7 +379,7 @@ sub primerFunc{
 		seek($fchrt, $row[3], 0);
 		read($fchrt, $tail, 250);
 		close($fchrt);
-	    }elsif($row[5] =~/inversion/){
+	    }elsif($row[5] =~ /inversion/){
 		seek($fchr, $tpos, 0);
 		read($fchr, $tail, 250);
 		$tail = &complement($tail);
@@ -1547,7 +1547,7 @@ sub svReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
+	if ($row[0] =~ /^[0-9]+$/){
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
@@ -1619,7 +1619,7 @@ sub kmerReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
+	if ($row[0] =~ /^[0-9]+$/){
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
@@ -1635,7 +1635,7 @@ sub kmerReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
+	if ($row[0] =~ /^[0-9]+$/){
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
@@ -1667,7 +1667,7 @@ sub kmerReadCount{
 	    }
 	    $_ = $prev;
 	    @prev = split;
-	    if ($prev[0] !~/[IVXYZ]/){
+	    if ($prev[0] =~ /^[0-9]+$/){
 		$prev[0] = "000" . $prev[0];
 		$prev[0] = substr($prev[0], length($prev[0]) -3, 3);
 	    }
@@ -1695,7 +1695,7 @@ sub kmerReadCount{
     }
     $_ = $prev;
     @prev = split;
-    if ($prev[0] !~/[IVXYZ]/){
+    if ($prev[0] =~ /^[0-9]+$/){
 	$prev[0] = "000" . $prev[0];
 	$prev[0] = substr($prev[0], length($prev[0]) -3, 3);
     }
@@ -1725,7 +1725,7 @@ sub snpReadCount{
     while(<IN>){
 	chomp;
 	@row = split;
-	if ($row[0] !~/[IVXYZ]/){
+	if ($row[0] =~ /^[0-9]+$/){
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
