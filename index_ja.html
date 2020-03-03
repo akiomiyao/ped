@@ -28,7 +28,12 @@
       <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型(リファレンスゲノムに対する多型)を検出します。
 	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
+      <li>多型部分を増幅するプライマー配列も同時に出力されます。
       </ul>
+      <p><b>Githubからのコードの取得は、</b><br>
+      sudo apt install git (Ubuntuの場合)<br>
+      sudo yum install git (CentOSの場合)<br>
+      git clone https://github.com/akiomiyao/ped.git
       <p><b>Dockerでの実行は、</b><br>
       docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=target,control=control,ref=reference,wd=/work<br>
 	  <ul>
@@ -81,9 +86,12 @@
 	 <table>
 	 <tr><td>target.aln</td><td>双方向整列法による整列データ</td></tr>
 	 <tr><td>target.bi.snp</td><td>双方向整列法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
+	 <tr><td>target.bi.primer</td><td>双方向整列法によるSNPリストに加えてプライマー配列が出力されます</td></tr>
 	 <tr><td>target.bi.vcn</td><td>HとMでマークされたSNPをvcn形式で出力されたファイル</td></tr>
-	 <tr><td>target.kmer.snp</td><td><i>k</i>-mer法で検出されたSNP</td></tr>
-	 <tr><td>target.sv</td><td>双方向整列法で検出された構造(挿入・欠失・逆位・転座)変異</td></tr>
+	 <tr><td>target.kmer.snp</td><td><i>k</i>-mer法で検出されたSNPリスト</td></tr>
+	 <tr><td>target.kmer.primer</td><td><i>k</i>-mer法で検出されたSNPリストに加えてプライマー配列が出力されます</td></tr>
+	 <tr><td>target.sv</td><td>双方向整列法で検出された構造(挿入・欠失・逆位・転座)変異リスト</td></tr>
+	 <tr><td>target.sv.primer</td><td>双方向整列法で検出された構造(挿入・欠失・逆位・転座)変異リストに加えてプライマー配列が出力されます</td></tr>
 	 <tr><td>target.index</td><td>アラインメント検索用インデックスファイル</td></tr>
 	 </table>
 	 targetの部分はターゲットとして指定したディレクトリ名となります。
@@ -131,65 +139,45 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
            PEDでは、bwaを使わず独自の方法でマッピングしているため、bwa/GATKと同様のクオリティースコアの算出が困難です。<br>
            そのため、クオリティースコアは1000の固定値としています。<br>
            多型のクオリティーは、サポートされるリードのカバー数(DP)で判断して下さい。<br>
-          <li> vcfの元データは、以下に一部を示したERR194146.bi.snpです。<pre>
-1       51930   T       C       1       50      0       19      1       
-1       69511   A       G       1       50      0       0       19      M
-1       88347   A       C       1       50      0       15      2       
-1       181387  A       C       1       50      0       50      1       
-1       181396  A       G       1       50      0       50      1       
-1       181413  A       C       1       50      0       50      1       </pre>
+          <li> ERR194146.bi.primerでは多型部分を増幅するプライマーセットも出力されます。<pre>
+1       1223251 A       G       50      0       0       26      M       GCTGAGCACTCACTTTCCTC    ATAGCGAGAAGGAGGTTGCC    76      CACACGGCACGCACACACGTACTCACGAGCACACGCACGGCACACTCATACACGACACACACGGCACACTCATGTACACACAACACACGCGCGCACACACAGGATGCCTGAGACCGGTGGCGGGAGCCTGGCTGAGCACTCACTTTCCTC[G/A]TCCACTTTGAGTTCCTCGTTGAGCCTGATGGCGTCGGCAACCTCCTTCTCGCTATGGCCTTTACTCGCCAAAAACTTCACCTTATACTCGTCCCAAGACACGTGACCTGGAAGAGCAGATCACACCTGTCAGGGCCTCTGATACTGAGC
+1       1224137 T       C       50      0       0       26      M       TCCACCAGGCAACGCGAAAA    TTCTGTGTGACAGAGGGGGA    137     GCAGGTGGCCGTCAGACTGGGCCCCCAGGACCCCGAACAGCCAGACGGATGCCGCCGGCCCAGGACTCCATGGCTGCGTGAACCTGCCACCAACAGCGACAGGCTCCACCAGGCAACGCGAAAAGCGTCCGGGACGTGGGGCTTGTGGGG[C/T]GCCGGGCCACGCCAGAGACACTGGGGAAGGTGGATGCCACGGTCCCCTCCCCGGGGAAACACATGGACCCTCCCCCTCTGTCACACAGAATCACCACCAGACCCCACTCTCCAACCACAGCTTCCAAAAGTCACACTCTTCACGTTTTA
+1       1224160 G       A       50      0       7       14      H       TCCACCAGGCAACGCGAAAA    TTCTGTGTGACAGAGGGGGA    137     CCCAGGACCCCGAACAGCCAGACGGATGCCGCCGGCCCAGGACTCCATGGCTGCGTGAACCTGCCACCAACAGCGACAGGCTCCACCAGGCAACGCGAAAAGCGTCCGGGACGTGGGGCTTGTGGGGTGCCGGGCCACGCCAGAGACACT[A/G]GGGAAGGTGGATGCCACGGTCCCCTCCCCGGGGAAACACATGGACCCTCCCCCTCTGTCACACAGAATCACCACCAGACCCCACTCTCCAACCACAGCTTCCAAAAGTCACACTCTTCACGTTTTATTTTATTTTTTGAGATGGAGTCT
+1       1224783 G       A       50      0       19      16      H       GGAGACCCCACCTCTACAAA    GTAGCTGAAACCACAGGTGC    74      AGGACGCAGTGGCCACACCTATAATCCCAGCCCTTTGGGAGGCTAAGACAGGTGGATCACTTAAGCCCAGAAGTTCAAGACCAGCTTGGGCAACATAGGGAGACCCCACCTCTACAAAAACAATTACGAAAATTCGCCAGGCGCGGTGGC[A/G]TGCACCTGTGGTTTCAGCTACTCAAGAGGCTGAGGTGGGAGGCCTCCCGAACCTGGAATGCGAAGGTTGCAGTGAACTGTGATCACACCACTGCACTCCAGCCTGGGCGGCATACCGAGACCCTGACTCAAAACAAGACAAAACAAAAT
+</pre>
            左から、<br>
            <ol>
            <li>染色体番号
            <li>位置
            <li>リファレンス塩基
            <li>変異型塩基
-           <li>検出されたアラインメント数
-           <li>リファレンス型のコントロールのリード数
+           <li>リファレンス型のコントロール(この場合hg38から作成したコントロール配列)のリード数
            <li>変異型のコントロールのリード数
-           <li>リファレンス型のターゲットのリード数
+           <li>リファレンス型のターゲット(ERR194146)のリード数
            <li>変異型のターゲットのリード数
            <li>ホモ・ヘテロ型判定です。一番右にMと表示されている行がホモ変異、Hがヘテロと判定しています。
+           <li>Left primer
+           <li>Right primer
+           <li>増幅断片長
+           <li>多型の前後300bpの配列情報
            </ol>
            <p><ul>
            <li>コントロールを指定しないで、リファレンスをコントロールとした場合、コントロールのリード数は、リファレンスから作成した疑似リードでのデプスが値に入ります。
-           <li>双方向整列法では、反復領域のアラインは最初から除外します。2行目は除外されなかった1つのアラインの変異情報からリードのデプスを検証したところ、ターゲット(ERR194146)では、19リードが変異型で検出されたことがわかります。
+           <li>双方向整列法では、反復領域のアラインは最初から除外します。2行目は除外されなかった、つまり反復配列領域でない部分のアラインの変異情報からリードのデプスを検証したところ、<br>
+ターゲット(ERR194146)では、26リードが変異型で検出されたことがわかります。hg38から作成したコントロール配列では、リファレンス型が50リードで変異型は検出されていません。
            </ul>
-           <li>構造変異は、ERR194146.sv<br>
+           <li>構造変異とそのプライマー配列は、ERR194146.sv.primer<br>
            に出力されます。
-           <pre>[miyao@cluster1 ERR194146]$ egrep 'M|H' ERR194146.sv|head  -n 30
-1       61361   15      101929373       r       translocation           50      0       23      10      H       TTTTCAAAATTCTTAATAAACCATTTATTCCTTCAACTTTCTATGCCATTTGATGTTTTGTAAAAAAAAAA
-1       630059  2       102215022       f       translocation           50      0       17      10      H       C
-1       634925  16      10724035        r       translocation           50      0       16      12      H       TCTCCCTTCACCATTTCCGACGGCATCTACGG
-1       634925  5       100051350       r       translocation           50      0       16      15      H       TCTCCCTTCACCATTTC
-1       790979  1       790943  f       deletion        -10     50      0       16      31      H       GAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATGGAATG
-1       840424  1       840410  f       deletion        -1      50      0       8       9       H       AAAAAAAAAAAAAA
-1       855380  1       855380  f       deletion        -2      50      0       11      13      H       T
-1       897794  1       897792  f       insertion       4       50      0       20      18      H       GAA
-1       902788  1       902774  f       deletion        -1      50      0       10      9       H       AAAAAAAAAAAAAA
-1       907869  1       907835  f       insertion       32      50      0       19      11      H       C
-1       911222  1       911221  f       deletion        -1      50      0       21      15      H       T
-1       923312  1       923312  f       deletion        -1      50      0       0       34      M
-1       932618  1       932617  f       deletion        -4      50      0       1       32      M       TTTC
-1       939575  1       939570  f       insertion       12      50      0       14      16      H       GGAGGACC
-1       939785  1       939797  f       deletion        -18     50      0       18      20      H       GCCAG
-1       945261  1       945260  f       deletion        -1      50      0       21      12      H       C
-1       949175  1       949175  f       deletion        -4      50      0       10      11      H       AGA
-1       950670  1       950672  f       deletion        -3      50      0       0       11      M
-1       959515  1       959510  f       insertion       4       50      0       1       13      M
-1       960382  1       960375  f       insertion       1       50      0       0       7       M       GGGGG
-1       967383  1       967377  f       deletion        -1      50      1       0       7       M       CCCCCC
-1       967386  1       967377  f       deletion        -1      50      0       0       7       M       CCCCCCCCC
-1       971793  1       971791  f       deletion        -1      50      0       18      22      H       GG
-1       989072  1       989072  f       deletion        -4      50      0       0       21      M       TTG
-1       1013468 1       1013466 f       insertion       1       50      0       1       9       M
-1       1014737 1       1014737 f       deletion        -4      50      0       1       20      M       AAG
-1       1019486 1       1019480 f       deletion        -1      50      0       0       10      M       GGGGGG
-1       1020069 1       1020061 f       deletion        -1      50      0       0       7       M       CCCCCCCC
-1       1022591 1       1022587 f       insertion       23      50      0       1       28      M       AGTCTGACCTGTGGTCTGAC
-1       1043224 1       1043225 f       deletion        -2      50      0       1       27      M
+           <pre>1       36936824        1       36936812        f       insertion       1       50      0       33      15      H       TTTTTTTTTT      GCATGCTAGGGGCTGTTAAG    CCGCACCTGTTGTTGTATCC    181     GAATGTCAGACTTTAACCTC TGATGGAACATTGGGATGAG
+1       36939873        1       36939870        f       insertion       1       50      0       1       36      M       C       ATCAGAGGGGGACCCTTGTT    AGATGACTGTGTCAGGAGGG    73      AGGCCTGGTCCACTACCACT TTGTCCCTGGGCCCTCCTGA
+1       36957834        1       36958209        f       deletion        -397    50      0       7       5       H       TGTGTCCCGTGAGCCTGTGTG   GAACCTATGTGTCCCGTGAG    AGTCATGGGACACACAGGCT    79      GTGTCCCGTGAGCCTGTGTG TGTGCCCCGTGAGCCTGTGT
+1       36959937        1       36959973        f       deletion        -47     50      0       0       13      M       TGCCCCATGA      ATTCTGTGCCCCATGAGCCT    TATGGGGCACACAGACTCAC    85      TGAGCCTGTGTGCCCCATGA TGCCCCATGAGCCTCTGTGC
+1       36962666        1       36962642        f       deletion        -2      50      0       8       12      H       AGAGAGAGAGAGAGAGAGAGAGAGA       GTGAGAGAGAGGGAGAGGAA    CCCTCTCTTTGCCTCTCCAT    84      GTGAGAGAGAGGGAGAGGAA AACAGAAGTGAACAAAAAGT
+1       36968265        1       36968222        f       deletion        -2      50      0       11      7       H       GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT    CCTCACAGTTTCACCTGCTC    AGGGAGCATGAACAGAGGGA    106     TCTTTCACTCTCTCTCTCCG TCTTCTTTGTTTCCCTCTGT
+1       36986463        1       36986416        f       insertion       4       50      0       7       9       H       TCCATCCATCCATCCATCCATCCATCCATCCATCCATCCATC      CCATCCATCCATCCATCCTG    TGGATGGATGGATGGATGGG    78      CATCCTGTCCCCATCTCTCT GCCCATCCATCCATCCATCC
+1       37001890        1       37001895        f       deletion        -9      50      0       25      25      H       GGA     AGCTCAGTCTTACCACTGGG    TCACAACCCCAGCTTCCTCT    70      CTCAGTCTTACCACTGGGGA GGAGACAATGTGGAACTGCC
 </pre>
-         左から、<br>
+         左からタブ区切りで、<br>
          <ol>
          <li>5'側からアラインした場合の染色体番号
          <li>5'側からアラインした場合の最初にギャップが現れた位置
@@ -204,6 +192,10 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
          <li>ターゲットのfastq配列に対する、変異型配列を持つリード数
          <li>ホモ型(M)、ヘテロ型(H)の種別
          <li>5'側からのギャップと3'側からのギャップに挟まれた部分の配列
+         <li>Left primer
+         <li>Right primer
+         <li>増幅断片長
+         <li> 多型部分の上流20塩基と下流20塩基の配列セット
          </ol>
          となります。
          <li>translocationに関しては、散在しているリファレンスゲノム上の反復配列で比較的多くのSNPがある場合、それぞれユニークな配列として認識されます。対象配列の反復配列にさらにSNPが入った場合、別の染色体に存在している反復配列領域と偶然認識される場合があります。あるいは、ERR194146配列のもとになったDNAは、培養細胞由来なので長期間の培養の間に、一部の細胞に変異が入った可能性も考えられます。反復配列領域の確認はサザンハイブリダイゼーションでは、スメアになり転座の確認は困難です。対象部位の上流と下流で確実にユニークと思われる部分にプライマーを設計して、PCRで想定サイズの断片が増幅されれば、転座の確認ができます。
@@ -270,7 +262,8 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
 
       <h2>PEDのインストール</h2>
       <p>以下の説明は、マルチスレッドで動作するシングルコンピュータ用のped.pl作成以前の説明です。<br>
-      ped.plを用いる場合は、上記の操作法「<a href = "#simple_tutorial">ped.plでの多型検出 (簡単なチュートリアル)</a>」ですべての解析ができます。
+      ped.plを用いる場合は、上記の操作法「<a href = "#simple_tutorial">ped.plでの多型検出 (簡単なチュートリアル)</a>」ですべての解析ができます。<br>
+      ped.pl作成以前から利用されているユーザのために残してあります。
       <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
       <ul>
 	<li>プログラムのダウンロード<br>
@@ -301,6 +294,7 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
 	  <li><a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
 	  から、コンパイルされた実行ファイルのアーカイブをダウンロードします。<br>
 	  <li>OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードします。<br>
+      クラウドを使わないのであれば、2.9.6-1をダウンロードしてください。最新版は、最初にクラウド関連の設定をする必要があります。<br>
 	  tar xvzf ファイル名<br>
 	  で展開できます。<br>
 	  tar xvzf sratoolkit.2.10.0-centos_linux64.tar.gz<br>
