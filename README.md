@@ -326,7 +326,7 @@ Column 11: Left primer sequence
 Column 12: Right primer sequence
 Column 13: Estimated size of the amplified fragment
 Column 14: Upstream and downstream sequence around the SNP
-Primer files are experimental.  
+Primer data are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
 ```
 - A part of the structural variation result is
@@ -356,7 +356,7 @@ Column 14: Left primer sequence
 Column 15: Right primer sequence
 Column 16: Estimated size of the amplified fragment
 Column 17: Upstream and downstream sequences around the junction
-Primer files are experimental.  
+Primer data are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
 
@@ -398,8 +398,8 @@ Following columns will be appeared in the primer file.
 Column 21: Left primer sequence 
 Column 22: Right primer sequence
 Column 23: Estimated size of the amplified fragment
-Column 24: Upstream and downstream sequence around the SNP```
-Primer files are experimental.  
+Column 24: Upstream and downstream sequence around the SNP
+Primer data are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
 ## Detection of polymorphisms between control and target
