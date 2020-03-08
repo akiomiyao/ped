@@ -36,7 +36,7 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 ```
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
-docker run --init -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
 -  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
