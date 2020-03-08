@@ -2528,7 +2528,6 @@ sub alignFunc{
 	if ($head_direction eq "f"){
 	    seek($chr_file, $head_pos - $margin -1, 0);
 	    read($chr_file, $head_seq, $length);
-	    $head_seq =~ y/a-z/A-Z/;
 	    next if $head_seq eq $seq;
 	    if ($hchr eq $tchr and $tail_direction eq "f"){
 		$distance = $tail_pos - $head_pos;
@@ -2568,11 +2567,9 @@ $seq
 	    if ($tail_direction eq "f"){
 		seek($chr_file, $tail_pos - $length + 20 + $margin -1, 0);
 		read($chr_file, $tail_seq, $length);
-		$tail_seq =~ y/a-z/A-Z/;
 	    }else{
 		seek($chr_file, $tail_pos - 20 -$margin, 0);
 		read($chr_file, $tail_seq, $length);
-		$tail_seq =~ y/a-z/A-Z/;
 		$tail_seq = &complement($tail_seq);
 	    }
 	    close($chr_file);
