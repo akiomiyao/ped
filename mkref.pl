@@ -129,6 +129,7 @@ sub mkChr{
 		}
 	    }elsif(! $flag){
 		y/a-z/A-Z/;
+		y/ACGT/N/c;
 		print OUT;
 	    }
 	}
@@ -152,6 +153,7 @@ sub mkChr{
 		    chomp;
 		    if (! /^>/){
 			y/a-z/A-Z/;
+			y/ACGT/N/c;
 			print OUT;
 		    }
 		}
@@ -181,6 +183,7 @@ sub mkChr{
 		$i++;
 	    }else{
 		y/a-z/A-Z/;
+		y/ACGT/N/c;
 		print OUT;
 	    }
 	}
@@ -216,6 +219,7 @@ sub mkChrFromFile{
 	    open(OUT, "> $ref");
 	}else{
 	    y/a-z/A-Z/;
+	    y/ACGT/N/c;
 	    print OUT;
 	}
     }
