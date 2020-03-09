@@ -31,8 +31,16 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 - The ped.pl is a multithreaded script, suitable for the multi-core CPU like as 16 or 8 cores.  
   Of course, the ped.pl can run with the 2 or single core machine, but slow.  
   The ped.pl runs on Linux (or FreeBSD) machine and Mac with at least 4 GB RAM and 1 TB hard disk (or SSD).  
-  Using the docker container for Linux is recommended, because programs for downloading short read sequences and scripts have been set up in the container.  
+
   Following is a demonstration of spontaneous SNPs and SVs detection from a *Caenorhabditis elegans* with 250-times repeated generations.  
+```
+cd ped
+perl download.pl accession=ERR3063486
+perl download.pl accession=ERR3063486
+perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235
+```
+  Installation of fastq-dump and ped scripts is described below.  
+  The docker container for Linux includes fastq-dump and ped scripts.  
 ```
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
@@ -48,6 +56,29 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
 - Options,  
   thread=8 : specify the max thread number. Default is the number of logical core or 14.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
+
+## Installation
+- If you do not want to use the docker container, downloading of programs is required.  
+- Programs run on Unix platforms (FreeBSD or Linux) and Mac.  
+- Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
+or  
+```
+git clone https://github.com/akiomiyao/ped.git  
+```
+If you got scripts by clone command of git, update to newest version is very easy using pull command of git.  
+```
+git pull  
+```
+- To download sequence data, fastq-dump from NCBI is required.  
+    Tool kit can be download from  
+    https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
+- To download reference data, curl is required.  
+    If your machine do not have curl program, install curl from package.  
+```
+sudo apt-get install curl (Ubontu)
+sudo yum install curl (CentOS)
+sudo pkg install curl (FreeBSD)
+```
 
 ## Setup of Docker
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
@@ -71,25 +102,13 @@ If you want run the docker container without sudo or su,
 ```
 sudo usermod -a -G docker your_username
 ```
-After the new login, docker commands can be execute with your account.
+After the new login, docker commands can be execute with your account.  
 
-## Installation
-- If you do not want to use the docker container, downloading of programs is required.  
-- Programs run on Unix platforms (FreeBSD or Linux) and Mac.  
-- Download zip file of PED from https://github.com/akiomiyao/ped and extract.  
-or  
-```
-git clone https://github.com/akiomiyao/ped.git  
-```
-If you got scripts by clone command of git, update to newest version is very easy using pull command of git.  
-```
-git pull  
-```
-- To download sequence data, fastq-dump from NCBI is required.  
-    Tool kit can be download from  
-    https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
-- To download reference data, curl is required.  
-    If your machine do not have curl program, install curl from package.  
+In the case of docker, zombie process due to execution of sub process will be incleased.  
+When the ped analysis is finished, zombie process will be removed.   
+On the run of docker container, the --init option is effective to kill zombie processes.  
+But premature termination of sort command is observed with --init options.  
+If the premature termination is observed, direct run of ped script from the github instead of docker is recommended.
 
 ## Instruction for bidirectional method  
 ```
