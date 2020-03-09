@@ -79,6 +79,11 @@ sudo apt-get install curl (Ubontu)
 sudo yum install curl (CentOS)
 sudo pkg install curl (FreeBSD)
 ```
+In the case of docker, zombie processes due to execution of sub process will be incleased.  
+When the ped analysis is finished, zombie processes will be removed.   
+On the run of docker container, the --init option is effective to kill zombie processes.  
+But premature termination of sort command is observed with --init options.  
+If the premature termination is observed, direct run of ped script from the github instead of docker is recommended.
 
 ## Setup of Docker
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
@@ -103,12 +108,6 @@ If you want run the docker container without sudo or su,
 sudo usermod -a -G docker your_username
 ```
 After the new login, docker commands can be execute with your account.  
-
-In the case of docker, zombie process due to execution of sub process will be incleased.  
-When the ped analysis is finished, zombie process will be removed.   
-On the run of docker container, the --init option is effective to kill zombie processes.  
-But premature termination of sort command is observed with --init options.  
-If the premature termination is observed, direct run of ped script from the github instead of docker is recommended.
 
 ## Instruction for bidirectional method  
 ```
