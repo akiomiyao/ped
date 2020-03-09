@@ -79,13 +79,14 @@ sudo apt-get install curl (Ubontu)
 sudo yum install curl (CentOS)
 sudo pkg install curl (FreeBSD)
 ```
+
+## Setup of Docker
 In the case of docker, zombie processes due to execution of sub process will be incleased.  
 When the ped analysis is finished, zombie processes will be removed.   
 On the run of docker container, the --init option is effective to kill zombie processes.  
 But premature termination of sort command is observed with --init options.  
 If the premature termination is observed, direct run of ped script from the github instead of docker is recommended.
 
-## Setup of Docker
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ```
 curl -fsSL https://get.docker.com -o get-docker.sh
