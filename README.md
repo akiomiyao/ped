@@ -417,10 +417,10 @@ Following columns will be appeared in the primer file.
 Column 21: Left primer sequence 
 Column 22: Right primer sequence
 Column 23: Estimated size of the amplified fragment
-Column 24: Upstream and downstream sequence around the SNP```
+Column 24: Upstream and downstream sequence around the SNP
+```
 Primer files are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
-```
 ## Detection of polymorphisms between control and target
 - SNPs between ERR3063486 (wild-type) and ERR3063487 (mutant)  
 ```
