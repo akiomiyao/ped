@@ -32,7 +32,7 @@ $usage = '
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
  Because default setting of ulimit is 1024, 14 threads is muximun for
- defalt setting. 
+ defalt setting of OS. 
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
@@ -116,13 +116,14 @@ if ($uname eq "FreeBSD"){
 
 if ($uname eq "Darwin"){
     $max_semaphore = 1;
-}elsif ($processor > 14 ){
-    $max_semaphore = 14;
+}elsif ($processor >= 8 ){
+    $max_semaphore = 8;
 }else{
     $max_semaphore = $processor;
 }
 $max_semaphore = 3 if $max_semaphore eq "";
 $max_semaphore = $thread if $thread ne "";
+$max_semaphore = 14 if $max_semaphore > 14;
 $semaphore = Thread::Semaphore->new($max_semaphore);
 
 $refdir = "$wd/$ref";
