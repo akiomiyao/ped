@@ -1573,7 +1573,7 @@ sub svReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "_";
+	    $genotype = "R";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
@@ -1584,7 +1584,7 @@ sub svReadCount{
 	    @prev = split('\t', $prev);
 	    if ($prev[5] =~ /translocation|inversion/){
 		$prev[7] = $prev[6];
-		$prev[6] = "_";
+		$prev[6] = "NA";
 	    }
 	    $prev[7] = "_" if $prev[7] eq "";
 	    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n" if $prev ne "";
@@ -1599,7 +1599,7 @@ sub svReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "_";
+    $genotype = "R";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
@@ -1610,7 +1610,7 @@ sub svReadCount{
     @prev = split('\t', $prev);
     if ($prev[5] =~ /translocation|inversion/){
 	$prev[7] = $prev[6];
-	$prev[6] = "_";
+	$prev[6] = "NA";
     }
     $prev[7] = "_" if $prev[7] eq "";
     print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
@@ -1662,7 +1662,7 @@ sub kmerReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "_";
+	    $genotype = "NA";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
@@ -1690,7 +1690,7 @@ sub kmerReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "_";
+    $genotype = "NA";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
@@ -1756,7 +1756,7 @@ sub snpReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "_";
+	    $genotype = "R";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
@@ -1776,7 +1776,7 @@ sub snpReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "_";
+    $genotype = "R";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
@@ -2509,7 +2509,7 @@ sub align{
 
 sub alignFunc{
     my $tag = shift;
-    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file);
+    my ($seq, $hpos, $hchr, $head_pos, $head_direction, $tpos, $tchr, $tail_pos, $tail_direction, $length, $head, $tail, $hhit, $thit, $margin, $head_seq, $distance, $head_bar, $tail_bar, $head_space, $tail_space, @head, @tail, @seq, $mcount, $out, $i, $j, $k, $head_junction, $head_fail, $unmatch, $hcount, $head_junction, $tail_junction, $tail_fail, $tcount, $tail_direction, $type, $distance, $fin, $fout, $chr_file, $nflag);
     $fin = $tag;
     $fout = "$tag-out";
     $chr_file = "$tag-chr";
@@ -2523,6 +2523,7 @@ sub alignFunc{
 	$tail = substr($_, $tpos -1, 20);
 	$hhit = 0;
 	$thit = 0;
+	$nflag = 0;
 	$margin = $hpos -1;
 	
 	open($chr_file, "$wd/$ref/chr$hchr");
@@ -2542,6 +2543,7 @@ sub alignFunc{
 			if ($seq[$i] eq $head[$i]){
 			    $head_bar .= "|";
 			}else{
+			    $nflag = 1 if $head[$i] eq "N";
 			    $head_bar .= " ";
 			    $pos = $head_pos + $i - $margin;
 			    if ($i >= $margin and $i < $length - $margin){
@@ -2589,12 +2591,14 @@ $seq
 		    $head_bar .= "|";
 		    $head_bar[$i] = "|";
 		}else{
+		    $nflag = 1 if $head[$i] eq "N";
 		    $head_bar .= " ";
 		}
 		if ($seq[$i] eq $tail[$i]){
 		    $tail_bar .= "|";
 		    $tail_bar[$i] = "|";
 		}else{
+		    $nflag = 1 if $tail[$i] eq "N";
 		    $tail_bar .= " ";
 		}
 	    }
@@ -2659,7 +2663,7 @@ $seq
 	    }
 	    
 	    $type = "";
-	    if ($head_junction ne "" and $tail_junction ne ""){
+	    if ($head_junction ne "" and $tail_junction ne "" and $nflag == 0){
 		if ($distance ne ""){
 		    $distance = $length - 20 - $distance - $margin * 2;
 		    if ($distance > 0 ){

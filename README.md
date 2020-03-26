@@ -318,16 +318,16 @@ perl qsub_kmer.pl ERR3063487 ERR3063486
 A part of SNP list of the bidirectional method is  
 ```
 1       3189273 T       C       50      0       15      9       H
-1       3189333 T       C       50      0       14      0       _
+1       3189333 T       C       50      0       14      0       R
 1       3189345 A       G       50      0       13      17      H
-1       3189429 G       A       50      0       15      0       _
+1       3189429 G       A       50      0       15      0       R
 1       3189498 G       A       50      0       0       39      M
-1       3189503 T       G       50      0       2       1       _
-1       3189527 T       G       50      0       10      0       _
-1       3189609 T       A       50      0       41      1       _
+1       3189503 T       G       50      0       2       1       R
+1       3189527 T       G       50      0       10      0       R
+1       3189609 T       A       50      0       41      1       R
 1       3189704 C       G       50      0       0       11      M
 1       3189741 A       G       50      0       0       23      M
-1       3189819 A       G       50      0       0       4       _
+1       3189819 A       G       50      0       0       4       R
 1       3189833 C       T       50      0       0       46      M
 
 Column 1: Chromosome number
@@ -339,7 +339,7 @@ Column 6: Number of reads in the control sort_uniq file with control type polymo
 Column 7: Number of reads in the control sort_uniq file with target type polymorphism
 Column 8: Number of reads in the target sort_uniq file with control type polymorphism
 Column 9: Number of reads in the target sort_uniq file with target type polymorphism
-Column 10: Genotype (M: homozygous, H: heterozygous, _: reference type)
+Column 10: Genotype (M: homozygous, H: heterozygous, R: reference type)
 Following columns will be appeared in the primer file.
 Column 11: Left primer sequence 
 Column 12: Right primer sequence
@@ -354,7 +354,7 @@ The algorithm of detection primer sequences has been developed by my experience 
 1       907869  1       907835  f       insertion       32      50      0       19      11      H       C
 1       911222  1       911221  f       deletion        -1      50      0       21      15      H       T
 1       923312  1       923312  f       deletion        -1      50      0       0       34      M       _
-1       931147  1       931131  f       insertion       4       50      0       7       19      _       CCCTCCCTCCC
+1       931147  1       931131  f       insertion       4       50      0       7       19      N       CCCTCCCTCCC
 1       932618  1       932617  f       deletion        -4      50      0       1       32      M       TTTC
 
 Column 1: Chromosome number of junction detected by 5' to 3' matching
@@ -368,8 +368,8 @@ Column 8: Number of reads in the control sort_uniq file with control type polymo
 Column 9: Number of reads in the control sort_uniq file with target type polymorphism
 Column 10: Number of reads in the target sort_uniq file with control type polymorphism
 Column 11: Number of reads in the target sort_uniq file with target type polymorphism
-Column 12: Genotype (M: homozygous, H: heterozygous, _: reference type)
-Column 13: Sequence between junctions
+Column 12: Genotype (M: homozygous, H: heterozygous, N: not applicable)
+Column 13: Sequence between junctions (_: no sequence within junctions)
 Following columns will be appeared in the primer file.
 Column 14: Left primer sequence 
 Column 15: Right primer sequence
@@ -383,15 +383,15 @@ The algorithm of detection primer sequences has been developed by my experience 
 ```
 X       14544549        ACAGTTGTATTTTTCAATT     A       A       G       r       0       0       0       13      0       27      0       0       13      0       0       30      M
 X       14544549        TACACCACTGTAAGTCAAC     A       A       G       f       13      0       0       0       0       0       27      0       13      0       0       30      M
-X       14592687        AAAAATTTGGATTTTTGGA     G       G       GT      r       0       15      0       0       20      20      0       1       5       0       10      0       _
-X       14592707        AAAAATTTGGATTTTTGGA     G       G       AG      f       0       0       15      0       20      0       20      0       5       0       10      0       _
-X       14615799        ACCCCTATATATAGTGTTT     T       T       AT      r       25      0       0       0       16      0       0       12      26      0       18      0       _
-X       14615819        ACCCCTATATATAGTGTTT     T       T       AT      f       0       0       0       25      12      0       0       16      26      0       23      0       _
-X       14624654        GTTGTGCTTTATTTATTTG     A       A       AT      r       0       0       0       19      15      0       0       20      19      0       19      0       _
-X       14624674        GTTGTGCTTTATTTATTTG     A       A       AG      f       18      0       0       0       18      0       16      0       19      0       17      0       _
+X       14592687        AAAAATTTGGATTTTTGGA     G       G       GT      r       0       15      0       0       20      20      0       1       5       0       10      0       R
+X       14592707        AAAAATTTGGATTTTTGGA     G       G       AG      f       0       0       15      0       20      0       20      0       5       0       10      0       R
+X       14615799        ACCCCTATATATAGTGTTT     T       T       AT      r       25      0       0       0       16      0       0       12      26      0       18      0       R
+X       14615819        ACCCCTATATATAGTGTTT     T       T       AT      f       0       0       0       25      12      0       0       16      26      0       23      0       R
+X       14624654        GTTGTGCTTTATTTATTTG     A       A       AT      r       0       0       0       19      15      0       0       20      19      0       19      0       R
+X       14624674        GTTGTGCTTTATTTATTTG     A       A       AG      f       18      0       0       0       18      0       16      0       19      0       17      0       R
 X       14632040        ATTTTTTTCACAAACAAGG     T       T       A       r       26      0       0       0       0       0       0       23      21      0       0       21      M
 X       14632040        CTTAAATCGGAGAACAAAT     T       T       A       f       0       0       0       25      22      0       0       0       21      0       0       21      M
-X       14682371        TCAGTTCAATCACGATAAA     A       A       AT      r       0       0       0       19      10      0       0       19      24      0       20      0       _
+X       14682371        TCAGTTCAATCACGATAAA     A       A       AT      r       0       0       0       19      10      0       0       19      24      0       20      0       R
 
 Column 1: Chromosome number
 Column 2: Position of SNP
@@ -412,7 +412,7 @@ Column 16: Number of reads in the control sort_uniq file with control type base
 Column 17: Number of reads in the control sort_uniq file with target type base
 Column 18: Number of reads in the target sort_uniq file with control type base
 Column 19: Number of reads in the target sort_uniq file with target type base
-Column 20: Genotype (M: homozygous, H: heterozygous, _: reference type)
+Column 20: Genotype (M: homozygous, H: heterozygous, R: reference type)
 Following columns will be appeared in the primer file.
 Column 21: Left primer sequence 
 Column 22: Right primer sequence
@@ -530,15 +530,15 @@ I       834776  I       834746  f       deletion        -12     6       0       
 I       1251597 I       1251573 f       deletion        -2      5       0       8       4       H       TGTGTGTGTGTGTGTGTGTGTGTGT
 I       1412142 I       1411952 f       insertion       102     12      1       6       3       H       CCCCCCGCTGACCCCAAACCAATATCCCGTCAAAAAACGAAAATTCATATTTTTCTTAATCTACAGTAATCCTACAGTGCCCCTACA
 I       1560682 I       1560674 f       deletion        -1      17      0       0       19      M       TTTTTTTT
-I       1560682 I       1561254 r       inversion       _       13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
+I       1560682 I       1561254 r       inversion       NA       13      0       0       6       M       TTAAAGGTGGTGTGGTCGAATTTTTTTT
 I       2160919 I       2160898 f       deletion        -1      9       0       8       4       H       TTTTTTTTCAAAAAAAAAAAA
 I       2384261 I       2384244 f       insertion       1       14      1       8       4       H       CAAAAAAAAAAAAAA
-I       2715230 III     12981863        r       translocation   _       5       1       5       3       H       CGTATTGCACAGCACATTTGACGCGCAAAAT
+I       2715230 III     12981863        r       translocation   NA       5       1       5       3       H       CGTATTGCACAGCACATTTGACGCGCAAAAT
 I       5081495 I       5081478 f       deletion        -2      7       1       6       4       H       TTTTTTTTTTTTTTTTTT
 I       8028077 I       8028066 f       deletion        -1      6       0       6       3       H       TTTTTTTTTTT
 I       8028078 I       8028065 f       insertion       1       6       0       6       3       H       TTTTTTTTTTT
 I       9825014 I       9825007 f       insertion       1       23      0       8       13      H       AAAAA
-I       10622455        IV      9192034 f       translocation   _       5       1       6       3       H       GTTCAAATAAAAATATTTTTTT
+I       10622455        IV      9192034 f       translocation   NA       5       1       6       3       H       GTTCAAATAAAAATATTTTTTT
 I       10887954        I       10887958        f       deletion        -6      11      0       1       10      M       A
 I       11005509        I       11005489        f       deletion        -1      5       1       0       5       M       AAATTTTTTTTTTTTTTTTT
 I       12856424        I       12856415        f       deletion        -1      14      0       8       5       H       TTTTTTTTT
@@ -547,20 +547,20 @@ II      191614  II      191601  f       insertion       1       11      0       
 II      948033  II      948099  f       deletion        -69     20      0       1       15      M       AT
 II      1777672 II      1770125 f       insertion       7506    8       1       9       4       H       ATGGTGAGTAGCCGGTAATTTCATAGTTATTGAAATTTGA
 II      2361947 II      2361931 f       deletion        -1      10      1       0       15      M       TTTTTCTTTTTTTTTT
-II      4463297 V       1000739 r       translocation   _       6       0       6       4       H       TTTCGATTTTCCAGAAAATCAAAAAAAAA
-II      4895056 V       18778607        r       translocation   _       5       0       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
-II      5473562 II      3675168 r       inversion       _       8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
-II      12746320        III     4520340 f       translocation   _       6       1       5       3       H       TGTAAAATTGTTTTTTTTT
-II      13112130        V       20740040        f       translocation   _       6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
-II      13327324        II      13327697        r       inversion       _       6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
+II      4463297 V       1000739 r       translocation   NA       6       0       6       4       H       TTTCGATTTTCCAGAAAATCAAAAAAAAA
+II      4895056 V       18778607        r       translocation   NA       5       0       5       3       H       TTCTACGTTTTGCAATGTGTTTTTT
+II      5473562 II      3675168 r       inversion       NA       8       1       5       3       H       TTTTACTCAGTTATGTTTTTTTT
+II      12746320        III     4520340 f       translocation   NA       6       1       5       3       H       TGTAAAATTGTTTTTTTTT
+II      13112130        V       20740040        f       translocation   NA       6       0       7       4       H       AAAAAAAAACGCATGCATTTTTCG
+II      13327324        II      13327697        r       inversion       NA       6       1       6       5       H       TTTTGACACTTTTTAGTAATAAATGCAAAAAAAATCAACAAAAATAGACTAAACATTGTAAAAACTGTAAAAACTAAGAGAAAAAAT
 III     1663181 III     1663357 f       deletion        -209    6       1       7       5       H       TTTTTTCCAGAAATTAATATTTCTAGAAAAAT
-III     2300741 X       15839886        r       translocation   _       19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
-III     2520715 X       97782   f       translocation   _       7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
-III     2985966 IV      876821  f       translocation   _       5       1       6       3       H       AAAAAAATTTTTTTTTT
+III     2300741 X       15839886        r       translocation   NA       19      0       11      6       H       TTAAAGGTGGAGTAGCGCCAGTGGGAAAATTGCTTTAAAACATGCCTATGGTACCACAATGACCAAATATCAT
+III     2520715 X       97782   f       translocation   NA       7       1       6       5       H       TATTTTTTCGCCATTTTTTTT
+III     2985966 IV      876821  f       translocation   NA       5       1       6       3       H       AAAAAAATTTTTTTTTT
 III     3566956 III     3566962 f       deletion        -48     8       1       6       4       H       TCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCTCT
 III     6231151 III     6231140 f       deletion        -1      14      0       6       3       H       AAAAAAAAAAA
 III     10402397        III     10402387        f       deletion        -2      5       1       7       4       H       TTTTTTTTTTT
-III     11280814        X       2272016 r       translocation   _       12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
+III     11280814        X       2272016 r       translocation   NA       12      0       6       3       H       TTTTTTTCAAAAAAAAAAAAA
 III     12543896        III     12543907        f       deletion        -62     8       1       9       4       H       AAATTTCCGGAAAACATGCAAATTGCCAGAATTGAAAATTTCCGGCAAAT
 III     13419473        III     13419443        f       insertion       6       5       1       10      5       H       TGTGTGTGTGTGTGTGTGTGTGT
 IV      1786345 IV      1786337 f       deletion        -1      15      0       0       12      M       AAAAAAAA
@@ -576,9 +576,9 @@ IV      4489131 IV      4489122 f       deletion        -1      16      0       
 V       1027708 V       1027700 f       deletion        -39     9       1       10      5       H       GCCTATGGCCTACGCCTATGGCCTACGCCTATGGCCTACGCCTATG
 V       1989616 V       1989642 f       deletion        -3      6       1       6       3       H       GATAAAAACTACTTGGATAAATGA
 V       9026732 V       9026728 f       deletion        -3      6       1       7       4       H       ATTATT
-V       11884926        II      3151004 r       translocation   _       5       1       6       5       H       GTGCCGAGTGCCGATCGGCACAATGTG
-V       18672436        IV      2681633 r       translocation   _       7       1       5       3       H       GGGAAAATTGCTTTAAAACATGCCTATGGTACTACAA
-V       18890234        V       18892184        r       inversion       _       6       1       6       3       H       TTTTTATTGAAAACTAGTATAAAAATATA
+V       11884926        II      3151004 r       translocation   NA       5       1       6       5       H       GTGCCGAGTGCCGATCGGCACAATGTG
+V       18672436        IV      2681633 r       translocation   NA       7       1       5       3       H       GGGAAAATTGCTTTAAAACATGCCTATGGTACTACAA
+V       18890234        V       18892184        r       inversion       NA       6       1       6       3       H       TTTTTATTGAAAACTAGTATAAAAATATA
 V       20123760        V       20123893        f       deletion        -150    12      0       7       4       H       GGGGTTCGAACCCCGG
 X       99547   X       99523   f       deletion        -1      8       1       9       5       H       AAAAAAAATTTTTTTTTTTTTTTT
 X       438457  X       438446  f       insertion       1       12      0       5       5       H       TTTTTTTTT
@@ -587,9 +587,9 @@ X       1522918 X       1522902 f       deletion        -1      6       1       
 X       2498483 X       2498466 f       deletion        -1      6       1       5       3       H       TTTTTTTTTTTTTTTTT
 X       3823840 X       3823828 f       deletion        -1      10      0       8       4       H       AAAAAAAAAAAA
 X       5885390 X       5885377 f       deletion        -1      11      0       10      5       H       TTTTTTTTTTTTT
-X       7312229 X       11435923        r       inversion       _       6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAATCAAAGAATCGACGACCGCCTCCTGAA
-X       10023790        III     7850798 r       translocation   _       5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
-X       14258766        III     303520  f       translocation   _       6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
+X       7312229 X       11435923        r       inversion       NA       6       0       5       4       H       TATTCACCCCGTTCGACTGTGCAATGGGTTTAATCTATTCACTTTGTAAATCAAAGAATCGACGACCGCCTCCTGAA
+X       10023790        III     7850798 r       translocation   NA       5       0       6       3       H       ATATCAAAATTTCATTTTTTTT
+X       14258766        III     303520  f       translocation   NA       6       0       9       5       H       TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
 ```
 
 ## Author
