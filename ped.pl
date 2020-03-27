@@ -1573,18 +1573,21 @@ sub svReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "R";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
 		}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 		    $genotype = "H";
+		}else{
+		    $genotype = "R";
 		}
+	    }else{
+		$genotype = "N";
 	    }
 	    @prev = split('\t', $prev);
 	    if ($prev[5] =~ /translocation|inversion/){
 		$prev[7] = $prev[6];
-		$prev[6] = "NA";
+		$prev[6] = "N";
 	    }
 	    $prev[7] = "_" if $prev[7] eq "";
 	    print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n" if $prev ne "";
@@ -1599,18 +1602,20 @@ sub svReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "R";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
 	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 	    $genotype = "H";
+	}else{
+	    $genotype = "R";
 	}
+	$genotype = "N";
     }
     @prev = split('\t', $prev);
     if ($prev[5] =~ /translocation|inversion/){
 	$prev[7] = $prev[6];
-	$prev[6] = "NA";
+	$prev[6] = "N";
     }
     $prev[7] = "_" if $prev[7] eq "";
     print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
@@ -1662,13 +1667,16 @@ sub kmerReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "NA";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
 		}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 		    $genotype = "H";
+		}else{
+		    $genotype = "R";
 		}
+	    }else{
+		$genotype = "N";
 	    }
 	    $_ = $prev;
 	    @prev = split;
@@ -1690,13 +1698,16 @@ sub kmerReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "NA";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
 	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 	    $genotype = "H";
+	}else{
+	    $genotype = "R";
 	}
+    }else{
+	$genotype = "N";
     }
     $_ = $prev;
     @prev = split;
@@ -1756,13 +1767,16 @@ sub snpReadCount{
 	$row[1] += 0;
 	$dat = join("\t", @row[0 .. $#row -1]);
 	if($dat ne $prev){
-	    $genotype = "R";
 	    if ($cw >= 5 and $cm <= 1){
 		if ($tm >= 5 and $tw <= 1){
 		    $genotype = 'M';
 		}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 		    $genotype = "H";
+		}else{
+		    $genotype = "R";
 		}
+	    }else{
+		$genotype = "N";
 	    }
 	    print OUT "$prev\t$cw\t$cm\t$tw\t$tm\t$genotype\n" if $prev ne "";
 	    $cm = 0;
@@ -1776,13 +1790,16 @@ sub snpReadCount{
 	$tw = $count if $row[$#row] eq "tw";
 	$prev = $dat;
     }
-    $genotype = "R";
     if ($cw >= 5 and $cm <= 1){
 	if ($tm >= 5 and $tw <= 1){
 	    $genotype = 'M';
 	}elsif(($tm + $tw) > 0 and $tm / ($tm + $tw) > 0.3 and $tm / ($tm + $tw) < 0.7 and $cm <= 1 and $tw >= 5){
 	    $genotype = "H";
+	}else{
+	    $genotype = "R";
 	}
+    }else{
+	$genotype = "N";
     }
     print OUT "$prev\t$cw\t$cm\t$tw\t$tm\t$genotype\n";
     close(OUT);

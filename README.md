@@ -339,7 +339,7 @@ Column 6: Number of reads in the control sort_uniq file with control type polymo
 Column 7: Number of reads in the control sort_uniq file with target type polymorphism
 Column 8: Number of reads in the target sort_uniq file with control type polymorphism
 Column 9: Number of reads in the target sort_uniq file with target type polymorphism
-Column 10: Genotype (M: homozygous, H: heterozygous, R: reference type)
+Column 10: Genotype (M: homozygous, H: heterozygous, R: reference type, N: not applicable)
 Following columns will be appeared in the primer file.
 Column 11: Left primer sequence 
 Column 12: Right primer sequence
@@ -368,7 +368,7 @@ Column 8: Number of reads in the control sort_uniq file with control type polymo
 Column 9: Number of reads in the control sort_uniq file with target type polymorphism
 Column 10: Number of reads in the target sort_uniq file with control type polymorphism
 Column 11: Number of reads in the target sort_uniq file with target type polymorphism
-Column 12: Genotype (M: homozygous, H: heterozygous, N: not applicable)
+Column 12: Genotype (M: homozygous, H: heterozygous, R: reference type, N: not applicable)
 Column 13: Sequence between junctions (_: no sequence within junctions)
 Following columns will be appeared in the primer file.
 Column 14: Left primer sequence 
@@ -412,7 +412,7 @@ Column 16: Number of reads in the control sort_uniq file with control type base
 Column 17: Number of reads in the control sort_uniq file with target type base
 Column 18: Number of reads in the target sort_uniq file with control type base
 Column 19: Number of reads in the target sort_uniq file with target type base
-Column 20: Genotype (M: homozygous, H: heterozygous, R: reference type)
+Column 20: Genotype (M: homozygous, H: heterozygous, R: reference type, N: not applicable)
 Following columns will be appeared in the primer file.
 Column 21: Left primer sequence 
 Column 22: Right primer sequence
