@@ -105,6 +105,10 @@ if ($uname eq "FreeBSD"){
     }
     close(IN);
 }elsif($uname eq "Linux"){
+    die "curl not found. Please install curl.
+sudo apt install curl (Ubuntu)
+sudo yum install curl (CentOS)
+" if ! -e "/usr/bin/curl";
     open(IN, "/proc/cpuinfo");
     while(<IN>){
 	$processor ++  if /processor/;
