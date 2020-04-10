@@ -31,12 +31,19 @@
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       <li>多型部分を増幅するプライマー配列も同時に出力されます。
       </ul>
-      <p><b>Githubからのコードの取得は、</b><br>
+      <li><b>Githubからのコードの取得は、</b><br>
       sudo apt install git (Ubuntuの場合)<br>
       sudo yum install git (CentOSの場合)<br>
       sudo pkg install git (FreeBSDの場合)<br>
+      でgitをインストールした後に、<br><br>
       git clone https://github.com/akiomiyao/ped.git
-	  <p><b>例</b>
+      <br><br>
+      curlも必要です。インストールされていない場合は、以下を実行してください。<br>
+      sudo apt install curl (Ubuntuの場合)<br>
+      sudo yum install curl (CentOSの場合)<br>
+      sudo pkg install curl (FreeBSDの場合)<br>
+ 
+	  <li><b>実行例</b>
 	  <ul>
 	  <li>perl ped.pl target=ERR194146,ref=hg38<br>
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
@@ -207,6 +214,7 @@ chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   
 	 一度作成されると次回以降の実行では、作成されたデータセットをもとに解析が進みます。
 	 <li>現在サポートしているリファレンスゲノムは以下の通りです。
 	 <pre>  Name           Description
+  Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
   B73v4          Corn (Zea mays B73) RefGen v4
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
