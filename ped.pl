@@ -2340,6 +2340,15 @@ sub sortData4Map{
 
 sub sortData4MapFunc{
     my $tag = shift;
+    report("Sorting sequence data. $tag");
+    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -f > $tmpdir/$tag.gz");
+    &waitFile("$tmpdir/$tag.gz");
+    system("rm $tmpdir/$tag.tmp.*");
+    $semaphore->up;
+}
+
+sub sortData4MapFuncSubFileVersion{
+    my $tag = shift;
     my ($nuca, $nucb, $nucc, $subtag, $fin, $ftmp, $fout);
     report("Sorting sequence data. $tag");
     foreach $nuca (@nuc){
