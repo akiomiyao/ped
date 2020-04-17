@@ -685,7 +685,7 @@ sub countKmerLbc{
 
     $fin = "$tag.lbc.in";
     $fout = "$tag.lbc.out";
-    open($fout, "|gzip > $wd/$target/lbc/$target.lbc.$tag.gz");
+    open($fout, "|gzip -c > $wd/$target/lbc/$target.lbc.$tag.gz");
     open($fin, "$tmpdir/$tag.count");
     while(<$fin>){
 	chomp;
@@ -747,7 +747,7 @@ sub countKmerSort{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&report("Making kmer for $target. Sorting of $parent.$tag subfile");
-		system("$zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
+		system("$zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip -c > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
 	    }
 	}
     }
@@ -762,7 +762,7 @@ sub countKmerSub{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$fout = "$tag.$parent.out";
-		open($fout, "|gzip > $tmpdir/$tag.$parent.gz");
+		open($fout, "|gzip -c > $tmpdir/$tag.$parent.gz");
 	    }
 	}
     }
@@ -925,42 +925,7 @@ sub mkControlReadChr{
 
 sub mkControlReadSub{
     my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $fin, $ftmp, $fout);
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$ftmp = $tag . $subtag;
-		open($ftmp, "> $wd/$ref/tmp/tmp.$ftmp");
-	    }
-	}
-    }
-    $fin = $tag;
-    open($fin, "cat $wd/$ref/tmp/$tag.* |");
-    while(<$fin>){
-	$ftmp = substr($_, 0, 6);
-	print $ftmp $_;
-    }
-    close($fin);
-    $fout = "tmpout.$tag";
-    open($fout, "|uniq |gzip -f > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$ftmp = $tag . $subtag;
-		close($ftmp);
-		$fin = "tmp.$tag";
-		open($fin, "sort $sort_opt -T $wd/$ref/tmp $wd/$ref/tmp/tmp.$ftmp |");
-		while(<$fin>){
-		    print $fout $_;
-		}
-		close($fin);
-		system("rm $wd/$ref/tmp/tmp.$ftmp");
-	    }
-	}
-    }
-    close($fout);
+    system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq |gzip -c > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
     system("rm $wd/$ref/tmp/$tag.*");
     $semaphore->up;
 }
@@ -969,50 +934,24 @@ sub mkUniq{
     my $tag = shift;
     my ($nuca, $nucb, $nucc, $subtag, $fin, $fout, $funiq);
     &report("Making ref20_uniq.$tag.gz");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$fout = $tag . $subtag;
-		open($fout, "> $wd/$ref/tmp/tmp.$fout");
-	    }
-	}
-    }
     $fin = $tag;
-    open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |");
-    while(<$fin>){
-	$fout = substr($_, 0, 6);
-	print $fout $_;
-    }
-    close($fin);
     $funiq = "tmpout.$tag";
-    open($funiq, "|gzip -f > $wd/$ref/ref20_uniq.$tag.gz");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$fout = $tag . $subtag;
-		close($fout);
-		$count = 0;
-		$fin = "tmp.$tag";
-		open($fin, "sort $sort_opt -T $tmpdir $wd/$ref/tmp/tmp.$fout |");
-		while(<$fin>){
-		    chomp;
-		    @row = split;
-		    if ($prev ne "" and $prev ne $row[0]){
-			print $funiq "$pline\n" if $count == 1;
-			$count =0;
-		    }
-		    $prev = $row[0];
-		    $pline = $_;
-		    $count++;
-		}
-		print $funiq "$pline\n" if $count == 1;
-		close($fin);
-		system("rm $wd/$ref/tmp/tmp.$fout");
-	    }
+    $count = 0;
+    open($funiq, "|gzip -c > $wd/$ref/ref20_uniq.$tag.gz");
+    open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |sort $sort_opt -T $tmpdir |");
+    while(<$fin>){
+	chomp;
+	@row = split;
+	if ($prev ne "" and $prev ne $row[0]){
+	    print $funiq "$pline\n" if $count == 1;
+	    $count =0;
 	}
+	$prev = $row[0];
+	$pline = $_;
+	$count++;
     }
+    print $funiq "$pline\n" if $count == 1;
+    close($fin);
     close($funiq);
     system("rm $wd/$ref/tmp/ref20.$tag.*");
     $semaphore->up;
@@ -1235,18 +1174,10 @@ sub mkSortUniq{
 
 sub sortUniqSort{
     my ($tag, $subject) = @_;
-    my ($nuca, $nucb, $nucc, $subtag);
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
     system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $tag . $nuca . $nucb . $nucc;
-		system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$subtag.tmp | uniq >> $wd/$subject/sort_uniq/$subject.sort_uniq.$tag && rm $wd/$subject/sort_uniq/$subtag.tmp");
-	    }
-	}
-    }
-    system("gzip $wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
+    system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq | gzip -c > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp");
+    &waitFile("$wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz");
     $semaphore->up;
 }
 
@@ -1254,7 +1185,7 @@ sub sortUniqSub{
     my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
-    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $subtag, $count, $complement, $total);
+    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement);
     system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1284,36 +1215,6 @@ sub sortUniqSub{
     }
     close(IN);
     &closeTag;
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		open($tag, "$wd/$subject/sort_uniq/$tag.tmp");
-		foreach $nucd (@nuc){
-		    foreach $nuce (@nuc){
-			foreach $nucf (@nuc){
-			    $subtag = $tag . $nucd . $nuce . $nucf;
-			    open ($subtag, "> $wd/$subject/sort_uniq/$subtag.tmp");
-			}
-		    }
-		}
-		while(<$tag>){
-		    $subtag = substr($_, 0, 6);
-		    print $subtag $_;
-		}
-		close($tag);
-		system("rm $wd/$subject/sort_uniq/$tag.tmp");
-		foreach $nucd (@nuc){
-		    foreach $nuce (@nuc){
-			foreach $nucf (@nuc){
-			    $subtag = $tag. $nucd . $nuce . $nucf;
-			    close($subtag);
-			}
-		    }
-		}
-	    }
-	}
-    }
 }
 
 sub toVcf{
@@ -1373,7 +1274,7 @@ sub snpMkT{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
+		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -1481,7 +1382,7 @@ sub snpMkC{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
+		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -1862,36 +1763,10 @@ sub joinTarget{
 
 sub sortSeqFunc{
     my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $fin, $fout);
     report("Sorting sequence data for verify. $tag");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$fout = $tag . $subtag;
-		open($fout, "> $tmpdir/tmp.$fout");
-	    }
-	}
-    }
-    $fin = $tag;
-    open($fin, "$zcat $tmpdir/$tag.tmp.gz |");
-    while(<$fin>){
-	$subtag = substr($_, 0, 6);
-	print $subtag $_;
-    }
-    close($fin);
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$fout = $tag . $subtag;
-		close($fout);
-		system("sort $sort_opt -T $tmpdir $tmpdir/tmp.$fout > $tmpdir/tmpsort.$fout && rm $tmpdir/tmp.$fout");
-	    }
-	}
-    }
-    system("cat $tmpdir/tmpsort.$tag* |gzip > $tmpdir/$tag.gz");
-    system("rm $tmpdir/$tag.tmp.gz $tmpdir/tmpsort.$tag*");
+    system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
+    &waitFile("$tmpdir/$tag.gz");
+    system("rm $tmpdir/$tag.tmp.gz");
     $semaphore->up;
 }
 
@@ -1917,7 +1792,7 @@ sub svMkC{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
+		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -2090,7 +1965,7 @@ sub svMkT{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip > $tmpdir/$tag.tmp.gz");
+		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
 	    }
 	}
     }
@@ -2341,56 +2216,11 @@ sub sortData4Map{
 sub sortData4MapFunc{
     my $tag = shift;
     report("Sorting sequence data. $tag");
-    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -f > $tmpdir/$tag.gz");
+    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
     &waitFile("$tmpdir/$tag.gz");
     system("rm $tmpdir/$tag.tmp.*");
     $semaphore->up;
 }
-
-sub sortData4MapFuncSubFileVersion{
-    my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $fin, $ftmp, $fout);
-    report("Sorting sequence data. $tag");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$ftmp = $tag . $subtag;
-		open($ftmp, "> $tmpdir/tmp.$ftmp");
-	    }
-	}
-    }
-    $fin = $tag;
-    open($fin, "cat $tmpdir/$tag.tmp.* |");
-    while(<$fin>){
-	$ftmp = substr($_, 0, 6);
-	print $ftmp $_;
-    }
-    close($fin);
-    $fout = "tmpout.$tag";
-    open($fout, "|gzip -f > $tmpdir/$tag.gz");
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$subtag = $nuca . $nucb . $nucc;
-		$ftmp = $tag . $subtag;
-		close($ftmp);
-		$fin = "tmp.$tag";
-		open($fin, "sort $sort_opt -T $tmpdir $tmpdir/tmp.$ftmp |");
-		while(<$fin>){
-		    print $fout $_;
-		}
-		close($fin);
-		system("rm $tmpdir/tmp.$ftmp");
-	    }
-	}
-    }
-    close($fout);
-    &waitFile("$tmpdir/$tag.gz");
-    system("rm $tmpdir/$tag.tmp.*");
-    $semaphore->up;
-}
-
 
 sub mkData4MapF{
     my ($nuca, $nucb, $nucc, $tag);
@@ -2521,7 +2351,7 @@ sub mapFunc{
 }
 
 sub align{
-    my ($nuca, $nucb, $nucc, $subtag);
+    my ($nuca, $nucb, $nucc, $tag);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
