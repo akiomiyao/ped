@@ -685,7 +685,7 @@ sub countKmerLbc{
 
     $fin = "$tag.lbc.in";
     $fout = "$tag.lbc.out";
-    open($fout, "|gzip -c > $wd/$target/lbc/$target.lbc.$tag.gz");
+    open($fout, "> $wd/$target/lbc/$target.lbc.$tag");
     open($fin, "$tmpdir/$tag.count");
     while(<$fin>){
 	chomp;
@@ -707,7 +707,7 @@ sub countKmerLbc{
     print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
     close($fin);
     close($fout);
-    system("rm $tmpdir/$tag.count");
+    system("gzip $wd/$target/lbc/$target.lbc.$tag && rm $tmpdir/$tag.count");
     $semaphore->up;
 }
 
@@ -925,19 +925,18 @@ sub mkControlReadChr{
 
 sub mkControlReadSub{
     my $tag = shift;
-    system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq |gzip -c > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
-    system("rm $wd/$ref/tmp/$tag.*");
+    system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag");
+    system("gzip $wd/$ref/sort_uniq/$ref.sort_uniq.$tag && rm $wd/$ref/tmp/$tag.*");
     $semaphore->up;
 }
 
 sub mkUniq{
     my $tag = shift;
-    my ($nuca, $nucb, $nucc, $subtag, $fin, $fout, $funiq);
     &report("Making ref20_uniq.$tag.gz");
-    $fin = $tag;
-    $funiq = "tmpout.$tag";
-    $count = 0;
-    open($funiq, "|gzip -c > $wd/$ref/ref20_uniq.$tag.gz");
+    my $fin = $tag;
+    my $funiq = "tmpout.$tag";
+    my $count = 0;
+    open($funiq, "> $wd/$ref/ref20_uniq.$tag");
     open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |sort $sort_opt -T $tmpdir |");
     while(<$fin>){
 	chomp;
@@ -953,7 +952,7 @@ sub mkUniq{
     print $funiq "$pline\n" if $count == 1;
     close($fin);
     close($funiq);
-    system("rm $wd/$ref/tmp/ref20.$tag.*");
+    system("gzip $wd/$ref/ref20_uniq.$tag && rm $wd/$ref/tmp/ref20.$tag.*");
     $semaphore->up;
 }
 
@@ -1176,8 +1175,9 @@ sub sortUniqSort{
     my ($tag, $subject) = @_;
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
     system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
-    system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq | gzip -c > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz && rm $wd/$subject/sort_uniq/$tag.tmp");
-    &waitFile("$wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz");
+    system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
+    &waitFile("$wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
+    system("gzip $wd/$subject/sort_uniq/$subject.sort_uniq.$tag && rm $wd/$subject/sort_uniq/$tag.tmp");
     $semaphore->up;
 }
 
@@ -1764,9 +1764,9 @@ sub joinTarget{
 sub sortSeqFunc{
     my $tag = shift;
     report("Sorting sequence data for verify. $tag");
-    system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
-    &waitFile("$tmpdir/$tag.gz");
-    system("rm $tmpdir/$tag.tmp.gz");
+    system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
+    &waitFile("$tmpdir/$tag");
+    system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.gz");
     $semaphore->up;
 }
 
@@ -2216,9 +2216,9 @@ sub sortData4Map{
 sub sortData4MapFunc{
     my $tag = shift;
     report("Sorting sequence data. $tag");
-    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
-    &waitFile("$tmpdir/$tag.gz");
-    system("rm $tmpdir/$tag.tmp.*");
+    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
+    &waitFile("$tmpdir/$tag");
+    system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.*");
     $semaphore->up;
 }
 
