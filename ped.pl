@@ -45,6 +45,8 @@ my $sort_opt = "-S 1M";
 @nuc = ('A', 'C', 'G', 'T');
 $ENV{LANG} = "C";
 
+$start_time = time;
+
 if ($ARGV[0] =~ /target|ref/){
     my @arg = split(',', $ARGV[0]);
     foreach (sort @arg){
@@ -241,7 +243,40 @@ if ($tmpdir eq "$wd/$target/tmp"){
     system("rm $tmpdir/*");
 }
 system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
-report("Job completed: $method method.");
+$end_time = time;
+$elapsed_time = $end_time - $start_time;
+$hour = int($elapsed_time / 3600);
+$min = $elapsed_time % 3600;
+$sec = $min % 60;
+$min = int($min / 60);
+if ($hour >= 24){
+    $day = int($hour / 24);
+    $hour = $hour % 24;
+}
+
+if ($day > 1){
+    $etime .= "$day days ";
+}elsif($day == 1){
+    $etime .= "$day day ";
+}
+if ($hour > 1){
+    $etime .= "$hour hours ";
+}elsif($hour == 1){
+    $etime .= "$hour hour ";
+}
+if ($min > 1){
+    $etime .= "$min minutes ";
+}elsif($min == 1){
+    $etime .= "$min minute ";
+}
+if ($second > 1){
+    $etime .= "$second seconds ";
+}elsif($second == 1){
+    $etime .= "$second second ";
+}
+
+report("Job completed: $method method.
+$etime ($elapsed_time seconds) elapsed.");
 
 sub kmer{
     &countKmer($target);
