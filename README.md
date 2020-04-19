@@ -46,7 +46,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR30
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
--  ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+- ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
   Sometimes, download.pl returns the timeout of network connection. In the case, network will be reconnected and redumed the download.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
@@ -56,6 +56,21 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
 - Options,  
   thread=8 : specify the max thread number. Default is the number of logical core or 14.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
+  clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
+  Distribution of counts by sequence length can be obtained by check_length.pl  
+  
+## For analysis of COVID-19 data
+```
+perl download.pl accession=SRR11542244
+perl check_length.pl target=SRR11542244
+perl ped.pl target=SRR11542244,ref=COVID19,clipping=100
+```
+or
+```
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11542244,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=COVID19,clipping=100,wd=/work
+```
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
@@ -146,23 +161,25 @@ perl mkref.pl hg38
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
-  B73v4           Corn (Zea mays B73) RefGen v4
-  Bomo            Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  GRCm38          Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
-  Gmax275v2.0     Soybean (Glycine max) genome project assemble version 2
-  IBSC2           Barley (Hordeum vulgare L. cv. Molex) Release 44
-  IRGSP1.0        Rice (Olyza sativa L. cv. Nipponbare) version 1.0
-  IWGSC1.0        Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
-  LJ3             Lotus japonicus MG20 v3.0
-  SL3             Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
-  SScrofa11.1     Pig (Sus scrofa) Release-97
-  TAIR10          Arabidopsis thaliana version TAIR10
-  UMD3.1          Cow (Bos taurus L1 Dominette 01449) UMD 3.1
-  WBcel235        Caenorhabditis elegans WBcel235
-  danRer11        Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
-  dmel626         Drosophila melanogaster
-  hg19            Human (Homo sapiens) Genome Reference Consortium Human Build 19
-  hg38            Human (Homo sapiens) Genome Reference Consortium Human Build 38
+  Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
+  B73v4          Corn (Zea mays B73) RefGen v4
+  Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+  COVID19        Severe acute respiratory syndrome coronavirus 2 (CIVID-19, NC_045512.2)
+  GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
+  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 44
+  IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
+  IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  SScrofa11.1    Pig (Sus scrofa) Release-97
+  TAIR10         Arabidopsis thaliana version TAIR10
+  UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  WBcel235       Caenorhabditis elegans WBcel235
+  danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
+  dmel626        Drosophila melanogaster
+  hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
+  hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
 ```
   If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.  
 - Otherwise,  
