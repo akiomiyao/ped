@@ -37,6 +37,9 @@ $usage = '
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
+ If short reads have different length sequcnes, clipping is required.
+ perl ped.pl target=SRR11542243,ref=COVID19,clipping=100
+
  Results will be saved in the target directory.
 
 ';
@@ -68,6 +71,7 @@ if ($ARGV[0] =~ /target|ref/){
     $wd = $ENV{wd};
     $tmpdir = $ENV{tmpdir};
     $max_semaphore = $ENV{thread};
+    $clipping =  $ENV{clipping};
 }else{
     print $usage;
 }
@@ -321,6 +325,7 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &svReadCount;
+
     &snpMkT;
     &sortSeq;
     &joinTarget;
@@ -1234,11 +1239,25 @@ sub sortUniqSub{
     while(<IN>){
 	if ($count == 1 and !/N/){
 	    chomp;
-	    $tag = substr($_, 0, 3);
-	    print $tag "$_\n";
-	    $complement = &complement($_);
-	    $tag = substr($complement, 0, 3);
-	    print $tag "$complement\n";
+	    if ($clipping ne ""){
+		my $readLength = length($_);
+		if ($readLength > $clipping){
+		    $_ = substr($_, 0, $clipping);
+		}
+		if ($readLength >= $clipping){
+		    $tag = substr($_, 0, 3);
+		    print $tag "$_\n";
+		    $complement = &complement($_);
+		    $tag = substr($complement, 0, 3);
+		    print $tag "$complement\n";
+		}
+	    }else{
+		$tag = substr($_, 0, 3);
+		print $tag "$_\n";
+		$complement = &complement($_);
+		$tag = substr($complement, 0, 3);
+		print $tag "$complement\n";
+	    }
 	    $total ++;
 	    if ($total % 1000000 == 0){
 		report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
@@ -1303,7 +1322,7 @@ sub toVcf{
 
 sub snpMkT{
     report("Making data for verification of snp. target");
-    my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat);
+    my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1411,7 +1430,7 @@ sub snpMkT{
 }
 
 sub snpMkC{
-    my (@row, $chr, $pos, $ref, $alt, $count, $chr_seq, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $cw, $cm, $tag, $nuca, $nucb, $nucc, @dat);
+    my (@row, $chr, $pos, $ref, $alt, $count, $chr_seq, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $cw, $cm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1560,6 +1579,8 @@ sub svReadCount{
     $prev[7] = "_" if $prev[7] eq "";
     print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
     close(OUT);
+    system("rm $tmpdir/*.target $tmpdir/*.control");
+    &report("Output SV data. complete");
 }
 
 sub kmerReadCount{
@@ -1748,7 +1769,7 @@ sub snpReadCount{
 
 sub joinControlFunc{
     my $tag = shift;
-    report("Selecting sequence data for verify. $tag");
+    report("Selecting control sequence data for verify. $tag");
     if (-e "$wd/$control/sort_uniq/$control.$tag.gz"){
 	system("bash -c \"join <($zcat $wd/$control/sort_uniq/$control.$tag.gz) <($zcat $tmpdir/$tag.gz)$tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }else{
@@ -1775,7 +1796,7 @@ sub joinControl{
 
 sub joinTargetFunc{
     my $tag = shift;
-    report("Selecting sequence data for verify. $tag");
+    report("Selecting target sequence data for verify. $tag");
     system("bash -c \"join <($zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     &waitFile("$tmpdir/$tag.target");
     system("rm $tmpdir/$tag.gz");
@@ -1821,7 +1842,7 @@ sub sortSeq{
 
 sub svMkC{
     report("Making control data for verification of sv");
-    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $cm, $cw, $hchr_seq);
+    my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $cm, $cw, $hchr_seq, $prev_chr);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1989,7 +2010,6 @@ sub svMkC{
 	    }
 	}
     }
-    report("Making control data for verification of sv complete");
 }
 
 sub svMkT{
