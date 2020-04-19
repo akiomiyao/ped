@@ -50,13 +50,13 @@ opendir(DIR, "$wd/$target/read/");
 foreach (readdir(DIR)){
     next if /^\./;
     if (/gz$/){
-	open(IN, "zcat $target/read/$_ |");
+	open(IN, "zcat $wd/$target/read/$_ |");
     }elsif(/bz2$/){
-	open(IN, "bzcat $target/read/$_ |");
+	open(IN, "bzcat $wd/$target/read/$_ |");
     }elsif(/xz$/){
-	open(IN, "xzcat $target/read/$_ |");
+	open(IN, "xzcat $wd/$target/read/$_ |");
     }else{
-	open(IN, "$target/read/$_");
+	open(IN, "$wd/$target/read/$_");
     }
     while(<IN>){
 	$line ++;
