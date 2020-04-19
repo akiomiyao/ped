@@ -42,10 +42,11 @@ if ($ARGV[0] =~ /target|accession/){
 }elsif ($ARGV[0] ne ""){
     $target = $ARGV[0];
 }
+$wd = "." if $wd eq "";
 
 die $usage if $target eq "";
 
-opendir(DIR, "$target/read/");
+opendir(DIR, "$wd/$target/read/");
 foreach (readdir(DIR)){
     next if /^\./;
     if (/gz$/){
