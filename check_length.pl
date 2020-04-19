@@ -29,7 +29,19 @@ $usage = '
 
 ';
 
-$target = $ARGV[0];
+if ($ARGV[0] =~ /target|accession/){
+    my @arg = split(',', $ARGV[0]);
+    foreach (sort @arg){
+        next if $_ eq "";
+        my ($name, $val) = split('=', $_);
+        $$name = $val;
+    }
+    if ($target eq "" and $accession ne ""){
+	$target = $accession;
+    }
+}elsif ($ARGV[0] ne ""){
+    $target = $ARGV[0];
+}
 
 die $usage if $target eq "";
 
