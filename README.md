@@ -53,6 +53,8 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
   If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
+  Results will be saved in target (e.g. ERR3063487) directory.  
+  ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
 - Options,  
   thread=8 : specify the max thread number. Default is the number of logical core or 14.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
@@ -237,7 +239,7 @@ qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl
 -  After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
-   ERR3063487.bi.vcf is the vcf file for SNPs.  
+   ERR3063487.vcf is the vcf format results.  
    ERR3063487.sv.primer is the list of primers to detect stuructural varilations.  
    ERR3063487.bi.primer is the list of primers to detect SNPs.  
    Primer files are experimental.  
@@ -272,7 +274,7 @@ perl qsub_bidirectional.pl ERR3063487 default WBcel235
   Run without arguments, help for script will be shown.  
 - ERR3063487.sv is the list of structural variations.  
   ERR3063487.bi.snp is the list of SNPs.  
-  ERR3063487.bi.vcf is the vcf file for SNPs.  
+  ERR3063487.vcf is the vcf file.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
   Please check quarity of polymorphism with depth (DP) in vcf file.  
