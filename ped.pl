@@ -1338,15 +1338,15 @@ sub toVcf{
 sub bi2vcf{
     my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out);
     report("Convert to vcf format");
-    open(ALN, "$target/$target.aln");
-    open(OUT, "> $target/$target.vcf");
+    open(ALN, "$wd/$target/$target.aln");
+    open(OUT, "> $wd/$target/$target.vcf");
     open(TMP, "|sort -S 1M -T $wd/$target > $wd/$target/$target.tmp");
     
     print OUT "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
 ##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
-##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record\">
+##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
 ##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description=\"Length of base pair identical micro-homology at event breakpoints\">
 ##INFO=<ID=HOMSEQ,Number=.,Type=String,Description=\"Sequence of base pair identical micro-homology at event breakpoints\">
 ##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
@@ -1361,7 +1361,7 @@ sub bi2vcf{
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
 
 
-    open(IN, "cat $target/$target.bi.snp|");
+    open(IN, "cat $wd/$target/$target.bi.snp|");
     while(<IN>){
 	next if $opt eq "" and ! /M|H/;
 	chomp;
@@ -1391,7 +1391,7 @@ sub bi2vcf{
     }
     
     
-    open(IN, "cat $target/$target.sv|");
+    open(IN, "cat $wd/$target/$target.sv|");
     while(<IN>){
 	next if $opt eq "" and ! /M|H/;
 	chomp;
@@ -1469,12 +1469,11 @@ sub bi2vcf{
 	}else{
 	    $qual = $row[10] * 10;
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "AF=$af;DP=$dp\tAD:DP\t$row[9],$row[10]:$dp\n";
-	}
-	
+	}	
     }
     
     close(TMP);
-    open(IN, "$target/$target.tmp");
+    open(IN, "$wd/$target/$target.tmp");
     while(<IN>){
 	@row = split;
 	$row[0] =~ s/^0*//;
@@ -1485,7 +1484,7 @@ sub bi2vcf{
     close(IN);
     close(OUT);
     close(ALN);
-    system("rm $target/$target.tmp");
+    system("rm $wd/$target/$target.tmp");
 }
 
 sub searchInsertion{
@@ -1538,7 +1537,6 @@ sub searchInsertion{
 	}
 	$middle = int(($top + $bottom) / 2);
     }
-
 }
 
 sub getInsert{
