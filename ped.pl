@@ -852,6 +852,7 @@ sub mkRef{
     }else{
 	&mkChrFromFile($file);
     }
+    &mkChrFasta;
     &mk20;
     &mkControlRead;
     system("rm -r $wd/$ref/tmp");
@@ -1070,6 +1071,20 @@ sub mk20{
 	}
     }    
     &joinAll;
+}
+
+sub mkChrFasta{
+    &report("Making fasta file of reference.");
+    open(OUT, "> $wd/$ref/$ref.fasta");
+    foreach $chr (@chr){
+	print OUT ">$chr\n";
+	open(IN, "$wd/$ref/chr$chr");
+	while(<IN>){
+	    print OUT "$_\n";
+	}
+	close(IN);
+    }
+    close(OUT);
 }
 
 sub mkChr{
