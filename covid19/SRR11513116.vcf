@@ -1,0 +1,35 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=SVLEN,Number=.,Type=Float,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description="Type of structural variant">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=INS,Description="Insertion of novel sequence">
+##ALT=<ID=INV,Description="Inversion of reference sequence">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SRR11513116
+1	105	.	G	A	1000	PASS	GT=0/1;AF=0.5;DP=194	GT:AD:DP	0/1:97,97:194
+1	115	.	T	C	1000	PASS	GT=0/1;AF=0.5;DP=218	GT:AD:DP	0/1:109,109:218
+1	117	.	C	G	1000	PASS	GT=0/1;AF=0.5;DP=142	GT:AD:DP	0/1:71,71:142
+1	117	.	C	T	1000	PASS	GT=0/1;AF=0.5;DP=130	GT:AD:DP	0/1:65,65:130
+1	126	.	A	G	1000	PASS	GT=0/1;AF=0.5;DP=104	GT:AD:DP	0/1:52,52:104
+1	126	.	A	T	1000	PASS	GT=0/1;AF=0.5;DP=210	GT:AD:DP	0/1:105,105:210
+1	136	.	A	T	1000	PASS	GT=0/1;AF=0.5;DP=270	GT:AD:DP	0/1:135,135:270
+1	140	.	C	A	1000	PASS	GT=0/1;AF=0.5;DP=246	GT:AD:DP	0/1:123,123:246
+1	141	.	T	A	1000	PASS	GT=0/1;AF=0.5;DP=268	GT:AD:DP	0/1:134,134:268
+1	142	.	A	T	1000	PASS	GT=0/1;AF=0.5;DP=272	GT:AD:DP	0/1:136,136:272
+1	8782	.	C	T	1000	PASS	GT=1/1;AF=0.991;DP=115	GT:AD:DP	1/1:1,114:115
+1	8794	.	T	C	1000	PASS	GT=0/1;AF=0.312;DP=16	GT:AD:DP	0/1:11,5:16
+1	17747	.	C	T	1000	PASS	GT=0/1;AF=0.301;DP=93	GT:AD:DP	0/1:65,28:93
+1	17858	.	A	G	1000	PASS	GT=1/1;AF=0.991;DP=122	GT:AD:DP	1/1:1,121:122
+1	17858	.	A	T	1000	PASS	GT=1/1;AF=0.991;DP=122	GT:AD:DP	1/1:1,121:122
+1	18060	.	C	T	1000	PASS	GT=1/1;AF=0.992;DP=125	GT:AD:DP	1/1:1,124:125
+1	19297	.	T	<INV>	1000	PASS	SVTYPE=INV;END=12751;GT=0/1;AF=0.375;DP=8	GT:AD:DP	0/1:5,3:8
+1	24694	.	A	T	1000	PASS	GT=1/1;AF=0.99;DP=101	GT:AD:DP	1/1:1,100:101
