@@ -333,9 +333,9 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &snpReadCount;
-    &bi2vcf;
     &primer(sv);
     &primer;
+    &bi2vcf;
 }
 
 sub primer{
@@ -503,6 +503,8 @@ sub primerFunc{
 	}
 	if ($out ne ""){
 	    print $fout $out;
+	}else{
+	    print $fout "$dat\tN\tN\tN\tN\n";
 	}
     }
     close($fin);
@@ -1240,7 +1242,7 @@ sub sortUniqSub{
     my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
-    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement);
+    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement, $readLength, $prev);
     system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1254,8 +1256,10 @@ sub sortUniqSub{
     while(<IN>){
 	if ($count == 1 and !/N/){
 	    chomp;
+	    $readLength = length($_);
+	    die "Length of short reads is not fixed. clipping option is required.\n" if $readLength != $prev and $clipping eq "";
+	    $prev = $readLength;
 	    if ($clipping ne ""){
-		my $readLength = length($_);
 		if ($readLength > $clipping){
 		    $_ = substr($_, 0, $clipping);
 		}
@@ -1339,29 +1343,8 @@ sub bi2vcf{
     my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out);
     report("Convert to vcf format");
     open(ALN, "$wd/$target/$target.aln");
-    open(OUT, "> $wd/$target/$target.vcf");
     open(TMP, "|sort -S 1M -T $wd/$target > $wd/$target/$target.tmp");
-    
-    print OUT "##fileformat=VCFv4.2
-##FILTER=<ID=PASS,Description=\"All filters passed\">
-##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
-##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
-##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
-##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description=\"Length of base pair identical micro-homology at event breakpoints\">
-##INFO=<ID=HOMSEQ,Number=.,Type=String,Description=\"Sequence of base pair identical micro-homology at event breakpoints\">
-##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
-##INFO=<ID=SVLEN,Number=.,Type=Float,Description=\"Difference in length between REF and ALT alleles\">
-##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description=\"Type of structural variant\">
-##ALT=<ID=DEL,Description=\"Deletion\">
-##ALT=<ID=INS,Description=\"Insertion of novel sequence\">
-##ALT=<ID=INV,Description=\"Inversion of reference sequence\">
-##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
-##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">
-##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
-#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
-
-
-    open(IN, "cat $wd/$target/$target.bi.snp|");
+    open(IN, "cat $wd/$target/$target.bi.primer|");
     while(<IN>){
 	next if $opt eq "" and ! /M|H/;
 	chomp;
@@ -1369,7 +1352,7 @@ sub bi2vcf{
 	$dp = $row[$#row] -1;
 	$chr= $row[0];
 	$pos = $row[1];
-	if ($chr =~ /\[0-9]/){
+	if ($chr =~ /[0-9]/){
 	    $chr = "000$chr";
 	    $chr = substr($chr, length($chr) - 3, 3);
 	}
@@ -1379,19 +1362,28 @@ sub bi2vcf{
 	$dp = $row[6] + $row[7];
 	next if $dp == 0;
 	$af = int(1000 * $row[7]/$dp)/1000;
-	next if $row[7] <= 2; 
+	next if $row[7] <= 2;
 	if (/M/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	    $info = "GT=1/1;";
 	}elsif(/H/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+	    $info = "GT=0/1;";
+	}else{
+	    $info = "";
+	}
+	$info .= "AF=$af;DP=$dp";
+	if ($row[9] ne "N"){
+	    $info .= ";PL=$row[9];PR=$row[10];PCRLEN=$row[11]";
+	}
+	
+	if (/M|H/){
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\tPASS\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
 	}else{
 	    $qual = $row[7] * 10;
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\tAF=$af;DP=$dp\tAD:DP\t$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tAD:DP\t$row[6],$row[7]:$dp\n";
 	}
     }
     
-    
-    open(IN, "cat $wd/$target/$target.sv|");
+    open(IN, "cat $wd/$target/$target.sv.primer|");
     while(<IN>){
 	next if $opt eq "" and ! /M|H/;
 	chomp;
@@ -1456,12 +1448,15 @@ sub bi2vcf{
 	next if $dp == 0;
 	$af = int(1000 * $row[10]/$dp)/1000;
 	next if $row[10] <= 2;
-	if ($chr =~ /\[0-9]/){
+	if ($chr =~ /[0-9]/){
 	    $chr = "000$chr";
 	    $chr = substr($chr, length($chr) - 3, 3);
 	}
 	$pos = "00000000000" . $pos;
 	$pos = substr($pos, length($pos) - 11, 11);
+	if ($row[13] ne "N"){
+	    $info .= "PL=$row[13];PR=$row[14];PCRLEN=$row[15];";
+	}
 	if (/M/){
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\tPASS\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
 	}elsif(/H/){
@@ -1471,9 +1466,35 @@ sub bi2vcf{
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "AF=$af;DP=$dp\tAD:DP\t$row[9],$row[10]:$dp\n";
 	}	
     }
-    
     close(TMP);
-    open(IN, "$wd/$target/$target.tmp");
+    close(ALN);
+    
+    open(OUT, "> $wd/$target/$target.vcf");
+    print OUT "##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description=\"All filters passed\">
+##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
+##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
+##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
+##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description=\"Length of base pair identical micro-homology at event breakpoints\">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description=\"Sequence of base pair identical micro-homology at event breakpoints\">
+##INFO=<ID=PCRLEN,Number=.,Type=Integer,Description=\"PCR product length\">
+##INFO=<ID=PL,Number=.,Type=String,Description=\"Left primer sequence\">
+##INFO=<ID=PR,Number=.,Type=String,Description=\"Right primer sequence\">
+##INFO=<ID=SVLEN,Number=.,Type=Float,Description=\"Difference in length between REF and ALT alleles\">
+##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description=\"Type of structural variant\">
+##ALT=<ID=DEL,Description=\"Deletion\">
+##ALT=<ID=INS,Description=\"Insertion of novel sequence\">
+##ALT=<ID=INV,Description=\"Inversion of reference sequence\">
+##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
+##source=<PROGRAM=ped.pl,Method=\"Bidirectional method\",target=$target,control=$control,reference=$ref>
+#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
+    close(OUT);
+
+    open(OUT, ">> $wd/$target/$target.vcf");
+    open(IN, "sort $sort_opt -T $wd/$target $wd/$target/$target.tmp |");
     while(<IN>){
 	@row = split;
 	$row[0] =~ s/^0*//;
@@ -1483,7 +1504,6 @@ sub bi2vcf{
     }
     close(IN);
     close(OUT);
-    close(ALN);
     system("rm $wd/$target/$target.tmp");
 }
 
@@ -1498,10 +1518,6 @@ sub searchInsertion{
     $pos = "00000000000" . $pos;
     $pos = substr($pos, length($pos) - 11, 11);
     
-    if ($wd eq ""){
-	$wd = ".";
-    }
-    
     $size = -s "$wd/$target/$target.index";
     open(INDEX, "$wd/$target/$target.index");
     binmode(INDEX);
@@ -1509,7 +1525,7 @@ sub searchInsertion{
     $bottom = $size;
     $middle = int($size / 2);
     while($bottom - $top > 1){
-	seek(INDEX, $middle, 0);
+	seek(INDEX, $middle - 100, 0);
 	read(INDEX, $data, 1000);
 	foreach (split('\n', $data)){
 	    @row = split;
@@ -1519,7 +1535,7 @@ sub searchInsertion{
 		if ($chr eq $ichr){
 		    if ($pos eq $ipos){
 			$insert = &getInsert($row[3]);
-			return $insert;
+			return $insert if $insert ne "";
 		    }
 		}
 	    }
@@ -1541,21 +1557,21 @@ sub searchInsertion{
 
 sub getInsert{
     my $address = shift;
-    my $length = 0;
+    my $insert_length = 0;
     my $count = 0;
-    my $insert;
+    my ($length, $insert, $flag);;
     seek(ALN, $address, 0);
     while(<ALN>){
+	return if /snp/;
 	chomp;
 	$count ++;
-	if (/^#/){
-	    $count = 1;
+	if ($count == 1){
 	    $insert_length = (split("\ ", $_))[7];
-	}
-	$pos = (split("\ ", $_))[2] if $count == 1;
-	$length = length($_) if $count == 4;
-	if ($count == 7){
-	    $insert = substr($_, $length - 3, $insert_length + 1);
+	    $pos = (split("\ ", $_))[2];
+	}elsif($count == 4){
+	    $length = length($_);
+	}elsif ($count == 7){
+	    $insert = substr($_, $length - 2, $insert_length + 1);
 	    if (length($insert) < $insert_length){
 		$insert = $insert_length;
 	    }
