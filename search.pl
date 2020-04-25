@@ -55,7 +55,7 @@ $top = 0;
 $bottom = $size;
 $middle = int($size / 2);
 while($bottom - $top > 1){
-    seek(INDEX, $middle, 0);
+    seek(INDEX, $middle - 100, 0);
     read(INDEX, $data, 1000);
     foreach (split('\n', $data)){
 	@row = split;

@@ -1257,7 +1257,7 @@ sub sortUniqSub{
 	if ($count == 1 and !/N/){
 	    chomp;
 	    $readLength = length($_);
-	    die "Length of short reads is not fixed. clipping option is required.\n" if $readLength != $prev and $clipping eq "";
+	    die "Length of short reads is not fixed. clipping option is required.\n" if $readLength != $prev and $prev != 0 and $clipping eq "";
 	    $prev = $readLength;
 	    if ($clipping ne ""){
 		if ($readLength > $clipping){
