@@ -3,9 +3,12 @@
 ##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
 ##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.">
+##INFO=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
 ##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
-##INFO=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=PCRLEN,Number=.,Type=Integer,Description="PCR product length">
+##INFO=<ID=PL,Number=.,Type=String,Description="Left primer sequence">
+##INFO=<ID=PR,Number=.,Type=String,Description="Right primer sequence">
 ##INFO=<ID=SVLEN,Number=.,Type=Float,Description="Difference in length between REF and ALT alleles">
 ##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description="Type of structural variant">
 ##ALT=<ID=DEL,Description="Deletion">
@@ -14,15 +17,16 @@
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+##source=<PROGRAM=ped.pl,Method="Bidirectional method",target=SRR11542244,control=COVID19,reference=COVID19>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SRR11542244
 1	4154	.	A	<INV>	1000	PASS	SVTYPE=INV;END=4756;GT=0/1;AF=0.508;DP=57	GT:AD:DP	0/1:28,29:57
-1	5272	.	GG	G	1000	PASS	SVTYPE=DEL;END=5272;HOMLEN=2;HOMSEQ=GG;SVLEN=-1;GT=0/1;AF=0.47;DP=34	GT:AD:DP	0/1:18,16:34
+1	5272	.	GG	G	1000	PASS	SVTYPE=DEL;END=5272;HOMLEN=2;HOMSEQ=GG;SVLEN=-1;PL=CTGGGTAGGTACATGTCAGC;PR=GCATCTTGTAGAGCAGGTGG;PCRLEN=148;GT=0/1;AF=0.47;DP=34	GT:AD:DP	0/1:18,16:34
 1	5871	.	AA	A	1000	PASS	SVTYPE=DEL;END=5871;HOMLEN=2;HOMSEQ=AA;SVLEN=-1;GT=0/1;AF=0.398;DP=113	GT:AD:DP	0/1:68,45:113
-1	9507	.	A	T	1000	PASS	GT=0/1;AF=0.433;DP=30	GT:AD:DP	0/1:17,13:30
+1	9507	.	A	T	1000	PASS	GT=0/1;AF=0.433;DP=30	GT:AD:DP	1/1:17,13:30
 1	9695	.	TATA	T	1000	PASS	SVTYPE=DEL;END=9699;SVLEN=-3;GT=0/1;AF=0.473;DP=112	GT:AD:DP	0/1:59,53:112
-1	9859	.	A	<INV>	1000	PASS	SVTYPE=INV;END=9641;GT=1/1;AF=1;DP=10	GT:AD:DP	1/1:0,10:10
-1	11104	.	T	C	1000	PASS	GT=1/1;AF=1;DP=72	GT:AD:DP	1/1:0,72:72
-1	11619	.	T	TT	1000	PASS	SVTYPE=INS;END=11617;SVLEN=1;GT=0/1;AF=0.337;DP=80	GT:AD:DP	0/1:53,27:80
-1	12781	.	C	T	1000	PASS	GT=0/1;AF=0.435;DP=85	GT:AD:DP	0/1:48,37:85
-1	19255	.	C	T	1000	PASS	GT=0/1;AF=0.428;DP=42	GT:AD:DP	0/1:24,18:42
-1	24953	.	G	A	1000	PASS	GT=0/1;AF=0.506;DP=144	GT:AD:DP	0/1:71,73:144
+1	9859	.	A	<INV>	1000	PASS	SVTYPE=INV;END=9641;PL=CTGCGCTGTGCACCTTTTTG;PR=CTGCGCTGTGCACCTTTTTG;PCRLEN=146;GT=1/1;AF=1;DP=10	GT:AD:DP	1/1:0,10:10
+1	11104	.	T	C	1000	PASS	GT=1/1;AF=1;DP=72;PL=GGGTACACACCACTGGTTGT;PR=GCTACAGTGGCAAGAGAAGG;PCRLEN=213	GT:AD:DP	1/1:0,72:72
+1	11619	.	T	TT	1000	PASS	SVTYPE=INS;END=11617;SVLEN=1;PL=GCCATTTCCATGTGGGCTCT;PR=GTGGGAGTAGTCCCTGTGAA;PCRLEN=283;GT=0/1;AF=0.337;DP=80	GT:AD:DP	0/1:53,27:80
+1	12781	.	C	T	1000	PASS	GT=0/1;AF=0.435;DP=85;PL=GCCGGTACTACACAAACTGC;PR=GCTTGTAGACGTACTGTGGC;PCRLEN=296	GT:AD:DP	1/1:48,37:85
+1	19255	.	C	T	1000	PASS	GT=0/1;AF=0.428;DP=42	GT:AD:DP	1/1:24,18:42
+1	24953	.	G	A	1000	PASS	GT=0/1;AF=0.506;DP=144;PL=GCACACTTTCCTCGTGAAGG;PR=CAACCTCATTGAGGCGGTCA;PCRLEN=310	GT:AD:DP	1/1:71,73:144
