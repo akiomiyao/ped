@@ -1567,7 +1567,7 @@ sub getInsert{
     my ($length, $insert, $flag);;
     seek(ALN, $address, 0);
     while(<ALN>){
-	return if /snp/;
+	return if /snp|deletion|inversion|translocation/;
 	chomp;
 	$count ++;
 	if ($count == 1){
