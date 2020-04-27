@@ -304,7 +304,6 @@ sub kmer{
 }
 
 sub bidirectional{
-=pod
     if (! -e "$wd/$target/$target.index"){
 	system("rm $wd/$target/tmp/* > /dev/null 2>&1");
 	&mkData4MapF;
@@ -339,8 +338,7 @@ sub bidirectional{
     &snpReadCount;
     &primer(sv);
     &primer;
-=cut
-&bi2vcf;
+    &bi2vcf;
 }
 
 sub primer{
