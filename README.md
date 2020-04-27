@@ -73,6 +73,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=COVID19,clipping=100,wd=/work
 ```
+[Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
