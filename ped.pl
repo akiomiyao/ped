@@ -189,7 +189,7 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
-open(REPORT, "> $wd/$target/$target.log");
+open(REPORT, ">> $wd/$target/$target.log");
 print REPORT "# Log of ped.pl
 $log";
 report("Job begin: $method method");
@@ -304,13 +304,16 @@ sub kmer{
 }
 
 sub bidirectional{
-    &mkData4MapF;
-    &sortData4Map;
-    &map;
-    &mkData4MapR;
-    &sortData4Map;
-    &map;
-    &align;
+    if (! -e "$wd/$target/$target.index"){
+	system("rm $wd/$target/tmp/* > /dev/null 2>&1");
+	&mkData4MapF;
+	&sortData4Map;
+	&map;
+	&mkData4MapR;
+	&sortData4Map;
+	&map;
+	&align;
+    }
 
     $semaphore->down;
     threads->new(\&index);
@@ -1468,7 +1471,8 @@ sub bi2vcf{
     }
     close(TMP);
     close(ALN);
-    
+    my $timestamp = `date '+%Y-%m-%d %H:%M:%S %z'`;
+    chomp($timestamp);
     open(OUT, "> $wd/$target/$target.vcf");
     print OUT "##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description=\"All filters passed\">
@@ -1490,6 +1494,7 @@ sub bi2vcf{
 ##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
 ##source=<PROGRAM=ped.pl,Method=\"Bidirectional method\",target=$target,control=$control,reference=$ref>
+##created=<TIMESTAMP=\"$timestamp\">
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
     close(OUT);
 
@@ -2886,7 +2891,7 @@ sub report{
     my $message = shift;
     my $now = `date`;
     chomp($now);
-    $message = "$now $message\n";
+    $message = "$now : $target : $message\n";
     print $message;
     print REPORT $message;
 }
