@@ -304,6 +304,7 @@ sub kmer{
 }
 
 sub bidirectional{
+=pod
     if (! -e "$wd/$target/$target.index"){
 	system("rm $wd/$target/tmp/* > /dev/null 2>&1");
 	&mkData4MapF;
@@ -338,7 +339,8 @@ sub bidirectional{
     &snpReadCount;
     &primer(sv);
     &primer;
-    &bi2vcf;
+=cut
+&bi2vcf;
 }
 
 sub primer{
@@ -1531,7 +1533,7 @@ sub searchInsertion{
     $middle = int($size / 2);
     while($bottom - $top > 1){
 	seek(INDEX, $middle - 100, 0);
-	read(INDEX, $data, 1000);
+	read(INDEX, $data, 2000);
 	foreach (split('\n', $data)){
 	    @row = split;
 	    if ($row[1] =~ /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/){
