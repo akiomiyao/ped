@@ -1385,7 +1385,7 @@ sub bi2vcf{
 	}
 	
 	if (/M|H/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\tPASS\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
 	}else{
 	    $qual = $row[7] * 10;
 	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tAD:DP\t$row[6],$row[7]:$dp\n";
@@ -1454,6 +1454,8 @@ sub bi2vcf{
 	    $alt = $reference . "]$row[2]:$row[3]";
 	}
 	
+	next if $reference eq $alt or $alt eq "|";
+	next if $alt !~ /[ACGT]/;
 	$dp = $row[9] + $row[10];
 	next if $dp == 0;
 	$af = int(1000 * $row[10]/$dp)/1000;
@@ -1468,9 +1470,9 @@ sub bi2vcf{
 	    $info .= "PL=$row[13];PR=$row[14];PCRLEN=$row[15];";
 	}
 	if (/M/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\tPASS\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
 	}elsif(/H/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\tPASS\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[9],$row[10]:$dp\n";
 	}else{
 	    $qual = $row[10] * 10;
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "AF=$af;DP=$dp\tAD:DP\t$row[9],$row[10]:$dp\n";
@@ -1538,7 +1540,7 @@ sub searchInsertion{
     $middle = int($size / 2);
     while($bottom - $top > 1){
 	seek(INDEX, $middle - 100, 0);
-	read(INDEX, $data, 2000);
+	read(INDEX, $data, 1200);
 	foreach (split('\n', $data)){
 	    @row = split;
 	    if ($row[1] =~ /^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$/){
