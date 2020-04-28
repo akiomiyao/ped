@@ -1245,7 +1245,7 @@ sub sortUniqSub{
     my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
-    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement, $readLength, $prev);
+    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement, $readLength, $prev, $subseq, $pos);
     system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1260,18 +1260,24 @@ sub sortUniqSub{
 	if ($count == 1 and !/N/){
 	    chomp;
 	    $readLength = length($_);
-	    die "Length of short reads is not fixed. clipping option is required.\n" if $readLength != $prev and $prev != 0 and $clipping eq "";
+	    die "Length of short reads is not fixed. clipping option is required.
+For nanopore reads clipping=100 or 150 is recommended.
+perl check_length.pl target=$target
+will list the distibution of read length.\n" if $readLength != $prev and $prev != 0 and $clipping eq "";
 	    $prev = $readLength;
 	    if ($clipping ne ""){
-		if ($readLength > $clipping){
-		    $_ = substr($_, 0, $clipping);
-		}
 		if ($readLength >= $clipping){
-		    $tag = substr($_, 0, 3);
-		    print $tag "$_\n";
-		    $complement = &complement($_);
-		    $tag = substr($complement, 0, 3);
-		    print $tag "$complement\n";
+		    $pos = 0;
+		    while(1){
+			$subseq = substr($_, $pos, $clipping);
+			last if length($subseq) < $clipping;
+			$pos += $clipping;
+			$tag = substr($subseq, 0, 3);
+			print $tag "$subseq\n";
+			$complement = &complement($subseq);
+			$tag = substr($complement, 0, 3);
+			print $tag "$complement\n";
+		    }
 		}
 	    }else{
 		$tag = substr($_, 0, 3);
@@ -1440,6 +1446,7 @@ sub bi2vcf{
 	    $info = "SVTYPE=INV;END=$row[3];";	
 	    $alt = "<INV>";
 	}elsif ($row[5] eq "translocation"){
+	    next; # IVG is not supported ?
 	    $pos = $row[1] - 1;
 	    seek(CHR, $pos -1, 0);
 	    read(CHR, $reference, 1);
