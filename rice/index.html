@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>PEDを用いたイネの多型解析例</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b>ここでは、コシヒカリの多型の取得を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
+      <a href = "DRR099981.png" target = "_blank"><img src = "DRR099981.png" width = "30%" align = "middle"></a>クリックすると拡大されます。<br>
+
+      <h2>Ubuntuのインストール</h2>
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li>検索エンジンで「iso 書き込み windows10 usb」で検索するとISOイメージをUSBディスクに書き込む方法がいろいろ表示されますので、好みの方法を選んでUSBメモリに書き込みます。
+      <li><a href = "https://linuxfan.info/ubuntu-18-04-install-guide" target = "_blank">Ubuntu 18.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt-get update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのSRAアーカイブからコシヒカリのfastq形式のファイル(DRR099981)をダウンロードします。
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=DRR099981</pre>
+git pullで最新のスクリプトに更新されます。<br>
+pedのディレクトリの中に、DRR099981の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
+アメリカからのダウンロードなので時間がかかります。<br>
+時々エラーが表示されますが自動的に再接続されるので、気長に待ちます。<br>
+同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。
+      <li>DRR099981の配列をイネの参照配列IRGSP1.0にマップして多型を検出します。
+<pre>$ perl ped.pl target=DRR099981,ref=IRGSP1.0</pre>
+イネの参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
+解析が無事終わるとDRR099981のディレクトリの中に、DRR099981.vcfという結果をまとめたファイルができます。<br>
+各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
+      </ul>
+      <h2>IVGブラウザによる結果の確認</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>
+<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/IRGSP1.0.fasta" target = "_blank">IRGSP1.0.fasta</a>をダウンロードします。<br>
+IVGを開いてGenomesのプルダウンメニューよりLoad Genome from Fileを選んで、IRGSP1.0.fastaをロードします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/locus.gff" target = "_blank">locus.gff</a><br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/transcripts.gff" target = "_blank">transcripts.gff</a><br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/transcripts_exon.gff" target = "_blank">transcripts_exon.gff</a><br>
+をダウンロードして、メインの表示ボックスの下のサブのボックスにドラッグします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/DRR099981.vcf" target = "_blank">DRR099981.vcf</a><br>
+をメインの表示ボックスにドラッグすれば、コシヒカリの多型データが取り込まれます。<br>
+各染色体の番号をクリックすると、染色体ごとの多型情報が表示されます。<br>
+興味のある部分をクリックすると、どんどん拡大されます。<br>
+多型をマウスで指すと詳細情報が表示されます。<br>
+多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
+      </ul>
+    </body>
+</html>
