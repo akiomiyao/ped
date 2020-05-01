@@ -14,7 +14,7 @@
     $ sudo apt install git<br>
     $ sudo apt install sra-toolkit<br>
     $ git clone https://github.com/akiomiyao/ped.git<br>
-    <li><b>Download fastq sequence data</b><br>
+    <li><b>Download fastq sequence data from NCBI sequence read archive</b><br>
     $ cd ped<br>
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11513115" target = "_blank">SRR11513115</a><br>
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11513116" target = "_blank">SRR11513116</a><br>
@@ -29,30 +29,33 @@
     $ perl ped.pl target=SRR11513118,ref=COVID19,clipping=143<br>
     $ perl ped.pl target=SRR11542243,ref=COVID19,clipping=100<br>
     $ perl ped.pl target=SRR11542244,ref=COVID19,clipping=100<br>
+    Currently, fastq files of Illmina and Oxford nanopore are suppored.
     <li><b>Size of clipping</b><br>
     Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequence, clipping of sequence is required.<br>
     $ perl check_length.pl target=SRR11513115<br>
     outputs read counts in each length. Choose optimal length for clipping.<br>
+    NCBI also shows optimal length. See the metadata of each run.<br>
+    For data of Oxford nanopore, clipping=100 or 150 is recommended.
     <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
     Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
     Download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
     Fasta file of reference is saved in "ped/COVID19/COVID19.fasta".<br>
     Click Genomes tab of IVG and load "COVID19.fasta" and "COVID19.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files.<br>
+    
     <li><b>Files</b><br>
-    <a href = "COVID19.fasta" target = "_blank">COVID19.fasta</a><br>
-    <a href = "COVID19.gff" target = "_blank">COVID19.gff</a><br>
+    <a href = "COVID19.fasta" target = "_blank">COVID19.fasta</a> From NCBI and modified for PED.<br>
+    <a href = "COVID19.gff" target = "_blank">COVID19.gff</a> From NCBI and modified for PED.<br>
     <a href = "SRR11542243.vcf" target = "_blank">SRR11542243.vcf</a> Sample from University Malaya<br>
     <a href = "SRR11542244.vcf" target = "_blank">SRR11542244.vcf</a> Sample from University Malaya<br>
     <a href = "SRR11513115.vcf" target = "_blank">SRR11513115.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513116.vcf" target = "_blank">SRR11513116.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <li><b>Acknowledgement</b><br>
+    Ilkka Havukkala for test the PED update for COVID-19 and advice about integration of IVG.<br>
     <li><b>Author</b><br>
     MIYAO Akio (miyao@affrc.go.jp)
     </ul>
-    <br>
-   
-    
   </body>
 </html>
