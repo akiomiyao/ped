@@ -31,7 +31,14 @@ git pullで最新のスクリプトに更新されます。<br>
 pedのディレクトリの中に、DRR099981の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
 アメリカからのダウンロードなので時間がかかります。<br>
 時々エラーが表示されますが自動的に再接続されるので、気長に待ちます。<br>
-同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。
+同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。<br>
+回線の問題でどうしてもダウンロードができない場合は、DDBJからもダウンロードできます。<br>
+<a href = "ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA006/DRA006061/DRX093425/DRR099981_1.fastq.bz2">ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA006/DRA006061/DRX093425/DRR099981_1.fastq.bz2</a><br>
+<a href = "ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA006/DRA006061/DRX093425/DRR099981_2.fastq.bz2">ftp://ftp.ddbj.nig.ac.jp/ddbj_database/dra/fastq/DRA006/DRA006061/DRX093425/DRR099981_2.fastq.bz2</a><br>
+をダウンロードして、<br>
+ped/DRR099981/read<br>
+のディレクトリにbz2形式で圧縮されたfastqファイルを置きます。圧縮された状態のままでも解析できます。
+
       <li>DRR099981の配列をイネの参照配列IRGSP1.0にマップして多型を検出します。
 <pre>$ perl ped.pl target=DRR099981,ref=IRGSP1.0</pre>
 イネの参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
@@ -54,6 +61,13 @@ IVGを開いてGenomesのプルダウンメニューよりLoad Genome from File�
 興味のある部分をクリックすると、どんどん拡大されます。<br>
 多型をマウスで指すと詳細情報が表示されます。<br>
 多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
+ページのトップの<a href = "DRR099981.png" target = "_blank">画像</a>が表示例です。クリックすると大きくなります。<br>
+多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
       </ul>
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
     </body>
 </html>

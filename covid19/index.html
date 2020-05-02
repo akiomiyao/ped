@@ -29,19 +29,19 @@
     $ perl ped.pl target=SRR11513118,ref=COVID19,clipping=143<br>
     $ perl ped.pl target=SRR11542243,ref=COVID19,clipping=100<br>
     $ perl ped.pl target=SRR11542244,ref=COVID19,clipping=100<br>
-    Currently, fastq files of Illmina and Oxford nanopore are suppored.
+    Currently, fastq files of Illmina and Oxford nanopore are supported.
     <li><b>Size of clipping</b><br>
-    Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequence, clipping of sequence is required.<br>
+    Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
     $ perl check_length.pl target=SRR11513115<br>
-    outputs read counts in each length. Choose optimal length for clipping.<br>
-    NCBI also shows optimal length. See the metadata of each run.<br>
+    outputs read counts in each length. Choose the optimal length for clipping.<br>
+    NCBI also shows the optimal length. See the metadata of each run.<br>
     For data of Oxford nanopore, clipping=100 or 150 is recommended.
     <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
     Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
     Download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
     Fasta file of reference is saved in "ped/COVID19/COVID19.fasta".<br>
     Click Genomes tab of IVG and load "COVID19.fasta" and "COVID19.gff" files.<br>
-    Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files.<br>
+    Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
     
     <li><b>Files</b><br>
     <a href = "COVID19.fasta" target = "_blank">COVID19.fasta</a> From NCBI and modified for PED.<br>
@@ -52,8 +52,12 @@
     <a href = "SRR11513116.vcf" target = "_blank">SRR11513116.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <li><b>Comments</b><br>
+    Run time is about 20 min for each accession using Intec Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Reads from Illumina platform returns fine results. On the other hand, results from nanopore contains a lot of false positives.<br>
+    Higher threshold may be required for analysis of nanopore data.
     <li><b>Acknowledgement</b><br>
-    Ilkka Havukkala for test the PED update for COVID-19 and advice about integration of IVG.<br>
+    I thank Dr Ilkka Havukkala for test the PED update for COVID-19 and advice about integration of IVG.<br>
     <li><b>Author</b><br>
     MIYAO Akio (miyao@affrc.go.jp)
     </ul>
