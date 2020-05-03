@@ -42,7 +42,31 @@
     Fasta file of reference is saved in "ped/COVID19/COVID19.fasta".<br>
     Click Genomes tab of IVG and load "COVID19.fasta" and "COVID19.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
-    
+    <li><b>Check mutation in bidirectional alignments</b><br>
+    In the ped directory,<pre>
+$ perl search.pl target=target,chr=chromosome,pos=position
+</pre>
+For example,
+
+<pre>$ perl search.pl target=SRR11542244,chr=1,pos=5872
+</pre>
+A part of output is
+
+<pre># 1 5872 1 5870 f deletion -1
+CTTACAAAGTCCTCAGAATA GTTACTTATAAATTGGATGG 0
+                                                  Chr1 5872
+                                                  |
+CTTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCAGTTACTTATAAATTGGATG
+||||||||||||||||||||||||||||||||||||||||||||||||||  |||    |     |  | |   ||| |   |   |   || | |   |
+CTTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAGAAAACAGTTACACAACAACCATAAAACCAGTTACTTATAAATTGGATGG
+ |   ||   |     |    || |  |   |   |    |||     ||||||||||||||||||||||||||||||||||||||||||||||||||||
+TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCAGTTACTTATAAATTGGATGG
+                                               |
+                                               Chr1 5870
+</pre>
+Because COVID-19 has single RNA genome, the name of chromosome is renumbered to 1 for the PED analysis.
+
+</pre>
     <li><b>Files</b><br>
     <a href = "COVID19.fasta" target = "_blank">COVID19.fasta</a> From NCBI and modified for PED.<br>
     <a href = "COVID19.gff" target = "_blank">COVID19.gff</a> From NCBI and modified for PED.<br>
