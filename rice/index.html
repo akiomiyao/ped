@@ -6,14 +6,20 @@
     <body>
       <h1>PEDを用いたイネの多型解析例</h1>
       <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
-      <b>ここでは、コシヒカリの多型の取得を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
-      <a href = "DRR099981.png" target = "_blank"><img src = "DRR099981.png" width = "30%" align = "middle"></a>クリックすると拡大されます。<br>
+      <b>ここでは、コシヒカリの多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
+      <table>
+      <tr><td><a href = "DRR099981.png" target = "_blank"><img src = "DRR099981.png" height = "20%"></a></td><td><ul><li>図をクリックすると拡大されます。
+<li>SNP以外に、挿入・欠失変異も正確に検出できる特徴があります。
+<li>変異部分を増幅するプライマー対の配列も得られます。</ul></td></tr>
+      </table>
 
       <h2>Ubuntuのインストール</h2>
       <ul>
       <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
       <li>検索エンジンで「iso 書き込み windows10 usb」で検索するとISOイメージをUSBディスクに書き込む方法がいろいろ表示されますので、好みの方法を選んでUSBメモリに書き込みます。
-      <li><a href = "https://linuxfan.info/ubuntu-18-04-install-guide" target = "_blank">Ubuntu 18.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。
+      <li><a href = "https://linuxfan.info/ubuntu-18-04-install-guide" target = "_blank">Ubuntu 18.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+      PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
+使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。
       </ul>
       <h2>PEDのセットアップと解析例</h2>
       <ul>
@@ -64,6 +70,11 @@ IVGを開いてGenomesのプルダウンメニューよりLoad Genome from File�
 ページのトップの<a href = "DRR099981.png" target = "_blank">画像</a>が表示例です。クリックすると大きくなります。<br>
 多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
       </ul>
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
       <h2>お問い合わせ</h2>
 〒305-8518<br>
 茨城県つくば市観音台2-1-2<br>
