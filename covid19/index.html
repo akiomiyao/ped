@@ -32,7 +32,7 @@
     Currently, fastq files of Illmina and Oxford nanopore are supported.
     <li><b>Size of clipping</b><br>
     Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
-    $ perl check_length.pl target=SRR11513115<br>
+    $ perl check_length.pl target=SRR11513115<br><br>
     outputs read counts in each length. Choose the optimal length for clipping.<br>
     NCBI also shows the optimal length. See the metadata of each run.<br>
     For data of Oxford nanopore, clipping=100 or 150 is recommended.
@@ -43,14 +43,11 @@
     Click Genomes tab of IVG and load "COVID19.fasta" and "COVID19.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
     <li><b>Check mutation in bidirectional alignments</b><br>
-    In the ped directory,<pre>
-$ perl search.pl target=target,chr=chromosome,pos=position
-</pre>
-For example,
-
-<pre>$ perl search.pl target=SRR11542244,chr=1,pos=5872
-</pre>
-A part of output is
+    In the ped directory,<br>
+$ perl search.pl target=target,chr=chromosome,pos=position<br><br>
+For example,<br>
+$ perl search.pl target=SRR11542244,chr=1,pos=5872<br><br>
+A part of output is<br>
 
 <pre># 1 5872 1 5870 f deletion -1
 CTTACAAAGTCCTCAGAATA GTTACTTATAAATTGGATGG 0
@@ -82,6 +79,11 @@ Because COVID-19 has single RNA genome, the name of chromosome is renumbered to 
     Higher threshold may be required for analysis of nanopore data.
     <li><b>Acknowledgement</b><br>
     I thank Dr Ilkka Havukkala for test the PED update for COVID-19 and advice about integration of IVG.<br>
+    <li><b>Citing PED</b><br>
+Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data<br>
+Akio Miyao, Jianyu Song Kiyomiya, Keiko Iida, Koji Doi, Hiroshi Yasue<br>
+BMC Bioinformatics. 2019 20(1):362.<br>
+URL <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
     <li><b>Author</b><br>
     MIYAO Akio (miyao@affrc.go.jp)
     </ul>
