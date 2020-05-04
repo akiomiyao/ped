@@ -35,7 +35,8 @@
     $ sudo docker pull akiomiyao/ped<br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR11513115,wd=/work <br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=COVID19,clipping=146,wd=/work <br>
-    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run. 
+    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+    Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
     <li><b>Size of clipping</b><br>
     Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
     $ perl check_length.pl target=SRR11513115<br>
@@ -81,7 +82,7 @@ Because COVID-19 has single RNA genome, the name of chromosome is renumbered to 
     <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
     <li><b>Comments</b><br>
-    Run time is about 20 min for each accession using Intec Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Run time is about 20 min for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
     Reads from Illumina platform returns fine results. On the other hand, results from nanopore contains a lot of false positives.<br>
     Higher threshold may be required for analysis of nanopore data.
     <li><b>Acknowledgement</b><br>
