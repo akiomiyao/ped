@@ -2913,7 +2913,7 @@ sub waitFile{
     }
     while(1){
 	my $mtime = (stat($file))[9];
-	if (time > $mtime + 5){
+	if (time > $mtime){
 	    return;
 	}
 	sleep 1;
