@@ -30,10 +30,17 @@
     $ perl ped.pl target=SRR11542243,ref=COVID19,clipping=100<br>
     $ perl ped.pl target=SRR11542244,ref=COVID19,clipping=100<br>
     Currently, fastq files of Illmina and Oxford nanopore are supported.
+    <li><b>For Docker users</b><br>
+    For example,<br>
+    $ sudo docker pull akiomiyao/ped<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR11513115,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=COVID19,clipping=146,wd=/work <br>
+    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run. 
     <li><b>Size of clipping</b><br>
     Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
-    $ perl check_length.pl target=SRR11513115<br><br>
-    outputs read counts in each length. Choose the optimal length for clipping.<br>
+    $ perl check_length.pl target=SRR11513115<br>
+    'check_length.pl' outputs read counts in each length.<br>
+    Choose the optimal length for clipping.<br>
     NCBI also shows the optimal length. See the metadata of each run.<br>
     For data of Oxford nanopore, clipping=100 or 150 is recommended.
     <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
