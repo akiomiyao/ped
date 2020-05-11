@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>PEDを用いたヒトの多型解析例</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b>ここでは、<a href = "https://www.illumina.com/platinumgenomes.html" target = "_blank">Illumina社が解析して公開したプラチナゲノムの配列データ</a>の多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
+<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194146" target = "_blank">ERR194146</a>と
+      <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194147" target = "_blank">ERR194147</a>の配列データを例に解析手順を紹介します。<br>
+      <table>
+      <tr><td><a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a></td><td><ul><li>IGVでの表示例です。図をクリックすると拡大されます。
+<li>SNP以外に、<b>挿入・欠失変異も正確に検出できる</b>特徴があります。
+<li>変異部分を増幅する<b>プライマー対の配列</b>も得られます。</ul></td></tr>
+      </table>
+
+      <h2>Ubuntuのインストール</h2>
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。18.04.3LTSでも、20.4 LTSでもどちらでも構いません。
+      <li><a href = "https://linuxfan.info/ubuntu-18-04-install-guide" target = "_blank">Ubuntu 18.04 LTSインストールガイド【スクリーンショットつき解説】</a>あるいは<a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+      マルチスレッドで動作しますので、4コア、あるいは8コアのCPUを用いると早く結果が得られます。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt-get update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのSRAアーカイブからヒトのプラチナゲノム配列のfastq形式のファイル(ERR194146とERR194147)をダウンロードします。
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=ERR194146
+$ perl download.pl accession=ERR194147</pre>
+git pullで最新のスクリプトに更新されます。<br>
+pedのディレクトリの中に、ERR194146とERR194147の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
+アメリカからのダウンロードなので時間がかかります。回線の状況によっては、1～2日かかるかもしれません。<br>
+時々エラーが表示されますが自動的に再接続されるので、気長に待ちます。<br>
+同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。<br>
+<li>ダウンロードがうまくいかない場合は、DDBJにもデータがあります。<br>
+<a href = "https://ddbj.nig.ac.jp/DRASearch/run?acc=ERR194146" target = "_blank">https://ddbj.nig.ac.jp/DRASearch/run?acc=ERR194146</a><br>
+<a href = "https://ddbj.nig.ac.jp/DRASearch/run?acc=ERR194147" target = "_blank">https://ddbj.nig.ac.jp/DRASearch/run?acc=ERR194147</a><br>
+のページのFASTQのリンクをクリックするとダウンロードできます。<br>
+DDBJのデータは圧縮されていますが、ped/ERR194146/readあるいはped/ERR194147/readのディレクトリの中に置けばそのままPEDで解析できます。
+
+
+      <li>ERR194146とERR194147の配列をヒトの参照配列hg19にマップして多型を検出します。
+<pre>$ perl ped.pl target=ERR194146,ref=hg19
+$ perl ped.pl target=ERR194147,ref=hg19</pre>
+ヒトの参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
+解析が無事終わるとERR194146とERR194147のディレクトリの中に、ERR194146.vcfとERR194147.vcfという結果をまとめたファイルができます。<br>
+各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
+      </ul>
+      <h2>IVGブラウザによる結果の確認</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>
+<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
+
+ERR194146.vcfとERR194147.vcfをメインの表示ボックスにドラッグすれば、ヒトの多型データが取り込まれます。<br>
+データのサイズが大きいので、インデックスを作成しますかと尋ねれますので、OKを押してしばらく待つとインデックスができて表示されます。<br>
+私が持っているWindows10のノートパソコンでは、インデックス作成の途中でメモリ不足になりフリーズしてしまいました。<br>
+メモリが8GBのUbuntuのコンピュータでは、止まらずインデックスができましたが、初回は表示に失敗する場合があるみたいてす。<br>
+いったんIGVを閉じて立ち上げなおして読み込ませると取り込まれます。<br>
+各染色体の番号をクリックすると、染色体ごとの多型情報が表示されます。<br>
+興味のある部分をクリックすると、どんどん拡大されます。<br>
+多型をマウスで指すと詳細情報が表示されます。<br>
+多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
+      <li><a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf" target = "_blank">ERR194146.vcf</a><br>
+      <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf.idx" target = "_blank">ERR194146.vcf.idx</a><br>
+      <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf" target = "_blank">ERR194147.vcf</a><br>
+      <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br>
+      に解析済みデータを置きました。比較検証にご利用ください。
+      </ul>
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+    </body>
+</html>

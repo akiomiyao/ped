@@ -7,6 +7,7 @@
       <h1>PEDを用いた多型検出</h1>
       ショートカット 
 	  <a href = "https://akiomiyao.github.io/ped/covid19/index.html" target = "_blank">[COVID-19特設サイトはこちら]</a>
+	  <a href = "https://akiomiyao.github.io/ped/human/index.html" target = "_blank">[ヒトの解析例]</a>
 	  <a href = "https://akiomiyao.github.io/ped/rice/index.html" target = "_blank">[イネの解析例]</a>
       <h2>PEDとは</h2>
       <p>Polymorphic Edge Detection (PED)は、DNAの多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。非常に正確にSNPとindel等構造変異を得ることができます。
@@ -52,6 +53,8 @@
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
       <li>docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=DRR054198,ref=IRGSP1.0,wd=/work<br>
       Dockerのコンテナを用いて、イネのIRGSP1.0のリファレンスに対するコシヒカリ(DRR054198)の多型を検出します。Dockerの設定は、<a href = "#Docker_install">こちら</a>
+	  <li>perl ped.pl target=SRR11513115,ref=COVID19,clipping=146<br>
+	  長さが不揃いなRT-PCRの配列データを146塩基にそろえて、新型コロナウイルスのリファレンス配列に対する多型を検出します。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した自然突然変異の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
