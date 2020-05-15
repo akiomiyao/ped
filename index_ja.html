@@ -21,9 +21,9 @@
 	<a name = "simple_tutorial">
 	<h2>ped.plでの多型検出 (簡単なチュートリアル)</h2>
 	 <ul>
-	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした8コアや16コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
+	  <li>ped.plは、マルチスレッドで高速に解析できます。Linuxをインストールした4コアや8コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
 	  時間はかかりますが、シングルコアや2コアのCPUでも動作します。<br>
-	  メモリーは4Gバイト以上、ディスクはヒトを解析する場合は1TB程度必要です。コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみのDockerのコンテナも公開しています。<br>
+	  メモリーは4Gバイト以上、ディスクはヒトを解析する場合は1TB程度必要です。コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみのDockerのコンテナも公開しています。AWSやGCP等のクラウドで実行できます。<br>
 	  <p><b>書式</b><br>
 	  perl ped.pl target=target,control=control,ref=reference
       <ul>
@@ -63,7 +63,7 @@
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=14<br>
 	  最大スレッド数を指定する場合。<br>
       通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。<br>
-      デフォルト値はLinux OSのデフォルトファイルオープン上限(1024)に収まる最大14スレッドです。
+      最大値はLinux OSのデフォルトファイルオープン上限(1024)に収まる14スレッドです。デフォルトは8スレッドとなっています。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
@@ -91,10 +91,10 @@
         
 	 <li>targetのディレクトリに以下の結果がまとめて出力されます。
 	 <table>
+	 <tr><td>target.vcf</td><td>HとMでマークされた多型をvcf形式で出力されたファイル</td></tr>
 	 <tr><td>target.aln</td><td>双方向整列法による整列データ</td></tr>
 	 <tr><td>target.bi.snp</td><td>双方向整列法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
 	 <tr><td>target.bi.primer</td><td>双方向整列法によるSNPリストに加えてプライマー配列が出力されます</td></tr>
-	 <tr><td>target.bi.vcn</td><td>HとMでマークされたSNPをvcn形式で出力されたファイル</td></tr>
 	 <tr><td>target.kmer.snp</td><td><i>k</i>-mer法で検出されたSNPリスト</td></tr>
 	 <tr><td>target.kmer.primer</td><td><i>k</i>-mer法で検出されたSNPリストに加えてプライマー配列が出力されます</td></tr>
 	 <tr><td>target.sv</td><td>双方向整列法で検出された構造(挿入・欠失・逆位・転座)変異リスト</td></tr>
@@ -116,36 +116,46 @@
      <h2>結果のフォーマット</h2>
      <ul>
            <li>以下は、ヒト (イルミナ プラチナゲノムの配列データ ERR194146)の出力例です。<br>
-           ERR194146のディレクトリの中にERR194146.bi.vcf
+           ERR194146のディレクトリの中にERR194146.vcf
            というvcf形式マップデータがセーブされます。<br>
 <pre>##fileformat=VCFv4.2
-##FILTER=&lt;ID=PASS,Description="All filters passed"&gt;
-##INFO=&lt;ID=GT,Number=1,Type=String,Description="Genotype"&gt;
-##INFO=&lt;ID=DP,Number=1,Type=Integer,Description="Approximate read depth)"&gt;
-##INFO=&lt;ID=AF,Number=.,Type=Float,Description="Allele Frequency"&gt;
-##FORMAT=&lt;ID=GT,Number=1,Type=String,Description="Genotype"&gt;
-##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed"&gt;
-##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description="Read depth"&gt;
+##INFO=&lt;ID=AF,Number=.,Type=Float,Description="Allele Frequency">
+##INFO=&lt;ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
+##INFO=&lt;ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.">
+##INFO=&lt;ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=&lt;ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=&lt;ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=&lt;ID=PCRLEN,Number=.,Type=Integer,Description="PCR product length">
+##INFO=&lt;ID=PL,Number=.,Type=String,Description="Left primer sequence">
+##INFO=&lt;ID=PR,Number=.,Type=String,Description="Right primer sequence">
+##INFO=&lt;ID=SVLEN,Number=.,Type=Float,Description="Difference in length between REF and ALT alleles">
+##INFO=&lt;ID=SVTYPE,Number=1,Type=Integer,Description="Type of structural variant">
+##ALT=&lt;ID=DEL,Description="Deletion">
+##ALT=&lt;ID=INS,Description="Insertion of novel sequence">
+##ALT=&lt;ID=INV,Description="Inversion of reference sequence">
+##FORMAT=&lt;ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
+##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description="Read depth">
+##source=&lt;PROGRAM=ped.pl,Method="Bidirectional method",target=ERR194146,control=hg19,reference=hg19>
+##created=&lt;TIMESTAMP="2020-05-07 19:45:32 +0900">
 #CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  ERR194146
-chr1    69511   .       A       G       1000    PASS    GT=1/1;AF=1;DP=19       GT:AD:DP        1/1:0,19:19
-chr1    629275  .       A       C       1000    PASS    GT=0/1;AF=0.522;DP=44   GT:AD:DP        0/1:21,23:44
-chr1    629275  .       A       G       1000    PASS    GT=0/1;AF=0.363;DP=33   GT:AD:DP        0/1:21,12:33
-chr1    629306  .       A       C       1000    PASS    GT=0/1;AF=0.342;DP=70   GT:AD:DP        0/1:46,24:70
-chr1    629487  .       A       C       1000    PASS    GT=0/1;AF=0.655;DP=61   GT:AD:DP        0/1:21,40:61
-chr1    629626  .       T       C       1000    PASS    GT=0/1;AF=0.472;DP=36   GT:AD:DP        0/1:19,17:36
-chr1    630318  .       A       C       1000    PASS    GT=0/1;AF=0.555;DP=45   GT:AD:DP        0/1:20,25:45
-chr1    630318  .       A       G       1000    PASS    GT=0/1;AF=0.333;DP=30   GT:AD:DP        0/1:20,10:30
-chr1    630775  .       A       C       1000    PASS    GT=0/1;AF=0.382;DP=68   GT:AD:DP        0/1:42,26:68
-chr1    630875  .       A       C       1000    PASS    GT=0/1;AF=0.422;DP=175  GT:AD:DP        0/1:101,74:175
-chr1    630899  .       A       C       1000    PASS    GT=0/1;AF=0.373;DP=150  GT:AD:DP        0/1:94,56:150
-chr1    631286  .       A       C       1000    PASS    GT=0/1;AF=0.302;DP=139  GT:AD:DP        0/1:97,42:139
-chr1    631811  .       C       T       1000    PASS    GT=0/1;AF=0.657;DP=35   GT:AD:DP        0/1:12,23:35
-chr1    632574  .       A       C       1000    PASS    GT=0/1;AF=0.32;DP=134   GT:AD:DP        0/1:91,43:134
-chr1    632692  .       A       G       1000    PASS    GT=0/1;AF=0.694;DP=59   GT:AD:DP        0/1:18,41:59
-chr1    632693  .       T       A       1000    PASS    GT=0/1;AF=0.547;DP=42   GT:AD:DP        0/1:19,23:42</pre>
+1       69511   .       A       G       1000    .       GT=1/1;AF=1;DP=19;PL=TGTGTGGCAACGCATGTGTC;PR=CAACTGGCTCACCGAATGGA;PCRLEN=74     GT:AD:DP        1/1:0,19:19
+1       564654  .       G       A       1000    .       GT=0/1;AF=0.534;DP=43;PL=CTCTCCCCTGAACTCTACAC;PR=CGGGGGTATGCTGTTCGAAT;PCRLEN=89 GT:AD:DP        1/1:20,23:43
+1       564655  .       A       C       1000    .       GT=0/1;AF=0.343;DP=32;PL=CTCTCCCCTGAACTCTACAC;PR=CGGGGGTATGCTGTTCGAAT;PCRLEN=89 GT:AD:DP        1/1:21,11:32
+1       564898  .       A       C       1000    .       GT=0/1;AF=0.313;DP=67;PL=TCCAGCATTCCCCCTCAAAC;PR=GGTGGCACGGAGAATTTTGG;PCRLEN=144        GT:AD:DP        1/1:46,21:67
+1       565006  .       T       C       1000    .       GT=0/1;AF=0.666;DP=57;PL=TAAGCTATCGGGCCCATACC;PR=GGTTGGGCCAGGGGATTAAT;PCRLEN=72 GT:AD:DP        1/1:19,38:57
+1       565006  .       T       G       1000    .       GT=0/1;AF=0.666;DP=57;PL=TAAGCTATCGGGCCCATACC;PR=GGTTGGGCCAGGGGATTAAT;PCRLEN=72 GT:AD:DP        1/1:19,38:57
+1       565454  .       T       C       1000    .       GT=0/1;AF=0.347;DP=23;PL=CCTGCTCCTTCTCACATGAC;PR=GAGTGAGGAGAAGGCTTACG;PCRLEN=89 GT:AD:DP        1/1:15,8:23
+1       565464  .       T       C       1000    .       GT=0/1;AF=0.514;DP=35;PL=CCTGCTCCTTCTCACATGAC;PR=GAGTGAGGAGAAGGCTTACG;PCRLEN=89 GT:AD:DP        1/1:17,18:35
+
+1       833173  .       C       CGAAC   1000    .       SVTYPE=INS;END=833173;SVLEN=4;PL=GCTTGCTGAATTCCTGCCTG;PR=GAGGACTGTGGGCGAAAAGT;PCRLEN=73;GT=0/1;AF=0.473;DP=38   GT:AD:DP        0/1:20,18:38
+
+1       867997  .       CTTTC   C       1000    .       SVTYPE=DEL;END=867998;HOMLEN=4;HOMSEQ=TTTC;SVLEN=-4;PL=CTCCCAGACCATGTCTGTGT;PR=AACACACAGATGGAGGTGGC;PCRLEN=85;GT=1/1;AF=0.969;DP=33     GT:AD:DP        1/1:1,32:33
+</pre>
            PEDでは、bwaを使わず独自の方法でマッピングしているため、bwa/GATKと同様のクオリティースコアの算出が困難です。<br>
            そのため、クオリティースコアは1000の固定値としています。<br>
            多型のクオリティーは、サポートされるリードのカバー数(DP)で判断して下さい。<br>
+転座に関してはIntegrative Genome Veiwer(IGV)でうまく表示できないので含めていません。同時に出力されるsvのファイルをご参照ください。
           <li> ERR194146.bi.primerでは多型部分を増幅するプライマーセットも出力されます。<pre>
 1       1223251 A       G       50      0       0       26      M       GCTGAGCACTCACTTTCCTC    ATAGCGAGAAGGAGGTTGCC    76      CACACGGCACGCACACACGTACTCACGAGCACACGCACGGCACACTCATACACGACACACACGGCACACTCATGTACACACAACACACGCGCGCACACACAGGATGCCTGAGACCGGTGGCGGGAGCCTGGCTGAGCACTCACTTTCCTC[G/A]TCCACTTTGAGTTCCTCGTTGAGCCTGATGGCGTCGGCAACCTCCTTCTCGCTATGGCCTTTACTCGCCAAAAACTTCACCTTATACTCGTCCCAAGACACGTGACCTGGAAGAGCAGATCACACCTGTCAGGGCCTCTGATACTGAGC
 1       1224137 T       C       50      0       0       26      M       TCCACCAGGCAACGCGAAAA    TTCTGTGTGACAGAGGGGGA    137     GCAGGTGGCCGTCAGACTGGGCCCCCAGGACCCCGAACAGCCAGACGGATGCCGCCGGCCCAGGACTCCATGGCTGCGTGAACCTGCCACCAACAGCGACAGGCTCCACCAGGCAACGCGAAAAGCGTCCGGGACGTGGGGCTTGTGGGG[C/T]GCCGGGCCACGCCAGAGACACTGGGGAAGGTGGATGCCACGGTCCCCTCCCCGGGGAAACACATGGACCCTCCCCCTCTGTCACACAGAATCACCACCAGACCCCACTCTCCAACCACAGCTTCCAAAAGTCACACTCTTCACGTTTTA
