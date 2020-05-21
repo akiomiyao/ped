@@ -1311,7 +1311,6 @@ sub toVcf{
 	open($fout, "> $wd/$target/$target.bi.vcf");
     }
     print $fout "##fileformat=VCFv4.2
-##FILTER=<ID=PASS,Description=\"All filters passed\">
 ##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
 ##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
@@ -1484,7 +1483,6 @@ sub bi2vcf{
     chomp($timestamp);
     open(OUT, "> $wd/$target/$target.vcf");
     print OUT "##fileformat=VCFv4.2
-##FILTER=<ID=PASS,Description=\"All filters passed\">
 ##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
 ##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
