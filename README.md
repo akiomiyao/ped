@@ -27,6 +27,20 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
           
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
+## For analysis of COVID-19 data
+```
+perl download.pl accession=SRR11542244
+perl check_length.pl target=SRR11542244
+perl ped.pl target=SRR11542244,ref=COVID19,clipping=100
+```
+or
+```
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11542244,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=COVID19,clipping=100,wd=/work
+```
+[Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
+
 ## Simplified instruction
 - The ped.pl is a multithreaded script, suitable for the multi-core CPU like as 16 or 8 cores.  
   Of course, the ped.pl can run with the 2 or single core machine, but slow.  
@@ -60,20 +74,6 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
   clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
-  
-## For analysis of COVID-19 data
-```
-perl download.pl accession=SRR11542244
-perl check_length.pl target=SRR11542244
-perl ped.pl target=SRR11542244,ref=COVID19,clipping=100
-```
-or
-```
-docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11542244,wd=/work
-docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
-docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=COVID19,clipping=100,wd=/work
-```
-[Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
@@ -169,6 +169,7 @@ perl mkref.pl hg38
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
   COVID19        Severe acute respiratory syndrome coronavirus 2 (CIVID-19, NC_045512.2)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
   IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 44
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
@@ -618,6 +619,7 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
+Version 1.4 Add clipping of short reads for RT-PCR data. Add aplication of CAVID-19 analysis.     
 Version 1.3 Update for search.pl for comfirmation of alignment. Improuvement of making sort_uniq data.  
 Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
 Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.  
