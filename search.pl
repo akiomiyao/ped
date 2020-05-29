@@ -64,11 +64,15 @@ while($bottom - $top > 1){
 	    $ipos = $row[1];
 	    if ($chr eq $ichr){
 		if ($pos eq $ipos){
-		    &printData;
+		    $dat = &printData;
+		    $output{$dat} = 1;
 		    $hit = 1;
 		}
 	    }
 	}
+    }
+    foreach (sort keys %output){
+	print $_;
     }
     exit if $hit;
     if ($ichr gt $chr){
@@ -86,19 +90,25 @@ while($bottom - $top > 1){
  }
 
 sub printData{
+    my (@tmp, $output);
     if ($row[2] eq "S"){
 	open(IN, "$wd/$target/$target.aln");
     }else{
 	open(IN, "$wd/$target/$target.aln.$row[2]");
     }
+    $row[3] -= 1000;
+    $row[3] = 0 if $row[3] < 0;
     seek(IN, $row[3], 0);
+    $flag = 0;
     while(<IN>){
-	if ($flag and /^$/){
-	    $flag = 0;
-	    print "\n";
-	    return;
+	if (/^$/){
+	    if ($flag){
+		return $output;
+	    }
+	    $output = "";
 	}
-	print;
-	$flag = 1;
+	@tmp = split;
+	$flag = 1 if $tmp[2] == $pos;
+	$output .= $_;
     }
 }
