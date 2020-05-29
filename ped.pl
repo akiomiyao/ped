@@ -328,7 +328,6 @@ sub bidirectional{
     &sortSeq;
     &joinControl;
     &svReadCount;
-
     &snpMkT;
     &sortSeq;
     &joinTarget;
@@ -680,25 +679,17 @@ sub countKmer{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		&report("Making kmer for $target. $tag");
-		&countKmerSub($target, $tag);
-	    }
-	}
-    }
-
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
-		&report("Making kmer for $target. Sorting of $tag subfiles");
-		threads->new(\&countKmerSort, $target, $tag);
+		&report("Making kmer for $target. $tag");
+		threads->new(\&countKmerSub, $target, $tag);
 	    }
 	}
     }
-    &joinAll;
 
-     foreach $nuca (@nuc){
+    &joinAll;
+    
+    system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
+    foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
@@ -708,57 +699,13 @@ sub countKmer{
 	    }
 	}
     }
+
     &joinAll;
-
-    system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		&report("Making last base counts for $target. $tag");
-		threads->new(\&countKmerLbc, $target, $tag);
-	    }
-	}
-    }
-    &joinAll;
-}
-
-sub countKmerLbc{
-    my ($target, $tag) = @_;
-    my ($fin, $fout, $seq, $count, $head, $prev, $nuc, %count);
-
-    $fin = "$tag.lbc.in";
-    $fout = "$tag.lbc.out";
-    open($fout, "> $wd/$target/lbc/$target.lbc.$tag");
-    open($fin, "$tmpdir/$tag.count");
-    while(<$fin>){
-	chomp;
-	($seq, $count) = split;
-        $head = substr($seq, 0, 19);
-        $nuc = substr($seq, 19, 1);
-        
-        if ($head ne $prev and $prev ne ""){
-            print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
-            $count{A} = 0;
-            $count{C} = 0;
-            $count{G} = 0;
-            $count{T} = 0;
-        }
-        $count{$nuc} = $count;
-        
-        $prev = $head;
-    }
-    print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
-    close($fin);
-    close($fout);
-    system("gzip $wd/$target/lbc/$target.lbc.$tag && rm $tmpdir/$tag.count");
-    $semaphore->up;
 }
 
 sub countKmerMerge{
     my ($target, $parent) = @_;
-    my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count);
+    my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count, $head, $prev, $nuc, %count);
     system("touch $tmpdir/$parent.count");
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -781,21 +728,31 @@ sub countKmerMerge{
 	    }
 	}
     }
-    $semaphore->up;
-}
-
-sub countKmerSort{
-    my ($target, $parent) = @_;
-    my ($nuca, $nucb, $nucc, $tag);
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		&report("Making kmer for $target. Sorting of $parent.$tag subfile");
-		system("$zcat $tmpdir/$parent.$tag.gz | sort $sort_opt -T $tmpdir |uniq -c | awk '{print \$2 \"\t\" \$1}'| gzip -c > $tmpdir/$parent.$tag.count.gz && rm $tmpdir/$parent.$tag.gz");
-	    }
-	}
+    $fin = "$parent.lbc.in";
+    $fout = "$parent.lbc.out";
+    open($fout, "> $wd/$target/lbc/$target.lbc.$parent");
+    open($fin, "$tmpdir/$parent.count");
+    while(<$fin>){
+	chomp;
+	($seq, $count) = split;
+        $head = substr($seq, 0, 19);
+        $nuc = substr($seq, 19, 1);
+        
+        if ($head ne $prev and $prev ne ""){
+            print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
+            $count{A} = 0;
+            $count{C} = 0;
+            $count{G} = 0;
+            $count{T} = 0;
+        }
+        $count{$nuc} = $count;
+        
+        $prev = $head;
     }
+    print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
+    close($fin);
+    close($fout);
+    system("gzip $wd/$target/lbc/$target.lbc.$parent && rm $tmpdir/$parent.count");
     $semaphore->up;
 }
 
@@ -807,7 +764,7 @@ sub countKmerSub{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$fout = "$tag.$parent.out";
-		open($fout, "|gzip -c > $tmpdir/$tag.$parent.gz");
+		open($fout, "> $tmpdir/$tag.$parent");
 	    }
 	}
     }
@@ -836,9 +793,13 @@ sub countKmerSub{
 		$tag = $nuca . $nucb . $nucc;
 		$fout = "$tag.$parent.out";
 		close($fout);
+		&report("Making kmer for $target. Sorting of $tag.$parent subfile");
+		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.$parent |uniq -c | awk '{print \$2 \"\t\" \$1}' > $tmpdir/$tag.$parent.count && rm $tmpdir/$tag.$parent");
+		system("gzip $tmpdir/$tag.$parent.count");
 	    }
 	}
     }
+    $semaphore->up;
 }
 
 sub mkRef{
@@ -1301,6 +1262,7 @@ will list the distibution of read length.\n" if $readLength != $prev and $prev !
 
 sub toVcf{
     report("Convert to vcf format");
+    my (@row, $dp, $af, $output, $prev);
     my $fin = "in-vcf";
     my $fout ="out-vcf";
     if ($method eq "kmer"){
@@ -1330,10 +1292,12 @@ sub toVcf{
 	    next if $dp == 0;
 	    $af = int(1000 * $row[18]/$dp)/1000;
 	    if (/M/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
 	    }elsif(/H/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
 	    }
+	    print $fout $output if $output ne $prev;
+	    $prev = $output;
 	}else{
 	    $dp = $row[6] + $row[7];
 	    next if $dp == 0;
@@ -1509,8 +1473,8 @@ sub bi2vcf{
     open(IN, "sort $sort_opt -T $wd/$target $wd/$target/$target.tmp |");
     while(<IN>){
 	@row = split;
-	$row[0] =~ s/^0*//;
-	$row[1] =~ s/^0*//;
+	$row[0] =~ s/^0+//;
+	$row[1] =~ s/^0+//;
 	$out = join("\t", @row);
 	print OUT "$out\n";
     }
@@ -1594,7 +1558,7 @@ sub getInsert{
 
 sub snpMkT{
     report("Making data for verification of snp. target");
-    my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr);
+    my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr, $dat);
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1606,7 +1570,7 @@ sub snpMkT{
     }
     my $fin = "in-mkt";
     my $fout = "out-mkt";
-    open($fout, "|sort $sort_opt -T $tmpdir | uniq -c > $tmpdir/snp.list");
+    open($fout, "|sort $sort_opt -T $tmpdir | uniq > $tmpdir/snp.tmp");
     if ($method eq "kmer"){
 	open($fin, "cat $tmpdir/$target.map.* |");
     }else{
@@ -1634,12 +1598,29 @@ sub snpMkT{
 	    }
 	    $row[2] = "000000000000" . $row[2];
 	    $row[2] = substr($row[2], length($row[2]) -11, 11);
-	    print $fout "$row[1] $row[2] $row[4] $row[5]\n";
+	    push(@dat, "$row[1] $row[2] $row[4] $row[5]");
 	}
+	if ($method ne "kmer" and $_ eq "" and $prev !~/Chr/){
+	    foreach $dat (@dat){
+		print $fout "$dat $prev\n";
+		$dat = "";
+	    }
+	    @dat = ();
+	}
+	$prev = $_;
     }
     close($fin);
     close($fout);
-
+    open($fin, "$tmpdir/snp.tmp");
+    open($fout, "| uniq -c > $tmpdir/snp.list");
+    while(<$fin>){
+	chomp;
+	@row = split;
+	print $fout "$row[0] $row[1] $row[2] $row[3]\n";
+    }
+    close($fin);
+    close($fout);
+    system("rm $tmpdir/snp.tmp");
     open($fin, "$tmpdir/snp.list");
     while(<$fin>){
 	chomp;
@@ -1698,6 +1679,20 @@ sub snpMkT{
 		close($tag);
 	    }
 	}
+    }
+    if ($method ne "kmer"){
+	open($fin, "$tmpdir/snp.list");
+	open($fout, "> $wd/$target/$target.bi.snp.count");
+	while(<$fin>){
+	    chomp;
+	    ($count, $chr, $pos, $ref, $alt) = split;
+	    next if $chr eq "";
+	    $chr =~ s/^0+//;
+	    $pos =~ s/^0+//;
+	    print $fout "$chr\t$pos\t$ref\t$alt\t$count\n";
+	}
+	close($fin);
+	close($fout);
     }
 }
 
@@ -2494,8 +2489,26 @@ sub svSort{
 	}
 	$count++;
     }
+    open($fin, "$tmpdir/$target.sv.sort");
+    open($fout, "|uniq -c > $tmpdir/$target.sv.count");
+    while(<$fin>){
+	chomp;
+	@row = split;
+	$row[7] = "N" if $row[7] =~ /Chr/;
+	print $fout "$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\n";
+    }
+    open($fin, "$tmpdir/$target.sv.count");
+    open($fout, "> $wd/$target/$target.sv.count");
+    while(<$fin>){
+	chomp;
+ 	@row = split;
+	$row[1] =~ s/^0+//;
+	$row[2] =~ s/^0+//;
+	print $fout "$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[0]\n";
+    }
     close($fin);
     close($fout);
+    system("rm $tmpdir/$target.sv.count");
     report("Making $target.sv.sort complete");
     $semaphore->up;
 }
