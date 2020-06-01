@@ -1,0 +1,76 @@
+<html>
+  <head>
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>Polymorphic Edge Detection (PED)<font size = "4"> - An efficent polymorphism detector for NGS data</font></h1>
+    <a href = "../index.html">[Link to Top Page]</a>
+    <h2>Example for <i>Arabidopsis thaliana</i></h2>
+    <a href = "DRR195470.png" target = "_blank"><img src = "DRR195470.png" width = "30%"> Click to large.</a><br>
+    <a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=DRP005838" target = "_blank">Samples are made for mutmap screen of <i>Arabidopsis thaliana.</i></a><br>
+    <b>Target region from 5 to 10 Mb in chromosome 1 is detected with homozygous mutaions.</b>
+    <ul>
+    <li><b>For Install linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
+    $ sudo apt update<br>
+    $ sudo apt install curl<br>
+    $ sudo apt install git<br>
+    $ sudo apt install sra-toolkit<br>
+    $ git clone https://github.com/akiomiyao/ped.git<br>
+    <li><b>Download fastq sequence data from NCBI sequence read archive</b><br>
+    $ cd ped<br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR195469" target = "_blank">DRR195469</a><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR195470" target = "_blank">DRR195470</a><br>
+    <li><b>Detection of polymorphism</b><br>
+    $ perl ped.pl target=DRR195470,control=DRR195469,ref=TAIR10<br>
+    <li><b>For Docker users</b><br>
+    For example,<br>
+    $ sudo docker pull akiomiyao/ped<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=DRR195469,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=DRR195470,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=DRR195470,control=DRR195469,ref=TAIR10,wd=/work <br>
+    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+    Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
+    <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
+    Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
+    Download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
+    Fasta file of reference is saved in "ped/TAIR10/TAIR10.fasta".<br>
+    Click Genomes tab of IVG and load "TAIR10.fasta" and "TAIR10.gff" files.<br>
+    Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
+    <li><b>Check mutation in bidirectional alignments</b><br>
+    In the ped directory,<br>
+$ perl search.pl target=target,chr=chromosome,pos=position<br><br>
+For example,<br>
+$ perl search.pl target=DRR195470,chr=1,pos=13466340<br><br>
+A part of output is<br>
+
+<pre># 1 13466340 1 13466302 f deletion -4
+AAACCTACAAATAATCATAT TGAATTGTTGGTTTAGAGAT 0
+                                                                                                                              Chr1 13466340
+                                                                                                                              |
+AAACCTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAG
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   | | | |   | |||     |
+AAACCTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAGAGAT
+  ||  | ||  |    |  |||    |        | |||    |        ||      |||  ||      |      |  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+CTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAGAGAT
+                                                                                    |
+                                                                                    Chr1 13466302
+</pre>
+</pre>
+    <li><b>Files</b><br>
+    Click to download<br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/TAIR10.fasta" target = "_blank">TAIR10.fasta</a><br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/TAIR10_GFF3_genes.gff" target = "_blank">TAIR10_GFF3_genes.gff</a> Modified for PED.<br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/DRR195470.vcf" target = "_blank">DRR195470.vcf</a><br>
+    <li><b>Comments</b><br>
+    Run time is about one day for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Reads from Illumina platform returns fine results.
+    <li><b>Citing PED</b><br>
+Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data<br>
+Akio Miyao, Jianyu Song Kiyomiya, Keiko Iida, Koji Doi, Hiroshi Yasue<br>
+BMC Bioinformatics. 2019 20(1):362.<br>
+URL <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
+    <li><b>Author</b><br>
+    MIYAO Akio (miyao@affrc.go.jp)
+    </ul>
+  </body>
+</html>
