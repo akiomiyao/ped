@@ -8,7 +8,7 @@
     <h2>Example of COVID19 Mutation Detection</h2>
     <a href = "covid19.png" target = "_blank"><img src = "covid19.png" width = "30%"></a> Click to large.<br>
     <ul>
-    <li><b>For Install linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
+    <li><b>Install PED into linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
     $ sudo apt update<br>
     $ sudo apt install curl<br>
     $ sudo apt install git<br>
@@ -55,6 +55,8 @@
 $ perl search.pl target=target,chr=chromosome,pos=position<br><br>
 For example,<br>
 $ perl search.pl target=SRR11542244,chr=1,pos=5872<br><br>
+or<br>
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl search.pl target=SRR11542244,chr=1,pos=5872,wd=/work <br><br>
 A part of output is<br>
 
 <pre># 1 5872 1 5870 f deletion -1
