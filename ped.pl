@@ -189,12 +189,6 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
-open(REPORT, ">> $wd/$target/$target.log");
-print REPORT "# Log of ped.pl
-$log";
-report("Job begin: $method method");
-
-
 if ($chr[0] eq ""){
     opendir(REF, $refdir);
     foreach(readdir(REF)){
@@ -206,6 +200,19 @@ if ($chr[0] eq ""){
     }
     closedir(REF);
 }
+
+if ($sub ne ""){
+    my $child = "$wd/$target/tmp/child.$$";
+    system("touch $child");
+    &$sub($arg);
+    system("rm $child");
+    exit;
+}
+
+open(REPORT, ">> $wd/$target/$target.log");
+print REPORT "# Log of ped.pl
+$log";
+report("Job begin: $method method");
 
 if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
     &mkRef;
@@ -807,6 +814,7 @@ sub mkRef{
     if (! -e "$wd/$ref"){
 	system("mkdir $wd/$ref");
     }
+=pod
     if ($file eq ""){
 	@row = split('/', $curl{$ref});
 	$remote_file = $row[$#row];
@@ -819,6 +827,7 @@ sub mkRef{
 	&mkChrFromFile($file);
     }
     &mkChrFasta;
+=cut
     &mk20;
     &mkControlRead;
     system("rm -r $wd/$ref/tmp");
@@ -939,12 +948,12 @@ sub mkControlReadSub{
 
 sub mkUniq{
     my $tag = shift;
-    &report("Making ref20_uniq.$tag.gz");
     my $fin = $tag;
     my $funiq = "tmpout.$tag";
     my $count = 0;
     open($funiq, "> $wd/$ref/ref20_uniq.$tag");
-    open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |sort $sort_opt -T $tmpdir |");
+    #    open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |sort $sort_opt -T $tmpdir |");
+    open($fin, "sort $sort_opt -T $tmpdir $wd/$ref/tmp/ref20.$tag.* |");
     while(<$fin>){
 	chomp;
 	@row = split;
@@ -964,7 +973,7 @@ sub mkUniq{
 }
 
 sub mk20mer{
-    my ($fin, $fout, $i, @tag, $tag, $forward, $length, $comp, $fpos, $rpos);
+    my ($fin, $fout, $i, $nuc, @tag, $tag, $forward, $length, $comp, $fpos, $rpos, $notstd);
     my $chr = shift;
 
     foreach $nuc (@nuc){
@@ -981,13 +990,14 @@ sub mk20mer{
     }
 
     my $file = "$wd/$ref/chr$chr";
-    open(IN, $file);
-    binmode(IN);
+    $fin = "fin.$chr";
+    open($fin, $file);
+    binmode($fin);
     $length = -s $file;
     for ($i = 0; $i <= $length - 20; $i++){
-	seek(IN, $i, 0);
-	read(IN, $forward, 20);
-	if ($forward !~ /[MRWSYKVHDBN]/){
+	seek($fin, $i, 0);
+	read($fin, $forward, 20);
+	if ($forward !~ /N/){
 	    $comp = complement($forward);
 	    $fpos = $i + 1;
 	    $rpos = $fpos + 20 -1;
@@ -997,7 +1007,8 @@ sub mk20mer{
 	    print $tag "$comp\t$chr\t$rpos\tr\n";
 	}
     }
-    close(IN);
+    close($fin);
+    
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -1014,16 +1025,26 @@ sub mk20mer{
 }
 
 sub mk20{
-    system("mkdir $wd/$ref/tmp");
-    &report("Making 20mer position file.");
-    foreach $i (@chr){
-	next if $i eq "NOP";
-	$semaphore->down;
-	&report("Processing Chr$i");
-	threads->new(\&mk20mer, $i);
+    system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
+    if (! -e "$wd/$ref/ref20_uniq.AAA.gz"){
+	&report("Making 20mer position file.");
+	foreach $i (@chr){
+	    next if $i eq "NOP";
+	    &canFork;
+	    &report("Processing Chr$i");
+	    system("perl ped.pl target=$target,ref=$ref,sub=mk20mer,arg=$i,wd=$wd &");
+	}
+	&waitChild;
     }
-    &joinAll;
-    
+    my (@row, %tag);
+    opendir(DIR, "$wd/$ref/tmp/");
+    foreach (readdir(DIR)){
+	if (/^ref20/){
+	    @row = split('\.', $_);
+	    $tag{$row[1]} = 1;
+	}
+    }
+    closedir(DIR);
     foreach $nuc (@nuc){
 	$tag[0] = $nuc;
 	foreach $nuc (@nuc){
@@ -1031,12 +1052,15 @@ sub mk20{
 	    foreach $nuc (@nuc){
 		$tag[2] = $nuc;
 		$tag = join('', @tag);
-		$semaphore->down;
-		threads->new(\&mkUniq, $tag);
+		if ($tag{$tag}){
+		    &canFork;
+		    &report("making ref20_uniq.$tag.gz");
+		    system("perl ped.pl target=$target,ref=$ref,sub=mkUniq,arg=$tag,wd=$wd &");
+		}
 	    }
 	}
     }    
-    &joinAll;
+    &waitChild;
 }
 
 sub mkChrFasta{
@@ -2962,6 +2986,40 @@ sub complement{
         }
     }
     return $out;
+}
+    
+sub canFork{
+    while(1){
+	my $count = 0;
+	sleep 1;
+	opendir(CDIR, "$wd/$target/tmp");
+	foreach(readdir(CDIR)){
+	    if (/child/){
+		$count++;
+	    }
+	}
+	closedir(CDIR);
+	if ($max_semaphore > $count){
+	    return 1;
+	}
+    }
+}
+
+sub waitChild{
+    while(1){
+	my $count = 0;
+	sleep 1;
+	opendir(CDIR, "$wd/$target/tmp");
+	foreach(readdir(CDIR)){
+	    if (/child/){
+		$count++;
+	    }
+	}
+	closedir(CDIR);
+	if ($count == 0){
+	    return 1;
+	}
+    }
 }
 
 sub bynumber{
