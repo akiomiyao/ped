@@ -2965,6 +2965,7 @@ sub complement{
 sub canFork{
     while(1){
 	my $count = 0;
+	select undef, undef, undef, 0.1;
 	opendir(CDIR, "$wd/$target/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
@@ -2975,7 +2976,6 @@ sub canFork{
 	if ($max_semaphore > $count){
 	    return 1;
 	}
-	sleep 1;
     }
 }
 
