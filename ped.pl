@@ -202,11 +202,17 @@ if ($chr[0] eq ""){
 }
 
 if ($sub ne ""){
-    my $child = "$wd/$target/tmp/child.$$";
+    my $child = "$wd/$target/child/child.$$";
     system("touch $child");
     &$sub($arg);
     system("rm $child");
     exit;
+}else{
+    if (-e "$wd/$target/child"){
+	system("rm $wd/$target/child/*");
+    }else{
+	system("mkdir $wd/$target/child");
+    }
 }
 
 open(REPORT, ">> $wd/$target/$target.log");
@@ -253,6 +259,7 @@ if ($tmpdir eq "$wd/$target/tmp"){
 }else{
     system("rm $tmpdir/*");
 }
+system("rm -r $wd/$target/child");
 system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
 $end_time = time;
 $elapsed_time = $end_time - $start_time;
@@ -877,22 +884,24 @@ sub mkControlRead{
     for (@chr){
 	next if $_ eq "NOP";
 	$semaphore->down;
+	&canFork;
 	&report("Processing Chr$_");
-	threads->new(\&mkControlReadChr, $_);
+	system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadChr,arg=$_,wd=$wd &");
     }
-    &joinAll;
+    &waitChild;
 
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		$semaphore->down;
+		&canFork;
 		&report("Making Control Read. $tag");
-		threads->new(\&mkControlReadSub, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub mkControlReadChr{
@@ -936,14 +945,12 @@ sub mkControlReadChr{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub mkControlReadSub{
     my $tag = shift;
     system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag");
     system("gzip $wd/$ref/sort_uniq/$ref.sort_uniq.$tag && rm $wd/$ref/tmp/$tag.*");
-    $semaphore->up;
 }
 
 sub mkUniq{
@@ -952,7 +959,6 @@ sub mkUniq{
     my $funiq = "tmpout.$tag";
     my $count = 0;
     open($funiq, "> $wd/$ref/ref20_uniq.$tag");
-    #    open($fin, "cat $wd/$ref/tmp/ref20.$tag.* |sort $sort_opt -T $tmpdir |");
     open($fin, "sort $sort_opt -T $tmpdir $wd/$ref/tmp/ref20.$tag.* |");
     while(<$fin>){
 	chomp;
@@ -969,7 +975,6 @@ sub mkUniq{
     close($fin);
     close($funiq);
     system("gzip $wd/$ref/ref20_uniq.$tag && rm $wd/$ref/tmp/ref20.$tag.*");
-    $semaphore->up;
 }
 
 sub mk20mer{
@@ -1021,7 +1026,6 @@ sub mk20mer{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub mk20{
@@ -2992,7 +2996,7 @@ sub canFork{
     while(1){
 	my $count = 0;
 	sleep 1;
-	opendir(CDIR, "$wd/$target/tmp");
+	opendir(CDIR, "$wd/$target/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
 		$count++;
@@ -3009,7 +3013,7 @@ sub waitChild{
     while(1){
 	my $count = 0;
 	sleep 1;
-	opendir(CDIR, "$wd/$target/tmp");
+	opendir(CDIR, "$wd/$target/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
 		$count++;
