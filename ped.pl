@@ -881,7 +881,6 @@ sub mkControlRead{
 
     for (@chr){
 	next if $_ eq "NOP";
-	$semaphore->down;
 	&canFork;
 	&report("Processing Chr$_");
 	system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadChr,arg=$_,wd=$wd &");
@@ -892,7 +891,6 @@ sub mkControlRead{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
 		&canFork;
 		&report("Making Control Read. $tag");
 		system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadSub,arg=$tag,wd=$wd &");
