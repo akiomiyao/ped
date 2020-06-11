@@ -821,7 +821,6 @@ sub mkRef{
     if (! -e "$wd/$ref"){
 	system("mkdir $wd/$ref");
     }
-=pod
     if ($file eq ""){
 	@row = split('/', $curl{$ref});
 	$remote_file = $row[$#row];
@@ -834,7 +833,6 @@ sub mkRef{
 	&mkChrFromFile($file);
     }
     &mkChrFasta;
-=cut
     &mk20;
     &mkControlRead;
     system("rm -r $wd/$ref/tmp");
