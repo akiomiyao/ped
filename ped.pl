@@ -2,7 +2,7 @@
 #
 # This file is a script for Polymorphic Edge Detection.
 #
-# Multithreaded version of all in one.
+# All in one version.
 #
 # Copyright (C) 2019 National Agriculture and Food Research Organization. All Rights Reserved.
 #
@@ -10,9 +10,6 @@
 #
 # Author: MIYAO Akio <miyao@affrc.go.jp>
 #
-
-use threads;
-use Thread::Semaphore;
 
 $usage = '
  ped.pl - program for polymorphic edge detection. 
@@ -134,7 +131,6 @@ if ($uname eq "Darwin"){
 $max_semaphore = 3 if $max_semaphore eq "";
 $max_semaphore = $thread if $thread ne "";
 $max_semaphore = 14 if $max_semaphore > 14;
-$semaphore = Thread::Semaphore->new($max_semaphore);
 
 $refdir = "$wd/$ref";
 if ($tmpdir eq ""){
@@ -329,11 +325,11 @@ sub bidirectional{
 	&align;
     }
 
-    $semaphore->down;
-    threads->new(\&index);
-    $semaphore->down;
-    threads->new(\&svSort);
-    &joinAll;
+    &canFork;
+    system("perl ped.pl target=$target,ref=$ref,sub=index,wd=$wd &");
+    &canFork;
+    system("perl ped.pl target=$target,ref=$ref,sub=svSort,wd=$wd &");
+    &waitChild;
 
     &svMkT;
     &sortSeq;
@@ -388,19 +384,19 @@ sub primer{
     }
     close(OUT);
     for ($i = 1; $i <= $count; $i++){
-	$semaphore->down;
+	&canFork;
 	$num = "000$i";
 	$num = substr($num, length($num) - 4, 4);
 	&report("Output primer sequences. $num");
-	threads->new(\&primerFunc, $num, $type);
+	system("perl ped.pl target=$target,ref=$ref,sub=primerFunc,arg=$num:$type,wd=$wd &");
     }
-    &joinAll;
+    &waitChild;
     system("cat $wd/$target/tmp/primer.* > $wd/$target/$target.$type.primer && rm $wd/$target/tmp/*");
 }
 
 sub primerFunc{
     my(@row, $seq, $i, $f, $r, @f, @r, $gc, $flag, $hpos, $tpos, $fpos, $rpos, $length, $tg, $head, $tail, $minimum_length, $out, $fin, $fout, $fchr, $fchrt);
-    my ($num, $type) = @_;
+    my ($num, $type) = split(':', $arg);
     $fin = "in.$num";
     $fout = "out.$num";
     $fchr = "chr.$num";
@@ -526,7 +522,6 @@ sub primerFunc{
     close($fin);
     close($fchr);
     close($fout);
-    $semaphore->up;
 }
 
 sub checkDimer{
@@ -556,13 +551,13 @@ sub mapKmer{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		&report("Mapping SNPs between $target and $control. $tag");
-		threads->new(\&mapKmerSub, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=mapKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub mapKmerSub{
@@ -609,7 +604,6 @@ sub mapKmerSub{
     }
     close($fout);
     close($fref);
-    $semaphore->up;
 }
 
 sub joinKmer{
@@ -619,13 +613,13 @@ sub joinKmer{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		&report("Detection SNPs between $target and $control. $tag");
-		threads->new(\&joinKmerSub, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub joinKmerSub{
@@ -679,7 +673,6 @@ sub joinKmerSub{
     close($fin);
     close($fout);
     system("rm $tmpdir/$target.lbc.$tag $tmpdir/$control.lbc.$tag");
-    $semaphore->up;
 }
 
 sub countKmer{
@@ -693,32 +686,32 @@ sub countKmer{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		&report("Making kmer for $target. $tag");
-		threads->new(\&countKmerSub, $target, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=countKmerSub,arg=$target:$tag,wd=$wd &");
 	    }
 	}
     }
 
-    &joinAll;
+    &waitChild;
     
     system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		&report("Joining kmer for $target. $tag");
-		threads->new(\&countKmerMerge, $target, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=countKmerMerge,arg=$target:$tag,wd=$wd &");
 	    }
 	}
     }
 
-    &joinAll;
+    &waitChild;
 }
 
 sub countKmerMerge{
-    my ($target, $parent) = @_;
+    my ($target, $parent) = split(':', $arg);
     my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count, $head, $prev, $nuc, %count);
     system("touch $tmpdir/$parent.count");
     foreach $nuca (@nuc){
@@ -767,11 +760,10 @@ sub countKmerMerge{
     close($fin);
     close($fout);
     system("gzip $wd/$target/lbc/$target.lbc.$parent && rm $tmpdir/$parent.count");
-    $semaphore->up;
 }
 
 sub countKmerSub{
-    my ($target, $parent) = @_;
+    my ($target, $parent) = split(':', $arg);
     my ($nuca, $nucb, $nucc, $fin, $fout, $length, $seq, $ktag, $i);
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -813,7 +805,6 @@ sub countKmerSub{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub mkRef{
@@ -1208,22 +1199,21 @@ sub mkSortUniq{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		threads->new(\&sortUniqSort, $tag, $subject);
+		&canFork;
+		system("perl ped.pl target=$target,ref=$ref,sub=sortUniqSort,arg=$tag:$subject,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub sortUniqSort{
-    my ($tag, $subject) = @_;
+    my ($tag, $subject) = split(':', $arg);
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
     system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
     system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
     &waitFile("$wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
     system("gzip $wd/$subject/sort_uniq/$subject.sort_uniq.$tag && rm $wd/$subject/sort_uniq/$tag.tmp");
-    $semaphore->up;
 }
 
 sub sortUniqSub{
@@ -2068,7 +2058,6 @@ sub joinControlFunc{
     }
     &waitFile("$tmpdir/$tag.control");
     system("rm $tmpdir/$tag.gz");
-    $semaphore->up;
 }
 
 sub joinControl{
@@ -2077,12 +2066,12 @@ sub joinControl{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		threads->new(\&joinControlFunc, $tag);
+		&canFork;
+		system("perl ped.pl target=$target,ref=$ref,sub=joinControlFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub joinTargetFunc{
@@ -2091,7 +2080,6 @@ sub joinTargetFunc{
     system("bash -c \"join <($zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     &waitFile("$tmpdir/$tag.target");
     system("rm $tmpdir/$tag.gz");
-    $semaphore->up;
 }
 
 sub joinTarget{
@@ -2100,12 +2088,12 @@ sub joinTarget{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		threads->new(\&joinTargetFunc, $tag);
+		&canFork;
+		system("perl ped.pl target=$target,ref=$ref,sub=joinTargetFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub sortSeqFunc{
@@ -2114,7 +2102,6 @@ sub sortSeqFunc{
     system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
     &waitFile("$tmpdir/$tag");
     system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.gz");
-    $semaphore->up;
 }
 
 sub sortSeq{
@@ -2123,12 +2110,12 @@ sub sortSeq{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		threads->new(\&sortSeqFunc, $tag);
+		&canFork;
+		system("perl ped.pl target=$target,ref=$ref,sub=sortSeqFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub svMkC{
@@ -2534,7 +2521,6 @@ sub svSort{
     close($fout);
     system("rm $tmpdir/$target.sv.count");
     report("Making $target.sv.sort complete");
-    $semaphore->up;
 }
 
 sub index{
@@ -2560,7 +2546,6 @@ sub index{
     close(INDEXIN);
     close(INDEXOUT);
     report("Making index complete");
-    $semaphore->up;
 }
 
 sub sortData4Map{ 
@@ -2569,12 +2554,12 @@ sub sortData4Map{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
-		threads->new(\&sortData4MapFunc, $tag);
+		&canFork;
+		system("perl ped.pl target=$target,ref=$ref,sub=sortData4MapFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub sortData4MapFunc{
@@ -2583,7 +2568,6 @@ sub sortData4MapFunc{
     system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
     &waitFile("$tmpdir/$tag");
     system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.*");
-    $semaphore->up;
 }
 
 sub mkData4MapF{
@@ -2592,13 +2576,13 @@ sub mkData4MapF{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		report("Bidirectional alignment: Making data for first mapping. $tag");
-		threads->new(\&mkData4MapFFunc, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=mkData4MapFFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub mkData4MapFFunc{
@@ -2635,7 +2619,6 @@ sub mkData4MapFFunc{
 	    }
 	}
     }
-    $semaphore->up;
 }
 
 sub mkData4MapR{
@@ -2644,13 +2627,13 @@ sub mkData4MapR{
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		$semaphore->down;
+		&canFork;
 		report("Making data for second mapping. $tag");
-		threads->new(\&mkData4MapRFunc, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=mkData4MapRFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub mkData4MapRFunc{
@@ -2687,7 +2670,6 @@ sub mkData4MapRFunc{
 	}
     }
     system("rm $tmpdir/$tag.map");
-    $semaphore->up;
 }
 
 sub map{
@@ -2697,13 +2679,13 @@ sub map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
-		$semaphore->down;
+		&canFork;
 		report("Mapping. $tag");
-		threads->new(\&mapFunc, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=mapFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
 }
 
 sub mapFunc{
@@ -2711,7 +2693,6 @@ sub mapFunc{
     system("bash -c \"join <($zcat $tmpdir/$tag.gz) <($zcat $refdir/ref20_uniq.$tag.gz) |cut -c 22- > $tmpdir/$tag.map\"");
     &waitFile("$tmpdir/$tag.map");
     system("rm $tmpdir/$tag.gz");
-    $semaphore->up;
 }
 
 sub align{
@@ -2721,13 +2702,13 @@ sub align{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
-		$semaphore->down;
+		&canFork;
 		report("Bidirectional alignment. $tag");
-		threads->new(\&alignFunc, $tag);
+		system("perl ped.pl target=$target,ref=$ref,sub=alignFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
-    &joinAll;
+    &waitChild;
     system("cat $tmpdir/$target.aln.* > $wd/$target/$target.aln && rm $tmpdir/*");
 }
 
@@ -2921,14 +2902,7 @@ $tail_space Chr$tchr $tail_junction
     close($fin);
     close($fout);
     close($chr_file);
-    $semaphore->up;
     system("rm $tmpdir/$tag.map");
-}
-
-sub joinAll{
-    foreach my $thr (threads->list){
-	$thr->join;
-    }
 }
 
 sub report{
@@ -2991,7 +2965,6 @@ sub complement{
 sub canFork{
     while(1){
 	my $count = 0;
-	sleep 1;
 	opendir(CDIR, "$wd/$target/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
@@ -3002,6 +2975,7 @@ sub canFork{
 	if ($max_semaphore > $count){
 	    return 1;
 	}
+	sleep 1;
     }
 }
 
