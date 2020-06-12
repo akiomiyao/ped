@@ -73,9 +73,10 @@ if ($ARGV[0] =~ /target|ref/){
     print $usage;
 }
 
+$cwd = `pwd`;
+chomp($cwd);
 if ($wd eq ""){
-    $wd = `pwd`;
-    chomp($wd);
+    $wd = $cwd;
 }
 
 $uname = `uname`;
@@ -326,9 +327,9 @@ sub bidirectional{
     }
 
     &canFork;
-    system("perl ped.pl target=$target,ref=$ref,sub=index,wd=$wd &");
+    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=index,wd=$wd &");
     &canFork;
-    system("perl ped.pl target=$target,ref=$ref,sub=svSort,wd=$wd &");
+    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=svSort,wd=$wd &");
     &waitChild;
 
     &svMkT;
@@ -388,7 +389,7 @@ sub primer{
 	$num = "000$i";
 	$num = substr($num, length($num) - 4, 4);
 	&report("Output primer sequences. $num");
-	system("perl ped.pl target=$target,ref=$ref,sub=primerFunc,arg=$num:$type,wd=$wd &");
+	system("perl $cwd/ped.pl target=$target,ref=$ref,sub=primerFunc,arg=$num:$type,wd=$wd &");
     }
     &waitChild;
     system("cat $wd/$target/tmp/primer.* > $wd/$target/$target.$type.primer && rm $wd/$target/tmp/*");
@@ -553,7 +554,7 @@ sub mapKmer{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Mapping SNPs between $target and $control. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=mapKmerSub,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mapKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -615,7 +616,7 @@ sub joinKmer{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Detection SNPs between $target and $control. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -688,7 +689,7 @@ sub countKmer{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Making kmer for $target. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=countKmerSub,arg=$target:$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=countKmerSub,arg=$target:$tag,wd=$wd &");
 	    }
 	}
     }
@@ -702,7 +703,7 @@ sub countKmer{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Joining kmer for $target. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=countKmerMerge,arg=$target:$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=countKmerMerge,arg=$target:$tag,wd=$wd &");
 	    }
 	}
     }
@@ -874,7 +875,7 @@ sub mkControlRead{
 	next if $_ eq "NOP";
 	&canFork;
 	&report("Processing Chr$_");
-	system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadChr,arg=$_,wd=$wd &");
+	system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkControlReadChr,arg=$_,wd=$wd &");
     }
     &waitChild;
 
@@ -884,7 +885,7 @@ sub mkControlRead{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Making Control Read. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=mkControlReadSub,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkControlReadSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -1023,7 +1024,7 @@ sub mk20{
 	    next if $i eq "NOP";
 	    &canFork;
 	    &report("Processing Chr$i");
-	    system("perl ped.pl target=$target,ref=$ref,sub=mk20mer,arg=$i,wd=$wd &");
+	    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mk20mer,arg=$i,wd=$wd &");
 	}
 	&waitChild;
     }
@@ -1046,7 +1047,7 @@ sub mk20{
 		if ($tag{$tag}){
 		    &canFork;
 		    &report("making ref20_uniq.$tag.gz");
-		    system("perl ped.pl target=$target,ref=$ref,sub=mkUniq,arg=$tag,wd=$wd &");
+		    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkUniq,arg=$tag,wd=$wd &");
 		}
 	    }
 	}
@@ -1200,7 +1201,7 @@ sub mkSortUniq{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl ped.pl target=$target,ref=$ref,sub=sortUniqSort,arg=$tag:$subject,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=sortUniqSort,arg=$tag:$subject,wd=$wd &");
 	    }
 	}
     }
@@ -2067,7 +2068,7 @@ sub joinControl{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl ped.pl target=$target,ref=$ref,sub=joinControlFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=joinControlFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2089,7 +2090,7 @@ sub joinTarget{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl ped.pl target=$target,ref=$ref,sub=joinTargetFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=joinTargetFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2111,7 +2112,7 @@ sub sortSeq{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl ped.pl target=$target,ref=$ref,sub=sortSeqFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=sortSeqFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2555,7 +2556,7 @@ sub sortData4Map{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl ped.pl target=$target,ref=$ref,sub=sortData4MapFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=sortData4MapFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2578,7 +2579,7 @@ sub mkData4MapF{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		report("Bidirectional alignment: Making data for first mapping. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=mkData4MapFFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkData4MapFFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2629,7 +2630,7 @@ sub mkData4MapR{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		report("Making data for second mapping. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=mkData4MapRFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkData4MapRFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2681,7 +2682,7 @@ sub map{
 		close($tag);
 		&canFork;
 		report("Mapping. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=mapFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mapFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2704,7 +2705,7 @@ sub align{
 		close($tag);
 		&canFork;
 		report("Bidirectional alignment. $tag");
-		system("perl ped.pl target=$target,ref=$ref,sub=alignFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=alignFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
