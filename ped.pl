@@ -229,22 +229,6 @@ if ($control ne $ref && ! -e "$wd/$control/sort_uniq/$control.sort_uniq.TTT.gz")
     &mkSortUniq($control);
 }
 
-open(IN, "$zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
-while(<IN>){
-    chomp;
-    $length = length($_);
-    last;
-}
-close(IN);
-
-open(IN, "$zcat $wd/$control/sort_uniq/*.gz 2> /dev/null |");
-while(<IN>){
-    chomp;
-    $clength = length($_);
-    last;
-}
-close(IN);
-
 if ($method eq "kmer"){
     &kmer;
 }else{
@@ -325,7 +309,6 @@ sub bidirectional{
 	&map;
 	&align;
     }
-
     &canFork;
     system("perl $cwd/ped.pl target=$target,ref=$ref,sub=index,wd=$wd &");
     &canFork;
@@ -1573,6 +1556,7 @@ sub getInsert{
 
 sub snpMkT{
     report("Making data for verification of snp. target");
+    &getLength;
     my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr, $dat);
 
     foreach $nuca (@nuc){
@@ -2294,7 +2278,7 @@ sub svMkC{
 sub svMkT{
     report("Making target data for verification of sv");
     my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $tm, $tw, $hchr_seq);
-
+    &getLength;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -2641,6 +2625,7 @@ sub mkData4MapRFunc{
     my $tag = shift;
     my ($nuca, $nucb, $nucc, $subtag, $margin, $tail_pos, $tail, $fout);
     my $fin = $tag . "IN";
+    &getLength;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -2963,6 +2948,24 @@ sub complement{
     return $out;
 }
     
+sub getLength{
+    open(IN, "$zcat $wd/$target/sort_uniq/*.gz 2> /dev/null |");
+    while(<IN>){
+	chomp;
+	$length = length($_);
+	last;
+    }
+    close(IN);
+    
+    open(IN, "$zcat $wd/$control/sort_uniq/*.gz 2> /dev/null |");
+    while(<IN>){
+	chomp;
+	$clength = length($_);
+	last;
+    }
+    close(IN);
+}
+
 sub canFork{
     while(1){
 	my $count = 0;
