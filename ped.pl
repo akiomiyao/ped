@@ -25,11 +25,12 @@ $usage = '
  If you want to specify both the working directory and tmp directory,
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
- If you want to set muximum number of threads,
+ If you want to set muximum number of threads (processes),
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
  Because default setting of ulimit is 1024, 14 threads is muximun for
- defalt setting of OS. 
+ defalt setting of OS. Thread function has been switched to making new process
+ in current version.
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
@@ -123,15 +124,15 @@ sudo yum install curl (CentOS)
 }
 
 if ($uname eq "Darwin"){
-    $max_semaphore = 1;
+    $max_process = 1;
 }elsif ($processor >= 8 ){
-    $max_semaphore = 8;
+    $max_process = 8;
 }else{
-    $max_semaphore = $processor;
+    $max_process = $processor;
 }
-$max_semaphore = 3 if $max_semaphore eq "";
-$max_semaphore = $thread if $thread ne "";
-$max_semaphore = 14 if $max_semaphore > 14;
+$max_process = 3 if $max_process eq "";
+$max_process = $thread if $thread ne "";
+$max_process = 14 if $max_process > 14;
 
 $refdir = "$wd/$ref";
 if ($tmpdir eq ""){
@@ -2969,7 +2970,8 @@ sub getLength{
 sub canFork{
     while(1){
 	my $count = 0;
-	select undef, undef, undef, 0.1;
+	$wait_time = 0.1 if $wait_time eq "";
+	select undef, undef, undef, $wait_time;
 	opendir(CDIR, "$wd/$target/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
@@ -2977,7 +2979,8 @@ sub canFork{
 	    }
 	}
 	closedir(CDIR);
-	if ($max_semaphore > $count){
+	$wait_time = 1 if $count > $max_process;
+	if ($max_process > $count){
 	    return 1;
 	}
     }
