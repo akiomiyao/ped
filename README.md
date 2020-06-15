@@ -42,7 +42,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,r
 [Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
 
 ## Simplified instruction
-- The ped.pl is a multithreaded script, suitable for the multi-core CPU like as 16 or 8 cores.  
+- The ped.pl is a multithreaded (multiprocess) script, suitable for the multi-core CPU like as 4 or 8 cores.  
   Of course, the ped.pl can run with the 2 or single core machine, but slow.  
   The ped.pl runs on Linux (or FreeBSD) machine and Mac with at least 4 GB RAM and 1 TB hard disk (or SSD).  
 
@@ -70,7 +70,8 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   Results will be saved in target (e.g. ERR3063487) directory.  
   ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
 - Options,  
-  thread=8 : specify the max thread number. Default is the number of logical core or 14.  
+  thread=8 : specify the max thread (thread was changed to process in current version) number.  
+  Default is the number of logical core or 8.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
   clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
@@ -171,7 +172,7 @@ perl mkref.pl hg38
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
-  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 44
+  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
