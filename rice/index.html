@@ -51,6 +51,19 @@ ped/DRR099981/read<br>
 解析が無事終わるとDRR099981のディレクトリの中に、DRR099981.vcfという結果をまとめたファイルができます。<br>
 各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
       </ul>
+      <h2>Dockerでの解析</h2>
+      <ul>
+      <li>Dockerを用いれば、必要な時に設定済み実行環境を取り込んで解析できます。<br>
+      グーグルクラウド(GCP)やアマゾンウェブサービス(AWS)などのクラウドでの実行も可能です。
+      <li>Dockerのセットアップ<br>
+      $ sudo apt install docker<br>
+      $ sudo apt install docker.io<br>
+      <li>解析例<br>
+      $ sudo docker pull akiomiyao/ped<br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=DRR099981,wd=/work <br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=DRR099981,ref=IRGSP1.0,wd=/work <br>
+      上記のコマンドをコピーしてターミナルウインドウにペーストして実行してください。
+      </ul>
       <h2>IVGブラウザによる結果の確認</h2>
       <ul>
       <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>

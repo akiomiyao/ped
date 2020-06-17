@@ -53,6 +53,19 @@ $ perl ped.pl target=ERR194147,ref=hg19</pre>
 解析が無事終わるとERR194146とERR194147のディレクトリの中に、ERR194146.vcfとERR194147.vcfという結果をまとめたファイルができます。<br>
 各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
       </ul>
+      <h2>Dockerでの解析</h2>
+      <ul>
+      <li>Dockerを用いれば、必要な時に設定済み実行環境を取り込んで解析できます。<br>
+      グーグルクラウド(GCP)やアマゾンウェブサービス(AWS)などのクラウドでの実行も可能です。
+      <li>Dockerのセットアップ<br>
+      $ sudo apt install docker<br>
+      $ sudo apt install docker.io<br>
+      <li>解析例<br>
+      $ sudo docker pull akiomiyao/ped<br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR194146,wd=/work <br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR194146,ref=hg19,wd=/work <br>
+      上記のコマンドをコピーしてターミナルウインドウにペーストして実行してください。<br>
+      </ul>
       <h2>IVGブラウザによる結果の確認</h2>
       <ul>
       <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>

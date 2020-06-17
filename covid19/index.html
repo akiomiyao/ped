@@ -31,7 +31,9 @@
     $ perl ped.pl target=SRR11542244,ref=COVID19,clipping=100<br>
     Currently, fastq files of Illmina and Oxford nanopore are supported.
     <li><b>For Docker users</b><br>
-    For example,<br>
+    $ sudo apt install docker<br>
+    $ sudo apt install docker.io<br>
+    Example of analysis,<br>
     $ sudo docker pull akiomiyao/ped<br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR11513115,wd=/work <br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=COVID19,clipping=146,wd=/work <br>
