@@ -1698,7 +1698,7 @@ sub snpMkT{
 
 sub snpMkC{
     my (@row, $chr, $pos, $ref, $alt, $count, $chr_seq, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $cw, $cm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr);
-
+    &getLength;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -2053,7 +2053,7 @@ sub joinControl{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=joinControlFunc,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,control=$control,ref=$ref,sub=joinControlFunc,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -2107,7 +2107,7 @@ sub sortSeq{
 sub svMkC{
     report("Making control data for verification of sv");
     my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $cm, $cw, $hchr_seq, $prev_chr);
-
+    &getLength;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
