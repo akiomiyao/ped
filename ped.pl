@@ -785,8 +785,7 @@ sub countKmerSub{
 		$fout = "$tag.$parent.out";
 		close($fout);
 		&report("Making kmer for $target. Sorting of $tag.$parent subfile");
-		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.$parent |uniq -c | awk '{print \$2 \"\t\" \$1}' > $tmpdir/$tag.$parent.count && rm $tmpdir/$tag.$parent");
-		system("gzip $tmpdir/$tag.$parent.count");
+		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.$parent |uniq -c | awk '{print \$2 \"\t\" \$1}' |gzip -c > $tmpdir/$tag.$parent.count.gz && rm $tmpdir/$tag.$parent");
 	    }
 	}
     }
@@ -921,8 +920,8 @@ sub mkControlReadChr{
 
 sub mkControlReadSub{
     my $tag = shift;
-    system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag");
-    system("gzip $wd/$ref/sort_uniq/$ref.sort_uniq.$tag && rm $wd/$ref/tmp/$tag.*");
+    system("cat $wd/$ref/tmp/$tag.* | sort $sort_opt -T $wd/$ref/tmp |uniq |gzip -c > $wd/$ref/sort_uniq/$ref.sort_uniq.$tag.gz");
+    system("rm $wd/$ref/tmp/$tag.*");
 }
 
 sub mkUniq{
@@ -930,7 +929,7 @@ sub mkUniq{
     my $fin = $tag;
     my $funiq = "tmpout.$tag";
     my $count = 0;
-    open($funiq, "> $wd/$ref/ref20_uniq.$tag");
+    open($funiq, "|gzip -c > $wd/$ref/ref20_uniq.$tag.gz");
     open($fin, "sort $sort_opt -T $tmpdir $wd/$ref/tmp/ref20.$tag.* |");
     while(<$fin>){
 	chomp;
@@ -946,7 +945,7 @@ sub mkUniq{
     print $funiq "$pline\n" if $count == 1;
     close($fin);
     close($funiq);
-    system("gzip $wd/$ref/ref20_uniq.$tag && rm $wd/$ref/tmp/ref20.$tag.*");
+    system("rm $wd/$ref/tmp/ref20.$tag.*");
 }
 
 sub mk20mer{
@@ -1196,9 +1195,8 @@ sub sortUniqSort{
     my ($tag, $subject) = split(':', $arg);
     report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
     system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
-    system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
-    &waitFile("$wd/$subject/sort_uniq/$subject.sort_uniq.$tag");
-    system("gzip $wd/$subject/sort_uniq/$subject.sort_uniq.$tag && rm $wd/$subject/sort_uniq/$tag.tmp");
+    system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq | gzip -c > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz");
+    system("rm $wd/$subject/sort_uniq/$tag.tmp");
 }
 
 sub sortUniqSub{
@@ -2042,7 +2040,6 @@ sub joinControlFunc{
     }else{
 	system("bash -c \"join <($zcat $wd/$control/sort_uniq/$control.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }
-    &waitFile("$tmpdir/$tag.control");
     system("rm $tmpdir/$tag.gz");
 }
 
@@ -2064,7 +2061,6 @@ sub joinTargetFunc{
     my $tag = shift;
     report("Selecting target sequence data for verify. $tag");
     system("bash -c \"join <($zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
-    &waitFile("$tmpdir/$tag.target");
     system("rm $tmpdir/$tag.gz");
 }
 
@@ -2085,9 +2081,8 @@ sub joinTarget{
 sub sortSeqFunc{
     my $tag = shift;
     report("Sorting sequence data for verify. $tag");
-    system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
-    &waitFile("$tmpdir/$tag");
-    system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.gz");
+    system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
+    system("rm $tmpdir/$tag.tmp.gz");
 }
 
 sub sortSeq{
@@ -2551,9 +2546,8 @@ sub sortData4Map{
 sub sortData4MapFunc{
     my $tag = shift;
     report("Sorting sequence data. $tag");
-    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir > $tmpdir/$tag");
-    &waitFile("$tmpdir/$tag");
-    system("gzip $tmpdir/$tag && rm $tmpdir/$tag.tmp.*");
+    system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
+    system("rm $tmpdir/$tag.tmp.*");
 }
 
 sub mkData4MapF{
@@ -2678,7 +2672,6 @@ sub map{
 sub mapFunc{
     my $tag = shift;
     system("bash -c \"join <($zcat $tmpdir/$tag.gz) <($zcat $refdir/ref20_uniq.$tag.gz) |cut -c 22- > $tmpdir/$tag.map\"");
-    &waitFile("$tmpdir/$tag.map");
     system("rm $tmpdir/$tag.gz");
 }
 
