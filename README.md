@@ -150,10 +150,6 @@ For example,
 ```
 perl mkref.pl WBcel235  
 ```
-or  
-```
-perl qsub_mkref.pl WBcel235 (For computer cluster)  
-```
 - Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
 If run without argument, help and supported reference will be listed.  
 If you want to new reference, add the reference information to the config file.    
@@ -197,10 +193,6 @@ mkdir IRGSP1.0
 cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
 perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
 ```
-or  
-```
-qsub -v target=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz mkref.pl  
-```
 - If you want to analyze public data in SRA.  
 ```
 perl download.pl accession=accession  
@@ -220,25 +212,14 @@ perl download.pl accession=ERR3063487
 mkdir mydata1  
 mkdir mydata1/read  
 cp somewhere/mydata1.fastq mydata1/read  
-perl bidirectional.pl mydata1 control reference  
+perl ped.pl target=mydata1,control=control,ref=reference
 ```
-or  
-```
-  perl ped.pl target=mydata1,control=control,ref=reference
-```
-- perl bidirectional.pl target control reference  
-  For example,  
+ 
+- For example,  
 ```
 perl ped.pl target=ERR3063487,ref=WBcel235  
 ```
-or  
-```  
-perl bidirectional.pl ERR3063487 default WBcel235  
-```
-or  
-```
-qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl 
-```
+-  Run without arguments, help for script will be shown.  
 -  After four hours, you will find results in ERR3063487 directory.  
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
@@ -250,14 +231,15 @@ qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl
    
 - Our verify process counts reads containing polymorphic region.  
   Basically, counts are from target and reference.  
-  If control is specified, counts from target and control will be listed.  
+  Quality score in vcf file is fixed to 1000.  
+  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
+  Please check quality of polymorphism with depth (DP) in vcf file.  
+- I express special thanks for the release of short reads to SRA by ENS Lyon.
+  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
+- If control is specified, counts from target and control will be listed.  
   For example,  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
-```
-or  
-```
-perl bidirectional.pl ERR3063487 ERR3063486 WBcel235 
 ```
   returns 'M' or 'H' marked SNPs and structural variations of ERR3063487 which are absent in ERR3063486.  
 - To confirm the alignment for detected polymorphisms,  
@@ -267,46 +249,16 @@ perl bidirectional.pl ERR3063487 ERR3063486 WBcel235
 perl search.pl target=ERR3063487,chr=II,pos=948033  
 ```
 Alignments will be selected by the search script.  
-- if you want to run with computer cluster, 
-```
-perl qsub_bidirectional.pl ERR3063487 default WBcel235  
-```
-- qsub_bidirectional.pl will work with Torque installed with default settings.  
-  If output format of qsub and qstat are customized, modification of the
-  script will be required.  
-  Run without arguments, help for script will be shown.  
-- ERR3063487.sv is the list of structural variations.  
-  ERR3063487.bi.snp is the list of SNPs.  
-  ERR3063487.vcf is the vcf file.  
-  Quality score in vcf file is fixed to 1000.  
-  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
-  Please check quality of polymorphism with depth (DP) in vcf file.  
-- I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
-  I found data set of *Caenorhabditis elegans.*  
-  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
-  I express special thanks for the release of short reads to SRA by ENS Lyon.  
 
 ## Instruction for *k*-mer method
 - For example,  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer  
 ```
-or  
-```
-perl kmer.pl ERR3063487 ERR3063486 WBcel235  
-```
-- if you want to run with computer cluster,  
-```
-perl qsub_kmer.pl ERR3063487 ERR3063486 WBcel235   
-```
   ERR3063487 specific SNPs against ERR3063486 will be detected.  
 - if you want to detect SNPs against reference genome,  
 ```
 perl ped.pl target=ERR3063487,ref=WBcel235,method=kmer  
-```
-or  
-```
-perl kmer.pl ERR3063487 default WBcel235  
 ```
 - ERR3063487.kmer.snp is the list of SNPs.  
   ERR3063487.kmer.vcf is the vcf file for SNPs.   
@@ -322,14 +274,6 @@ perl kmer.pl ERR3063487 default WBcel235
   For example,  
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,method=kmer  
-```
-or  
-```
-perl kmer.pl ERR3063487 ERR3063486  
-```
-or  
-```
-perl qsub_kmer.pl ERR3063487 ERR3063486  
 ```
 - ERR3063487.kmer is the list of polymorphic edge.  
   SNPs tagged with first 19-mer will be used for the genetic analysis,  
@@ -620,6 +564,8 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
+Version 1.6 Scripts for grid engine have been removed.  
+Version 1.5 Threads in ped.pl have been changed to forking process.  
 Version 1.4 Add clipping of short reads for RT-PCR data. Add application of CAVID-19 analysis.     
 Version 1.3 Update for search.pl for confirmation of alignment. Improvement of making sort_uniq data.  
 Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
