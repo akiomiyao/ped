@@ -61,13 +61,13 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR30
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
 - ERR3063487 sequence is after 250 generations of the nematode (ERR3063486).  
+  BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
   Sometimes, download.pl returns the timeout of network connection. In the case, network will be reconnected and resumed the download.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
-  SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
+  Result of SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 (target) directory.  
   If control is omitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
-  Results will be saved in target (e.g. ERR3063487) directory.  
   ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
 - Options,  
   thread=8 : specify the max thread (thread was changed to process in current version) number.  
@@ -75,6 +75,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
   clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
+  perl check_length.pl target=ERR3063487  
 
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
@@ -91,25 +92,29 @@ git pull
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
     https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
+  or
+  ```
+  sudo apt install sra-toolkit (Ubontu)
+  ```
 - To download reference data, curl is required.  
     If your machine do not have curl program, install curl from package.  
 ```
-sudo apt-get install curl (Ubontu)
+sudo apt install curl (Ubontu)
 sudo yum install curl (CentOS)
 sudo pkg install curl (FreeBSD)
 ```
 
 ## Setup of Docker
-In the case of docker, zombie processes due to execution of sub process will be increased.  
-When the ped analysis is finished, zombie processes will be removed.   
-On the run of docker container, the --init option is effective to kill zombie processes.  
-But premature termination of sort command is observed with --init options.  
-If the premature termination is observed, direct run of ped script from the github instead of docker is recommended.
-
+If docker is installed, ped can be run with docker command without preinstall of ped.  
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ```
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
+```
+or  
+```
+sudo apt install docker
+sudo apt install docker.io
 ```
 To get or update the container,
 ```
@@ -129,19 +134,7 @@ sudo usermod -a -G docker your_username
 ```
 After the new login, docker commands can be execute with your account.  
 
-## Instruction for bidirectional method  
-```
-perl ped.pl target=target,control=control,ref=reference
-```
-- Run without argument, ped.pl returns the usage and options.  
-If reference data is absent, ped.pl downloads the reference sequence and makes reference dataset.  
-```
-perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
-```
-- ERR3063487 sequence is after 250 generations of the nematode (ERR3063486).  
-  SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
-  If control is omitted, polymorphisms against reference genome will be saved in target directory.  
-  If script runs without arguments, description of how to use the script will be shown.  
+## Making reference data by mkref.pl 
 - If you want to make reference data separately,  
 ```
 perl mkref.pl reference  
@@ -151,7 +144,7 @@ For example,
 perl mkref.pl WBcel235  
 ```
 - Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
-If run without argument, help and supported reference will be listed.  
+If ped runs without argument, help and supported reference will be listed.  
 If you want to new reference, add the reference information to the config file.    
 Format is described in the comment in config file.  
 To make reference of human,  
@@ -193,6 +186,7 @@ mkdir IRGSP1.0
 cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
 perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
 ```
+## Downloading fastq file
 - If you want to analyze public data in SRA.  
 ```
 perl download.pl accession=accession  
@@ -202,11 +196,6 @@ For example,
 perl download.pl accession=ERR3063486  
 perl download.pl accession=ERR3063487   
 ```
-- Data directory of ERR3063486 and ERR3063487 will be created.  
-  Fastq data from SRA in NCBI will be downloaded in read subdirectory.  
-  ERR3063486 is the read data of *Caenorhabditis elegans* wild-type.  
-  ERR3063487 is the read data of *Caenorhabditis elegans* mutant.  
-  BioPoject https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If you want to analyze your private file,  
 ```
 mkdir mydata1  
@@ -214,28 +203,22 @@ mkdir mydata1/read
 cp somewhere/mydata1.fastq mydata1/read  
 perl ped.pl target=mydata1,control=control,ref=reference
 ```
- 
-- For example,  
-```
-perl ped.pl target=ERR3063487,ref=WBcel235  
-```
--  Run without arguments, help for script will be shown.  
--  After four hours, you will find results in ERR3063487 directory.  
+
+## Output files of PED in target directory
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
+   Line marked 'M' is homozygous mutation in target against control.  
+   Line marked 'H' is heterozygous mutation in target against control.  
+  
    ERR3063487.vcf is the vcf format results.  
-   ERR3063487.sv.primer is the list of primers to detect structural variations.  
-   ERR3063487.bi.primer is the list of primers to detect SNPs.  
-   Primer files are experimental.  
-   The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
+   ERR3063487.bi.primer and ERR3063487.sv.primer is the list of primers to detect SNPs and structural variations, respectively.  
+   Primer files are experimental. The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
    
 - Our verify process counts reads containing polymorphic region.  
   Basically, counts are from target and reference.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
   Please check quality of polymorphism with depth (DP) in vcf file.  
-- I express special thanks for the release of short reads to SRA by ENS Lyon.
-  https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
 - If control is specified, counts from target and control will be listed.  
   For example,  
 ```
