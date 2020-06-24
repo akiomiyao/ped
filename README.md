@@ -27,11 +27,11 @@ Short read sequence is aligned with reference sequence from both 5'- and 3'-ends
           
 All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. k* = 20) in each position. For example, the Individual_A has the *k*-mer sequence of AAATGGTACATTTATATTAT but does not have AAATGGTACATTTATATTAC. On the other hand, the Individual_B has the AAATGGTACATTTATATTAC but does not have AAATGGTACATTTATATTAT. The last base of *k*-mer of Individual_A is T, and Individual_B is C. The last base of *k*-mers must be SNP or edge of insertion, deletion, inversion, translocation or copy number variation. The *k*-mer method detects edges of polymorphism by difference of last base of *k*-mers. This method enables to detect polymorphisms by direct comparison of NGS data.
 
-## For analysis of COVID-19 data
+## For analysis of SARS-CoV-2(COVID-19) data
 ```
 perl download.pl accession=SRR11542244
 perl check_length.pl target=SRR11542244
-perl ped.pl target=SRR11542244,ref=COVID19,clipping=100
+perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100
 ```
 or
 ```
