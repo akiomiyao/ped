@@ -60,12 +60,12 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR30
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/work
 ```
-- ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+- ERR3063487 sequence is after 250 generations of the nematode (ERR3063486).  
   Downloading fastq files may take several hours, because connection of fastq-dump to NCBI-SRA is slow.  
-  Sometimes, download.pl returns the timeout of network connection. In the case, network will be reconnected and redumed the download.  
+  Sometimes, download.pl returns the timeout of network connection. In the case, network will be reconnected and resumed the download.  
   Fastq files will be saved in ERR3063486/read and ERR3063487/read.  
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
-  If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
+  If control is omitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
   Results will be saved in target (e.g. ERR3063487) directory.  
   ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
@@ -100,7 +100,7 @@ sudo pkg install curl (FreeBSD)
 ```
 
 ## Setup of Docker
-In the case of docker, zombie processes due to execution of sub process will be incleased.  
+In the case of docker, zombie processes due to execution of sub process will be increased.  
 When the ped analysis is finished, zombie processes will be removed.   
 On the run of docker container, the --init option is effective to kill zombie processes.  
 But premature termination of sort command is observed with --init options.  
@@ -123,7 +123,7 @@ To kill running container,
 ```
 sudo docker kill Container_ID
 ```
-If you want run the docker container without sudo or su,
+If you want to run the docker container without sudo or su,
 ```
 sudo usermod -a -G docker your_username
 ```
@@ -138,9 +138,9 @@ If reference data is absent, ped.pl downloads the reference sequence and makes r
 ```
 perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
 ```
-- ERR3063487 sequence is after 250 generations of the nematoda (ERR3063486).  
+- ERR3063487 sequence is after 250 generations of the nematode (ERR3063486).  
   SNPs and SVs in ERR3063487 against ERR3063486, *i.e.* spontaneous mutations during 250 generations, will be saved in ERR3063487 directory.  
-  If control is ommitted, polymorphisms against reference genome will be saved in target directory.  
+  If control is omitted, polymorphisms against reference genome will be saved in target directory.  
   If script runs without arguments, description of how to use the script will be shown.  
 - If you want to make reference data separately,  
 ```
@@ -155,7 +155,7 @@ or
 perl qsub_mkref.pl WBcel235 (For computer cluster)  
 ```
 - Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
-If run without argument, help and suported reference will be listed.  
+If run without argument, help and supported reference will be listed.  
 If you want to new reference, add the reference information to the config file.    
 Format is described in the comment in config file.  
 To make reference of human,  
@@ -168,7 +168,6 @@ perl mkref.pl hg38
   Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
   B73v4          Corn (Zea mays B73) RefGen v4
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  COVID19        Severe acute respiratory syndrome coronavirus 2 (CIVID-19, NC_045512.2)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
@@ -176,6 +175,7 @@ perl mkref.pl hg38
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
   SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   SScrofa11.1    Pig (Sus scrofa) Release-97
   TAIR10         Arabidopsis thaliana version TAIR10
@@ -243,7 +243,7 @@ qsub -v target=ERR3063487,control=default,ref=WBcel235 bidirectional.pl
    ERR3063487.sv is the list of structural variation.  
    ERR3063487.bi.snp is the list of SNPs.  
    ERR3063487.vcf is the vcf format results.  
-   ERR3063487.sv.primer is the list of primers to detect stuructural varilations.  
+   ERR3063487.sv.primer is the list of primers to detect structural variations.  
    ERR3063487.bi.primer is the list of primers to detect SNPs.  
    Primer files are experimental.  
    The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
@@ -280,7 +280,7 @@ perl qsub_bidirectional.pl ERR3063487 default WBcel235
   ERR3063487.vcf is the vcf file.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
-  Please check quarity of polymorphism with depth (DP) in vcf file.  
+  Please check quality of polymorphism with depth (DP) in vcf file.  
 - I searched small size short reads suitable for demonstration of PED from SRA in NCBI.  
   I found data set of *Caenorhabditis elegans.*  
   https://www.ncbi.nlm.nih.gov/bioproject/PRJEB30822  
@@ -315,7 +315,7 @@ perl kmer.pl ERR3063487 default WBcel235
   The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
   Quality score in vcf file is fixed to 1000.  
   Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
-  Please check quarity of polymorphism with depth (DP) in vcf file.  
+  Please check quality of polymorphism with depth (DP) in vcf file.  
 - The *k*-mer method is able to detect polymorphisms by the direct comparison between two short read data.  
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  
@@ -334,7 +334,7 @@ perl qsub_kmer.pl ERR3063487 ERR3063486
 - ERR3063487.kmer is the list of polymorphic edge.  
   SNPs tagged with first 19-mer will be used for the genetic analysis,  
   such as segregation analysis.  
-  The 19-mer can be used as the identifire (*i.e.* name) for analysis.  
+  The 19-mer can be used as the identifier (*i.e.* name) for analysis.  
 
 ## Examples of result
 A part of SNP list of the bidirectional method is  
@@ -620,10 +620,10 @@ Institute of Crop Science / National Agriculture and Food Research Organization
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
 ## Version
-Version 1.4 Add clipping of short reads for RT-PCR data. Add aplication of CAVID-19 analysis.     
-Version 1.3 Update for search.pl for comfirmation of alignment. Improuvement of making sort_uniq data.  
+Version 1.4 Add clipping of short reads for RT-PCR data. Add application of CAVID-19 analysis.     
+Version 1.3 Update for search.pl for confirmation of alignment. Improvement of making sort_uniq data.  
 Version 1.2 sort_uniq files are divided to 64 subfiles by first three nucleotide sequence. Remake of reference data is required.   
-Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced, but requires more CPU time.  
+Version 1.1 sort_uniq files are compressed by gzip. Requirement of disk space is reduced but requires more CPU time.  
 Version 1.0 Original version for PED paper.  
 
 ## Citing PED

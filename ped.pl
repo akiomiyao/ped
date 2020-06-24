@@ -25,20 +25,31 @@ $usage = '
  If you want to specify both the working directory and tmp directory,
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
- If you want to set muximum number of threads (processes),
+ If you want to set maximum number of threads (processes),
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
- Because default setting of ulimit is 1024, 14 threads is muximun for
- defalt setting of OS. Thread function has been switched to making new process
+ Because default setting of ulimit is 1024, 14 threads is maximun for
+ default setting of OS. Thread function has been switched to making new process
  in current version.
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
- If short reads have different length sequcnes, clipping is required.
- perl ped.pl target=SRR11542243,ref=COVID19,clipping=100
+ If short reads have different length sequences, clipping is required.
+ perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
 
  Results will be saved in the target directory.
+
+ An example,
+ perl download.pl accession=SRR11542243
+ perl check_length.pl SRR11542243
+ perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
+
+ SRR11542243.vcf in SRR11542243 directioy is the result.
+ It takes 5 minuits.
+  
+ perl search.pl target=SRR11542243,chr=1,pos=11185
+ will show bidirectional alignments.
 
 ';
 
