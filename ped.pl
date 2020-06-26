@@ -2091,7 +2091,6 @@ sub joinTarget{
 
 sub sortSeqFunc{
     my $tag = shift;
-    report("Sorting sequence data for verify. $tag");
     system("$zcat $tmpdir/$tag.tmp.gz |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
     system("rm $tmpdir/$tag.tmp.gz");
 }
@@ -2103,6 +2102,7 @@ sub sortSeq{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
+		report("Sorting sequence data for verify. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=sortSeqFunc,arg=$tag,wd=$wd &");
 	    }
 	}
