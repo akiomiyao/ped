@@ -1,6 +1,6 @@
 # PED : Polymorphic Edge Detection
 
-Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in the [Web page (English)](https://akiomiyao.github.io/ped/) [(Japanese)](https://akiomiyao.github.io/ped/index_ja.html) [(Paper)](https://doi.org/10.1186/s12859-019-2955-6).
+Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in [Web pages (English)](https://akiomiyao.github.io/ped/) [(Japanese)](https://akiomiyao.github.io/ped/index_ja.html) [(Paper)](https://doi.org/10.1186/s12859-019-2955-6).
 
 ### Polymorphic Edge
 
@@ -176,7 +176,7 @@ perl mkref.pl hg38
   hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
 ```
   If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.  
-- Otherwise,  
+- Otherwise, if you want to make reference data absent in the config file,  
 ```
 perl mkref.pl reference fasta_file_name  
 ```
