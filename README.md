@@ -1,6 +1,6 @@
 # PED : Polymorphic Edge Detection
 
-Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). We developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in [Web pages (English)](https://akiomiyao.github.io/ped/) [(Japanese)](https://akiomiyao.github.io/ped/index_ja.html) [(Paper)](https://doi.org/10.1186/s12859-019-2955-6).
+Polymorphic Edge Detection (PED) is the analysis flow for DNA polymorphism detection from short reads of next generation sequencer (NGS). I developed two methods to detect polymorphisms based on detection of the polymorphic edge. One is based on bidirectional alignment and the other is based on comparison of *k*-mers. Examples of PED result and useful information are shown in [Web pages (English)](https://akiomiyao.github.io/ped/) [(Japanese)](https://akiomiyao.github.io/ped/index_ja.html) [(Paper)](https://doi.org/10.1186/s12859-019-2955-6).
 
 ### Polymorphic Edge
 
@@ -39,6 +39,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100,wd=/work
 ```
+Run time of ped.pl is only two minutes for one accession using a standard desktop computer installed Linux (Ubuntu).  
 [Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
 
 ## Simplified instruction
