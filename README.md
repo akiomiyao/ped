@@ -161,6 +161,7 @@ perl mkref.pl hg38
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
+  HBV            Hepatitis B virus (strain ayw, NC_03977.2)
   IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
