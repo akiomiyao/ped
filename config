@@ -100,3 +100,8 @@ SARS-CoV-2	chromosome	0	0	1
 Gifu1.2	description	Lotus japonicus Gifu 
 Gifu1.2	wget	http://viewer.shigen.info/lotus/data/Lj_Gifu_v1.2_genome.fa.gz
 Gifu1.2	chromosome	0	0	1	2	3	4	5	6
+
+HBV	description	Hepatitis B virus (strain ayw, NC_03977.2)
+HBV	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/viral/Hepatitis_B_virus/latest_assembly_versions/GCF_000861825.2_ViralProj15428/GCF_000861825.2_ViralProj15428_genomic.fna.gz
+HBV	chromosome	0	0	1
+
