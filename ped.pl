@@ -1332,7 +1332,7 @@ sub bi2vcf{
 	$dp = $row[$#row] -1;
 	$chr= $row[0];
 	$pos = $row[1];
-	if ($chr =~ /[0-9]/){
+	if ($chr =~ /[0-9]/ and $chr !~ /[a-z]/i){
 	    $chr = "000$chr";
 	    $chr = substr($chr, length($chr) - 3, 3);
 	}
@@ -1431,7 +1431,7 @@ sub bi2vcf{
 	next if $dp == 0;
 	$af = int(1000 * $row[10]/$dp)/1000;
 	next if $row[10] <= 2;
-	if ($chr =~ /[0-9]/){
+	if ($chr =~ /[0-9]/ and $chr !~ /[a-z]/i){
 	    $chr = "000$chr";
 	    $chr = substr($chr, length($chr) - 3, 3);
 	}
