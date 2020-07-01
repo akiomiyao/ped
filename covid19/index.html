@@ -48,22 +48,29 @@
     For data of Oxford nanopore, clipping=100 or 150 is recommended.
     <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
     Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
-    Download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
-    Fasta file of reference is saved in "ped/SARS-CoV-2/SARS-CoV-2.fasta".<br>
+Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a> is useful.<br>
+<a href = "igv-web.png" target = "_blank"><img src = "igv-web.png" height = "30%"></a> Click to large. <br>
+      
+      Select Genome to Sars-CoV-2 (ASM985889v3) from the pull down menu. <br>
+      Download pre-analyzed vcf files linked below. <br>
+      Import files by selecting 'Local file' in 'Tracks' pull down menu. Because vcf files are big, it takes minutes. <br><br>
+      
+    
+    If you want to view by your computer, download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
     Click Genomes tab of IVG and load "SARS-CoV-2.fasta" and "SARS-CoV-2.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
     <li><b>Check mutation in bidirectional alignments</b><br>
     In the ped directory,<br>
 $ perl search.pl target=target,chr=chromosome,pos=position<br><br>
 For example,<br>
-$ perl search.pl target=SRR11542244,chr=1,pos=5872<br><br>
-or<br>
-$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl search.pl target=SRR11542244,chr=1,pos=5872,wd=/work <br><br>
+$ perl search.pl target=SRR11542244,chr=NC_045512.2,pos=5872<br><br>
+or<br><br>
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl search.pl target=SRR11542244,chr=NC_045512.2,pos=5872,wd=/work <br><br>
 A part of output is<br>
 
-<pre># 1 5872 1 5870 f deletion -1
+<pre># NC_045512.2 5872 NC_045512.2 5870 f deletion -1
 CTTACAAAGTCCTCAGAATA GTTACTTATAAATTGGATGG 0
-                                                  Chr1 5872
+                                                  ChrNC_045512.2 5872
                                                   |
 CTTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCAGTTACTTATAAATTGGATG
 ||||||||||||||||||||||||||||||||||||||||||||||||||  |||    |     |  | |   ||| |   |   |   || | |   |
@@ -71,14 +78,11 @@ CTTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAGAAAACAGTTACACAACAACCATAAAACCA
  |   ||   |     |    || |  |   |   |    |||     ||||||||||||||||||||||||||||||||||||||||||||||||||||
 TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCAGTTACTTATAAATTGGATGG
                                                |
-                                               Chr1 5870
-</pre>
-Because COVID-19 has single RNA genome, the name of chromosome is renumbered to 1 for the PED analysis.
-
+                                               ChrNC_045512.2 5870
 </pre>
     <li><b>Files</b><br>
-    <a href = "SARS-CoV-2.fasta" target = "_blank">SARS-CoV-2.fasta</a> From NCBI and modified for PED.<br>
-    <a href = "SARS-CoV-2.gff" target = "_blank">SARS-CoV-2.gff</a> From NCBI and modified for PED.<br>
+    <a href = "SARS-CoV-2.fasta" target = "_blank">SARS-CoV-2.fasta</a> From NCBI<br>
+    <a href = "SARS-CoV-2.gff" target = "_blank">SARS-CoV-2.gff</a> From NCBI<br>
     <a href = "SRR11542243.vcf" target = "_blank">SRR11542243.vcf</a> Sample from University Malaya<br>
     <a href = "SRR11542244.vcf" target = "_blank">SRR11542244.vcf</a> Sample from University Malaya<br>
     <a href = "SRR11513115.vcf" target = "_blank">SRR11513115.vcf</a> Sample from Utah Public Health Laboratory<br>
@@ -86,7 +90,7 @@ Because COVID-19 has single RNA genome, the name of chromosome is renumbered to 
     <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
     <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
     <li><b>Comments</b><br>
-    Run time is about 5 min for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Run time is about 2 min for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
     Reads from Illumina platform returns fine results. On the other hand, results from nanopore contains a lot of false positives.<br>
     Higher threshold may be required for analysis of nanopore data.
     <li><b>Acknowledgement</b><br>

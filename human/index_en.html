@@ -9,6 +9,7 @@
       <b>In this section, install of Linux(Ubuntu), setup of PED and browsing of detected polymorphisms using <a href = "https://www.illumina.com/platinumgenomes.html" target = "_blank">Platinum human sequence data provided by Illumina</a> are described.</b><br><br>
 Following is PED analysis with <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194146" target = "_blank">ERR194146</a> and
       <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194147" target = "_blank">ERR194147</a> sequence data.<br>
+Project title of short reads: Whole genome sequencing and variant calls for the Coriell CEPH/UTAH 1463 family to create a "platinum" standard comprehensive set for variant calling improvement <a href = "https://www.ncbi.nlm.nih.gov/bioproject/PRJEB3381" target = "_blank">(PRJEB3381)</a>.<br>
       <table>
       <tr><td><a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a></td><td><ul><li>An example of genome view by IGV. Click to large.
 <li><b>Indels can be detect exactly,</b> as well as SNPs.
@@ -61,7 +62,14 @@ Sequences of primer pair are also outputted into vcf file.
       <h2>Visualization of detected polymorphisms using IVG</h2>
       <ul>
       <li>Integrative Genomics Viewer (IVG) is a genome browser made in Broad Institute.<br>
-Download from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
+Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a> is useful.<br>
+<a href = "igsf3l.png" target = "_blank"><img src = "igsf3l.png" height = "10%"></a>
+<a href = "igsf3.png" target = "_blank"><img src = "igsf3.png" height = "10%"></a> Click to large.
+      <ul>
+      <li>Download pre-analyzed vcf files linked below.
+      <li>Import files by selecting 'Local file' in 'Tracks' pull down menu. Because vcf files are big, it takes minutes. <br>
+      </ul>
+      <li>Or download from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
 Drag ERR194146.vcf and ERR194147.vcf on main display panel of IVG, data will be imported.<br>
 Due to big size of vcf data, IVG requests making index. Click OK and create index.<br>
 For making index, enough memory (8GB for linux is enough) is required, otherwise your computer will freeze.<br>
@@ -74,7 +82,7 @@ Sequence of primer pair for target polymorphism and PCR product size as well as 
       <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf.idx" target = "_blank">ERR194146.vcf.idx</a><br>
       <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf" target = "_blank">ERR194147.vcf</a><br>
       <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br>
-      are already analyzed data for compare your analysis.
+      are already analyzed data.
       </ul>
       <h2>Link of PED</h2>
       <ul>

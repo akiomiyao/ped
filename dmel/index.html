@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>Polymorphic Edge Detection (PED)<font size = "4"> - An efficient polymorphism detector for NGS data</font></h1>
+    <a href = "../index.html">[Link to Top Page]</a>
+    <h2>Example for <i>Drosophila melanogaster</i></h2>
+    <ul>
+    <li><b>For Install linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
+    $ sudo apt update<br>
+    $ sudo apt install curl<br>
+    $ sudo apt install git<br>
+    $ sudo apt install sra-toolkit<br>
+    $ git clone https://github.com/akiomiyao/ped.git<br>
+    <li><b>Download fastq sequence data from NCBI sequence read archive</b><br>
+    $ cd ped<br>
+    <b>for tdo1 (target)</b><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR6872095" target = "_blank">SRR6872095</a><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR6872097" target = "_blank">SRR6872097</a><br>
+    $ mkdir tdo1<br>
+    $ mkdir tdo1/read<br>
+    $ mv SRR6872095/read/* tdo1/read<br>
+    $ mv SRR6872097/read/* tdo1/read<br>
+	<b>for tso1 (control)</b><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR6872107" target = "_blank">SRR6872107</a><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR6872108" target = "_blank">SRR6872108</a><br>
+    $ mkdir tso1<br>
+    $ mkdir tso1/read<br>
+    $ mv SRR6872107/read/* tso1/read<br>
+    $ mv SRR6872108/read/* tso1/read<br>
+    <li><b>Detection of polymorphism</b><br>
+    $ perl ped.pl target=tdo1,control=tso1,ref=dmel626<br>
+    <li><b>For Docker users</b><br>
+    Set up of Docker,<br>
+    $ sudo apt install docker<br>
+    $ sudo apt install docker.io<br>
+    Example of analysis,<br>
+    $ sudo docker pull akiomiyao/ped<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR6872095,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR6872097,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR6872107,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR6872108,wd=/work <br>
+    $ mkdir tdo1<br>
+    $ mkdir tdo1/read<br>
+    $ mv SRR6872095/read/* tdo1/read<br>
+    $ mv SRR6872097/read/* tdo1/read<br>
+    $ mkdir tso1<br>
+    $ mkdir tso1/read<br>
+    $ mv SRR6872107/read/* tso1/read<br>
+    $ mv SRR6872108/read/* tso1/read<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=tdo1,control=tso1,ref=dmel626,wd=/work <br>
+    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+    Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
+    <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
+    Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
+    Download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
+    Fasta file of reference is saved in "ped/dmel626/dmel626.fasta".<br>
+    Click Genomes tab of IVG and load "dmel626.fasta" and "dmel626.gff" files.<br>
+    Click File tab and load "ped/tdo1/tdo1.vcf" and other vcf files or drop files on the main window.<br>
+    <li><b>Check mutation in bidirectional alignments</b><br>
+    In the ped directory,<br>
+$ perl search.pl target=target,chr=chromosome,pos=position<br><br>
+For example,<br>
+$ perl search.pl target=DRR195470,chr=1,pos=13466340<br><br>
+A part of output is<br>
+
+<pre># 1 13466340 1 13466302 f deletion -4
+AAACCTACAAATAATCATAT TGAATTGTTGGTTTAGAGAT 0
+                                                                                                                              Chr1 13466340
+                                                                                                                              |
+AAACCTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAG
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||   | | | |   | |||     |
+AAACCTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAGAGAT
+  ||  | ||  |    |  |||    |        | |||    |        ||      |||  ||      |      |  ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+CTACAAATAATCATATTTTGTTTTCAGTTTTGACATATATAGTATGAGCATAAGTACCATATATAATTAGCACAAATTTGAATATATATATATATATATATATATATATATATATATATATATATACTAATTGAATTGTTGGTTTAGAGAT
+                                                                                    |
+                                                                                    Chr1 13466302
+</pre>
+    <li><b>Files</b><br>
+    Click to download<br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/TAIR10.fasta" target = "_blank">TAIR10.fasta</a><br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/TAIR10_GFF3_genes.gff" target = "_blank">TAIR10_GFF3_genes.gff</a> Modified for PED.<br>
+    <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200523ATDX/DRR195470.vcf" target = "_blank">DRR195470.vcf</a><br>
+    <li><b>Comments</b><br>
+    Run time is about one day for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Reads from Illumina platform returns fine results.
+    <li><b>Citing PED</b><br>
+Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data<br>
+Akio Miyao, Jianyu Song Kiyomiya, Keiko Iida, Koji Doi, Hiroshi Yasue<br>
+BMC Bioinformatics. 2019 20(1):362.<br>
+URL <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
+    <li><b>Author</b><br>
+    MIYAO Akio (miyao@affrc.go.jp)
+    </ul>
+  </body>
+</html>
