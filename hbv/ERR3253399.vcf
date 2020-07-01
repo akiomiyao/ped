@@ -1,0 +1,25 @@
+##fileformat=VCFv4.2
+##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.">
+##INFO=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=PCRLEN,Number=.,Type=Integer,Description="PCR product length">
+##INFO=<ID=PL,Number=.,Type=String,Description="Left primer sequence">
+##INFO=<ID=PR,Number=.,Type=String,Description="Right primer sequence">
+##INFO=<ID=SVLEN,Number=.,Type=Float,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description="Type of structural variant">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=INS,Description="Insertion of novel sequence">
+##ALT=<ID=INV,Description="Inversion of reference sequence">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+##source=<PROGRAM=ped.pl,Method="Bidirectional method",target=ERR3253399,control=HBV,reference=HBV>
+##created=<TIMESTAMP="2020-07-01 15:17:04 +0900">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	ERR3253399
+NC_003977.2	1743	.	T	C	1000	.	GT=1/1;AF=1;DP=8;PL=CCGACCTTGAGGCATACTTC;PR=GCCTACAGCCTCCTAGTACA;PCRLEN=99	GT:AD:DP	1/1:0,8:8
+NC_003977.2	1743	.	T	G	1000	.	GT=1/1;AF=1;DP=8;PL=CCGACCTTGAGGCATACTTC;PR=GCCTACAGCCTCCTAGTACA;PCRLEN=99	GT:AD:DP	1/1:0,8:8
+NC_003977.2	1911	.	C	T	1000	.	GT=1/1;AF=1;DP=13;PL=TGGCTTTGGGGCATGGACAT;PR=GAGCTGAGGCGGTATCTAGA;PCRLEN=121	GT:AD:DP	1/1:0,13:13
+NC_003977.2	1984	.	C	A	1000	.	GT=1/1;AF=1;DP=7;PL=GGCATGGACATCGACCCTTA;PR=GAGCTGAGGCGGTATCTAGA;PCRLEN=112	GT:AD:DP	1/1:0,7:7
