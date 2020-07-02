@@ -176,6 +176,7 @@ perl mkref.pl hg38
   dmel626        Drosophila melanogaster
   hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
   hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
+  sacCer3        Saccharomyces cerevisiae (UCSC sacCer3)
 ```
   If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.  
 - Otherwise, if you want to make reference data absent in the config file,  

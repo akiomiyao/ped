@@ -813,6 +813,10 @@ sub mkRef{
 	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
 	    &report("Downloading $curl{$ref}");
 	    system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
+	    if ($ref eq "sacCer3"){
+		system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
+		system("mv S288C_reference_genome_R64-1-1_20110203/S288C_reference_sequence_R64-1-1_20110203.fsa $wd/$ref");
+	    }
 	}
 	&mkChr;
     }else{
@@ -1068,6 +1072,9 @@ sub mkChr{
     my @file = split('/', $curl{$ref});
     my $file = $file[$#file];
     $file =~ s/\ +$//g;
+    if ($file{$ref} ne ""){
+	$file = $file{$ref};
+    }
     my $i = 0;
     chdir "$wd/$ref";
     &report("Making chromosome file from $file");
