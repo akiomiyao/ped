@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>Detection of polymorphisms from yeast NGS by PED</h1>
+      <a href = "../index.html">[Link to top page]</a><br><br>
+      <b>In this section, install of Linux(Ubuntu), setup of PED and browsing of detected polymorphisms using <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=ERP122160" target = "_blank">NGS of yeast phosphomutants</a> are described.</b><br><br>
+An example of genome view by IGV. Click to large.
+      <table>
+      <tr><td><a href = "sacCer3.png" target = "_blank"><img src = "sacCer3.png" height = "30%"></a></td><td><ul>
+<li><b>Indels can be detect exactly,</b> as well as SNPs.
+<li><b>Nucleotide sequences of primer pair</b> to amplify target mutations are also shown.</ul></td></tr>
+      </table>
+
+      <h2>Install of Ubuntu</h2>
+      <ul>
+      <li>Download Ubuntu 20.4 LTS from <a href = "https://ubuntu.com/download" target = "_blank">Ubuntu download site</a>.
+      <li><a href = "https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop" target = "_blank">Ubuntu install tutorial</a> will be helpful for installing.<br>
+      Because PED uses maximum CPU power, exclusive use for PED analysis is recommended.<br>
+      PED supports multithread environment. CPU with 4 or 8 core is recommended.
+      </ul>
+      <h2>Setup and analysis of PED</h2>
+      <ul>
+      <li>Installing software required by PED
+      <pre>$ sudo apt update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>Download fastq files from NCBI Sequence read archive site.
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=ERR4194721
+$ perl download.pl accession=ERR4194722
+$ perl download.pl accession=ERR4194723
+$ perl download.pl accession=ERR4194724
+$ perl download.pl accession=ERR4194725
+$ perl download.pl accession=ERR4194726
+</pre>
+Scripts are updated by git pull command.<br>
+Sometimes error message will appear. The script will try to reconnect. Check increasing size of downloading files.<br>
+      <li>Detection of polymorphisms in NGS sequences on yeast reference genome sacCer3.
+<pre>$ perl ped.pl target=ERR4194721,control=ERR4194722,ref=sacCer3
+$ perl ped.pl target=ERR4194722,control=ERR4194723,ref=sacCer3
+$ perl ped.pl target=ERR4194723,control=ERR4194724,ref=sacCer3
+$ perl ped.pl target=ERR4194724,control=ERR4194725,ref=sacCer3
+$ perl ped.pl target=ERR4194725,control=ERR4194726,ref=sacCer3
+</pre>
+Since sacCer3 reference file is already configured, data are automatically downloaded and calculated.<br>
+When all processes are done, vcf files will be created in target derectory.<br>
+Other strain belongs same project (condition) should be chosen for the control.<br>
+Common mutations among strains against the reference sequence will be eliminated.<br>
+Sequences of primer pair are also outputted into vcf file.
+      </ul>
+      <h2>For Docker users</h2>
+      <ul>
+      <li>Set up of Docker<br>
+<pre>$ sudo apt install docker
+$ sudo apt install docker.io</pre>
+      <li>Example of analysis,<br>
+<pre>$ sudo docker pull akiomiyao/ped
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194721,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194722,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194723,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194724,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194725,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR4194726,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR4194721,control=ERR4194722,ref=sacCer3,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR4194722,control=ERR4194723,ref=sacCer3,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR4194723,control=ERR4194724,ref=sacCer3,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR4194724,control=ERR4194725,ref=sacCer3,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR4194725,control=ERR4194726,ref=sacCer3,wd=/work</pre>
+      Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+      Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
+      </ul>
+      <h2>Visualization of detected polymorphisms using IVG</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) is a genome browser made in Broad Institute.<br>
+Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a> is useful.<br>
+<a href = "sacCer3.png" target = "_blank"><img src = "sacCer3.png" height = "10%"></a>
+<a href = "ERR4194723.png" target = "_blank"><img src = "ERR4194723.png" height = "10%"></a> Click to large.
+      <ul>
+      <li>Download pre-analyzed vcf files linked below.
+      <li>Import files by selecting 'Local file' in 'Tracks' pull down menu.<br>
+      </ul>
+      <li>Or download from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
+Drag vcf files on main display panel of IVG, data will be imported.<br>
+When click the number of chromosome, map and polymorphisms by each chromosome will be shown.<br>
+Click at interested position, zoom up the region.<br>
+Mouse over at vertical line of polymorphism, detailed information will be shown.<br>
+Sequence of primer pair for target polymorphism and PCR product size as well as kind and frequency of polymorphism will also be shown.<br>
+      <li><a href = "ERR4194721.vcf" target = "_blank">ERR4194721.vcf</a><br>
+      <a href = "ERR4194722.vcf" target = "_blank">ERR4194722.vcf</a><br>
+      <a href = "ERR4194723.vcf" target = "_blank">ERR4194723.vcf</a><br>
+      are already analyzed data.
+      </ul>
+      <h2>Link of PED</h2>
+      <ul>
+       <li>Github: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>Docker: sudo docker pull akiomiyao/ped<br>
+&emsp;&emsp;&emsp;&emsp;sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR194146,wd=/work<br>
+&emsp;&emsp;&emsp;&emsp;sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR194146,ref=hg19,wd=/work<br>
+<li>Paper: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>Contact</h2>
+MIYAO Akio, Ph.D (miyao@affrc.go.jp) (Family name is MIYAO)<br>
+Institute of Crop Science / NARO<br>
+2-1-2, Kannondai, Tsukuba, Ibaraki, 305-8518, Japan<br>
+    </body>
+</html>
