@@ -39,17 +39,19 @@
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       <li>多型部分を増幅するプライマー配列も同時に出力されます。
       </ul>
-      <li><b>Githubからのコードの取得は、</b><br>
-      sudo apt install git (Ubuntuの場合)<br>
-      sudo yum install git (CentOSの場合)<br>
-      sudo pkg install git (FreeBSDの場合)<br>
-      でgitをインストールした後に、<br><br>
-      git clone https://github.com/akiomiyao/ped.git
-      <br><br>
-      curlも必要です。インストールされていない場合は、以下を実行してください。<br>
-      sudo apt install curl (Ubuntuの場合)<br>
-      sudo yum install curl (CentOSの場合)<br>
-      sudo pkg install curl (FreeBSDの場合)<br>
+      <li>Linux(Ubuntu)のインストール
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。
+      </ul>
+      <li>PEDのセットアップ
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
  
 	  <li><b>実行例</b>
 	  <ul>
@@ -123,8 +125,9 @@
      <h2>結果のフォーマット</h2>
      <ul>
            <li>以下は、ヒト (イルミナ プラチナゲノムの配列データ ERR194146)の出力例です。<br>
-           ERR194146のディレクトリの中にERR194146.vcf
-           というvcf形式マップデータがセーブされます。<br>
+ERR194146のディレクトリの中にERR194146.vcf
+というvcf形式マップデータがセーブされます。<br>
+vcf形式の結果はBroad Instituteから提供されている<a href = "https://igv.org/app/" target = "_blank">Integrative Genomics Viewer (IGV)</a>でグラフィカルに表示可能です。
 <pre>##fileformat=VCFv4.2
 ##INFO=&lt;ID=AF,Number=.,Type=Float,Description="Allele Frequency">
 ##INFO=&lt;ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
@@ -240,13 +243,15 @@
   Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
   B73v4          Corn (Zea mays B73) RefGen v4
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  COVID19        Severe acute respiratory syndrome coronavirus 2 (CIVID-19, NC_045512.2)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
-  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 44
+  HBV            Hepatitis B virus (strain ayw, NC_003977.2)
+  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
   SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   SScrofa11.1    Pig (Sus scrofa) Release-97
   TAIR10         Arabidopsis thaliana version TAIR10
@@ -256,6 +261,7 @@
   dmel626        Drosophila melanogaster
   hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
   hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
+  sacCer3        Saccharomyces cerevisiae (UCSC sacCer3)
 </pre>
      <li>サポートされていないリファレンス配列で解析したい場合
      <ul>
@@ -266,7 +272,8 @@
      </ul>
 	 </ul>
 	 <a name = "Docker_install">
-	 <h2>Dockerのインストール</h2>
+	 <h2>Dockerを用いた解析</h2>
+     Dockerを用いると、dockerhubに登録済みの実行環境をダウンロードして一連の解析を行うことができます。解析が完了すると実行環境はクリアされて結果のみが残ります。<br>
 	 CentOSやUbuntuにインストールする場合<br>
      <ul>
 	 <li>参照 <a href = "https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script" target = "_blank">https://docs.docker.com/install/linux/docker-ce/ubuntu/</a><br>
@@ -274,8 +281,9 @@
      sudo sh get-docker.sh<br>
      を実行します。<br>
      Ubuntuの場合は、<br>
+     sudo apt install docker<br>
      sudo apt install docker.io<br>
-     でインストールできます。
+     の2つの操作のみでもインストールできます。
      <li>sudo docker pull akiomiyao/ped<br>
      でコンテナをダウンロードすることができます。
      <li>コンテナを起動した後、途中で止めたい場合は、<br>
@@ -291,127 +299,6 @@
      一連の解析が終わるとゾンビプロセスもなくなりますので、大きな影響はないと考えていますが、気になる方は、docker ではなく github からスクリプトをクローンして ped.pl を直接実行することをお勧めします。
      </ul>
 
-
-      <h2>PEDのインストール</h2>
-      <p>以下の説明は、マルチスレッドで動作するシングルコンピュータ用のped.pl作成以前の説明です。<br>
-      ped.plを用いる場合は、上記の操作法「<a href = "#simple_tutorial">ped.plでの多型検出 (簡単なチュートリアル)</a>」ですべての解析ができます。<br>
-      ped.pl作成以前から利用されているユーザのために残してあります。
-      <p>Unix (LinuxあるいはFreeBSD)がインストールされたコンピュータが必要です。シングルおよびコンピュータクラスタ双方の解析ソフトウェアがあります。
-      <ul>
-	<li>プログラムのダウンロード<br>
-	  <a href = "https://github.com/akiomiyao/ped" target = "_blank">https://github.com/akiomiyao/ped</a>にアクセスして、<br>
-	  Clone or downloadのプルダウンメニューよりzipファイルをダウンロードする。あるいは、<br>
-	  git clone https://github.com/akiomiyao/ped.git<br>
-	  を実行します。
-	<li>以後の作業は、展開されたpedあるいはped-masterのディレクトリで作業します。git cloneで展開した場合は、展開したディレクトリで<br>
-	  git pull<br>
-	  を実行すると、最新のスクリプトに同期されます。
-	  </ul>
-	<h2>リファレンスゲノムデータセットの作成</h2>
-	<ul>
-	  <li>ped.plの場合は、実行初回に自動実行されるので、別途作成する必要はなくなりました。以下の作業は、ped.plではなく、bidirectional.plやkmer.plを実行する場合のみ必要です。
-	  <li>引数なしで実行するとヘルプと対応しているゲノムがリストされます。<br>
-	  perl mkref.pl<br>
-	  <li>イネ(日本晴)データセットは、<br>
-	  perl mkref.pl IRGSP1.0<br>
-	  を実行します。<br>
-	  <li>IRGSP1.0をhg38にするとヒトのデータセットができます。<br>
-	  perl mkref.pl hg38<br>
-	  ヒトの場合はサイズが大きいので、作成に1日程度かかります。<br>
-	  <li>サーバーがFTPで外部と接続できない場合は、公開サイトからゲノムデータをダウンロードできない場合があります。<br>
-      この場合は、ブラウザ経由で別途ゲノムデータをダウンロードして、リファレンス用のディレクトリに移して再実行すると処理を続けることができます。
-	</ul>
-    <a  name = "fastq-dump">
-	<h2>fastq-dumpのインストール</h2>
-	<ul>
-	  <li><a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
-	  から、コンパイルされた実行ファイルのアーカイブをダウンロードします。<br>
-	  <li>OSがCentOSなら、CentOS Linux 64 bit architecture - non-sudo tar archiveをダウンロードします。<br>
-      クラウドを使わないのであれば、2.9.6-1をダウンロードしてください。最新版は、最初にクラウド関連の設定をする必要があります。<br>
-	  tar xvzf ファイル名<br>
-	  で展開できます。<br>
-	  tar xvzf sratoolkit.2.10.0-centos_linux64.tar.gz<br>
-	  <li>展開されたディレクトリの中のbinの中にある、fastq-dump-orig.2.10.0をユーザのホームディレクトリのbinディレクトリにfastq-dumpというファイル名でコピーします。<br>
-	  例<br>
-	  cp sratoolkit.2.10.0-centos_linux64/bin/fastq-dump-orig.2.10.0 ~/bin/fastq-dump
-	  </ul>
-	<h2>Fastqデータの取得</h2>
-	<ul>
-	<li>解析対象のfastqデータ<br>
-	  日本晴 <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR099989" target = _blank">DRR099989</a><br>
-	  コシヒカリ <a href = "https://www.ncbi.nlm.nih.gov/sra/?term=DRR054198" target = _blank">DRR054198</a><br>
-	<li>download.plを実行します。<br>
-	  perl download.pl DRR099989<br>
-	  perl download.pl DRR054198<br>
-	<li>pedのディレクトリの中に、DRR054198とDRR099989のディレクトリが作成され、その中のreadのディレクトリの中にfastqファイルがダウンロードされます。<br>
-	  fastqファイルは、gz形式やbz2形式で圧縮されていても、そのまま解析が可能です。<br>
-	  ターゲット名のディレクトリ下のreadディレクトリの中に置いたファイルがまとめて解析されます。<br>
-	  ペアエンドのデータでも複数のシングルエンドのデータでも解析されますが、ファイルの圧縮形式は揃っている必要があります。<br>
-	 <li>PEDではリード長が一定している必要があります。リード長がばらついているデータは、長さを揃える必要があります。
-	 </ul>
-	 
-	<h2>bidirectional法での多型の検出</h2>
-	  bidirectional法では、SNP以外に、挿入、欠失、逆位、転座等の構造変異も検出されます。<br>
-	  <ul>
-	  <li>perl bidirectional.pl ターゲット コントロール リファレンス<br>
-	  例<br>
-	  perl bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
-	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされます。<br>
-	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
-	  perl bidirectional.pl DRR054198 default IRGSP1.0<br>
-	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られます。
-	  <li>DRR054198のディレクトリには、<br>
-	  DRR054198.aln.0<br>
-	  DRR054198.aln.5<br>
-	  DRR054198.aln.10<br>
-	  DRR054198.aln.15<br>
-	  DRR054198.bi.snp<br>
-	  DRR054198.bi.vcf<br>
-	  DRR054198.index<br>
-	  DRR054198.sv<br>
-	  が出力されます。<br>
-	  snp情報は、DRR054198.bi.snpに独自フォーマットで出力され、確度の高いSNPがvcf形式でDRR054198.bi.vcfに出力されます。<br>
-	  構造変異は、独自フォーマットでDRR054198.svに出力されます。<br>
-	  DRR054198.alnはアラインメント結果で、リードの末端から0、5、10、15のマージンをとった20塩基の配列を用いてリファレンスゲノム上の位置を求めています。<br>
-	  pedディレクトリで、<br>
-	  perl search.pl DRR054198 1 1369483<br>
-	  のように、perl search.pl target chr position<br>
-	  を実行すると対応するアラインメントが検索され表示されます。<br>
-	  </ul>
-	<h2><i>k</i>-mer法での多型の検出</h2>
-	  <i>k</i>-mer法は、SNPの検出のみとなります。
-	  <ul>
-	  <li>perl kmer.pl ターゲット コントロール リファレンス<br>
-	  例<br>
-	  perl kmer.pl  DRR054198 DRR099989 IRGSP1.0<br>
-	  <li>この場合は、DRR054198のディレクトリ内に結果ファイルがセーブされます。<br>
-	  比較対象のリードがなく、多型のマップ情報のみを得る場合は、<br>
-	  perl kmer.pl DRR054198 default IRGSP1.0<br>
-	  のように、controlの値をdefaultにすると、リファレンスゲノム自体をコントロールとしてカウントした結果が得られます。
-	  </ul>
-	<h2>グリッドエンジンを用いた並列計算</h2>
-	  Torqueをインストールする必要があります。<br>
-	  <ul>
-	  <li>マルチコアのコンピュータの場合、スタンドアロンのコンピュータでも動作しますが、十分なメモリを搭載する必要があります。<br>
-      メモリ不足でエラーになった場合は、qsub_が頭につかないスクリプトで解析する必要があります。<br>
-	  Torqueのインストール方法は<a href = "https://github.com/akiomiyao/ped/wiki/Install-of-Torque" target = "_blank">こちら</a>。yumで簡単にインストールできます。<br>
-      <li>CentOSを搭載した16CPU, 38GBのコンピュータにTorqueをインストールしてhg38ゲノムに対するヒトの多型データ検出に成功しています。
-	  <li>perl qsub_mkref.pl リファレンス<br>
-	  例 perl qsub_mkref.pl IRGSP1.0
-	  <li>perl qsub_bidirectional.pl ターゲット コントロール リファレンス<br>
-	  例 perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0<br>
-	  グリッドエンジンを用いて高速に計算することができます。
-      <li>各ノードに1TB程度のSSDを搭載してテンポラリーディレクトリに指定するとより高速に処理ができます。<br>
-      perl qsub_bidirectional.pl ターゲット コントロール リファレンス テンポラリーディレクトリ<br>
-      perl qsub_bidirectional.pl DRR054198 DRR099989 IRGSP1.0 /mnt/ssd<br>
-      のように実行します。リファレンスデータ等が /mnt/ssd にコピーされて保持されるのでマスター・ノード間のネットワークの負荷が軽減されます。<br>
-      ヒトのデータしか解析しないような場合に利用すると効率的です。
-      <li>農研機構高度解析センターのコンピュータクラスターを用いる場合は、<br>
-    common.pl の中の<br>
-    # $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
-    の行のコメントアウトを外して、<br>
-    $qsub_opt = "-S /usr/bin/perl -jc M.c8";<br>
-    としてセーブしなおしてから実行する必要があります。</ul>
     <a name = "example">
     <h2>解析事例</h2>
       <ul>
@@ -548,63 +435,6 @@ clipping=100で解析しています。この場合は、100塩基以上のリ�
            <li>文献: <a href = "https://www.jstage.jst.go.jp/article/jsbbs/67/2/67_16096/_article" target = "_blank">Detection of novel QTLs qDTH4.5 and qDTH6.3, which confer late heading under short-day conditions, by SSR marker-based and QTL-seq analysis. Breed Sci. 67(2):101-109 (2017).</a>
            <li><a href = "https://github.com/akiomiyao/ped/wiki/Bulked-segrigant-analysis-of-rice" target = "_blank">英文リンク</a>
          </ul>
-         <li>ヒトの多型検出
-         <ul>
-           <li>perl mkref.pl hg38<br>
-           を実行してリファレンスを作る。
-           <li>perl download.pl ERR194146<br>
-           で、<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP001960&o=acc_s%3Aa" target = "_blank">CEPH/UTAH家系の父親のfastqデータ</a>をダウンロードする。<br>
-           どういうわけか、最近息子のERR194152の配列がNCBI/SRAからダウンロードできなくなった。母親ERR194147は今のところダウンロード可能である。
-           <li>高度解析センターのclusterを用いた場合の実行ログ<pre>[miyao@cluster1 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
-2019年 10月 16日 水曜日 16:30:24 JST Making ERR194146.sort_uniq.
-2019年 10月 17日 木曜日 10:48:55 JST Aligning of ERR194146 sequence to hg38 genome.
-2019年 10月 18日 金曜日 06:42:16 JST Splitting of Indel alignment.
-2019年 10月 18日 金曜日 06:42:17 JST Splitting of SNP alignment.
-2019年 10月 18日 金曜日 08:52:26 JST Verifying indel 01
-2019年 10月 18日 金曜日 08:52:27 JST Verifying SNPs 01
-2019年 10月 18日 金曜日 08:52:28 JST Verifying SNPs 02
-2019年 10月 18日 金曜日 08:52:29 JST Verifying SNPs 03
-2019年 10月 18日 金曜日 08:52:30 JST Verifying SNPs 04
-2019年 10月 18日 金曜日 08:52:31 JST Verifying SNPs 05
-2019年 10月 18日 金曜日 08:52:32 JST Verifying SNPs 06
-2019年 10月 18日 金曜日 08:52:33 JST Verifying SNPs 07
-2019年 10月 18日 金曜日 08:52:34 JST Verifying SNPs 08
-2019年 10月 18日 金曜日 08:52:35 JST Verifying SNPs 09
-2019年 10月 18日 金曜日 08:52:36 JST Verifying SNPs 10
-2019年 10月 18日 金曜日 08:52:37 JST Verifying SNPs 11
-2019年 10月 18日 金曜日 08:52:38 JST Verifying SNPs 12
-2019年 10月 18日 金曜日 08:52:39 JST Verifying SNPs 13
-2019年 10月 18日 金曜日 08:52:40 JST Verifying SNPs 14
-2019年 10月 18日 金曜日 08:52:41 JST Verifying SNPs 15
-2019年 10月 18日 金曜日 18:45:48 JST Making vcf file of SNP
-2019年 10月 18日 金曜日 18:48:58 JST bidirectional.pl complete.</pre>
-           <li>16 core、38GBの1台のコンピュータにTorqueをインストールして実行した所要時間は以下の通り。<pre>
-[miyao@s2 ped]$ perl qsub_bidirectional.pl ERR194146 default hg38
-Mon Dec  2 23:30:45 JST 2019 Aligning of ERR194146 sequence to hg38 genome
-Tue Dec  3 20:47:06 JST 2019 Indexing of alignment
-Tue Dec  3 20:47:07 JST 2019 Splitting of Indel alignment
-Tue Dec  3 20:47:08 JST 2019 Splitting of SNP alignment
-Tue Dec  3 21:10:11 JST 2019 Verifying indel 01
-Tue Dec  3 21:10:12 JST 2019 Verifying SNPs 01
-Tue Dec  3 21:10:13 JST 2019 Verifying SNPs 02
-Tue Dec  3 21:10:14 JST 2019 Verifying SNPs 03
-Tue Dec  3 21:10:16 JST 2019 Verifying SNPs 04
-Tue Dec  3 21:10:17 JST 2019 Verifying SNPs 05
-Tue Dec  3 21:10:18 JST 2019 Verifying SNPs 06
-Tue Dec  3 21:10:19 JST 2019 Verifying SNPs 07
-Tue Dec  3 21:10:20 JST 2019 Verifying SNPs 08
-Tue Dec  3 21:10:21 JST 2019 Verifying SNPs 09
-Tue Dec  3 21:10:22 JST 2019 Verifying SNPs 10
-Tue Dec  3 21:10:23 JST 2019 Verifying SNPs 11
-Tue Dec  3 21:10:24 JST 2019 Verifying SNPs 12
-Tue Dec  3 21:10:25 JST 2019 Verifying SNPs 13
-Tue Dec  3 21:10:26 JST 2019 Verifying SNPs 14
-Tue Dec  3 21:10:27 JST 2019 Verifying SNPs 15
-Wed Dec  4 19:19:06 JST 2019 Making vcf file of SNP
-Wed Dec  4 19:21:32 JST 2019 bidirectional.pl complete.
-</pre>
-    </ul>
-    </ul>
     <h2>PEDに関する資料</h2>
       <ul>
        <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
