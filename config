@@ -110,3 +110,6 @@ sacCer3	wget	http://sgd-archive.yeastgenome.org/sequence/S288C_reference/genome_
 sacCer3	file	S288C_reference_sequence_R64-1-1_20110203.fsa
 sacCer3	chromosome	0	0	I	II	III	IV	V	VI	VII	VIII	IX	X	XI	XII	XIII	XIV	XV	XVI	NOP
 
+Ecoli	description	Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
+Ecoli	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
+Ecoli	chromosome	0	0	NC_000913.3
