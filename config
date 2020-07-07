@@ -113,3 +113,7 @@ sacCer3	chromosome	0	0	I	II	III	IV	V	VI	VII	VIII	IX	X	XI	XII	XIII	XIV	XV	XVI	NOP
 Ecoli	description	Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
 Ecoli	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz
 Ecoli	chromosome	0	0	NC_000913.3
+
+Bsubtilis	description	Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
+Bsubtilis	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/045/GCF_000009045.1_ASM904v1/GCF_000009045.1_ASM904v1_genomic.fna.gz
+Bsubtilis	chromosome	0	0	NC_000964.3

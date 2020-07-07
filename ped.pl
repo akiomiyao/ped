@@ -48,7 +48,7 @@ $usage = '
  SRR11542243.vcf in SRR11542243 directioy is the result.
  It takes 5 minuits.
   
- perl search.pl target=SRR11542243,chr=1,pos=11185
+ perl search.pl target=SRR11542243,chr=NC_045512.2,pos=11185
  will show bidirectional alignments.
 
 ';
