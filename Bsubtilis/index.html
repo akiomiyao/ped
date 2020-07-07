@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>Detection of polymorphisms from <i>Bacillus subtilis</i> NGS by PED</h1>
+      <a href = "../index.html">[Link to top page]</a><br><br>
+      <b>In this section, install of Linux(Ubuntu), setup of PED and browsing of detected polymorphisms using <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=SRP163548" target = "_blank">NGS of mutant strains of <i>Bacillus subtilis</i> 168</a> are described.</b><br><br>
+An example of genome view by IGV. Click to large.
+      <table>
+      <tr><td><a href = "Bsubtilis.png" target = "_blank"><img src = "Bsubtilis.png" height = "30%"></a><a href = "Bsubtilis2.png" target = "_blank"><img src = "Bsubtilis2.png" height = "30%"></a></td><td><ul>
+<li><b>Indels can be detect exactly,</b> as well as SNPs.
+<li><b>Nucleotide sequences of primer pair</b> to amplify target mutations are also shown.</ul></td></tr>
+      </table>
+Strain GP1948 (SRR7967955) is a suppressor mutant of topoisomerase A mutation.<br>
+Mutation at 2,011,091 is G to A substitution in the GltA gene.<br>
+Reference: <a href = "https://doi.org/10.1093/nar/gkz260" target = "_blank">Topoisomerase IV can functionally replace all type 1A topoisomerases in <i>Bacillus subtilis</i></a>
+      <h2>Install of Ubuntu</h2>
+      <ul>
+      <li>Download Ubuntu 20.4 LTS from <a href = "https://ubuntu.com/download" target = "_blank">Ubuntu download site</a>.
+      <li><a href = "https://ubuntu.com/tutorials/tutorial-install-ubuntu-desktop" target = "_blank">Ubuntu install tutorial</a> will be helpful for installing.<br>
+      Because PED uses maximum CPU power, exclusive use for PED analysis is recommended.<br>
+      PED supports multithread environment. CPU with 4 or 8 core is recommended.
+      </ul>
+      <h2>Setup and analysis of PED</h2>
+      <ul>
+      <li>Installing software required by PED
+      <pre>$ sudo apt update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>Download fastq files from NCBI Sequence read archive site.
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=SRR7967955
+</pre>
+Scripts are updated by git pull command.<br>
+Sometimes error message will appear during download. The script will try to reconnect. Check increasing size of downloading files.<br>
+<li>Check sequence length of the fastq file.
+<pre>$ perl check_length.pl SRR7967955
+Omitted above
+290     4868
+291     4953
+292     3574
+293     2917
+294     4086
+295     2267
+296     5828
+297     9657
+298     32047
+299     80536
+300     536716
+301     1153100
+</pre>
+Because PED requires fixed length short read sequences, clipping option is required.<br>
+Longest sequences (301 base) are most abundant. But, there are many shorter sequences in the file.<br>
+In this case, 150 base for clipping is better. Long sequence with 300 and 301 base will divided into 2 sequences.  
+<li>Detection of polymorphisms in NGS sequences on <i>Bacillus subtilis</i> reference genome.
+<pre>$ perl ped.pl target=SRR7967955,ref=Bsubtilis,clipping=150
+</pre>
+Since Bsubtilis reference file is already configured, data are automatically downloaded and calculated.<br>
+When all processes are done, vcf files will be created in target directory.<br>
+If sequence from other strain belongs same project (condition) is chosen for the control,
+common mutations among strains against the reference sequence will be eliminated.<br>
+Sequences of primer pair are also outputted into vcf file.
+      </ul>
+      <h2>For Docker users</h2>
+      <ul>
+      <li>Install of Docker<br>
+<pre>$ sudo apt install docker
+$ sudo apt install docker.io</pre>
+      <li>Example of analysis,<br>
+<pre>$ sudo docker pull akiomiyao/ped
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR7967955,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl check_length.pl accession=SRR7967955,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR7967955,ref=Bsubtilis,clipping=150,wd=/work</pre>
+      Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+      Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
+      </ul>
+      <h2>Visualization of detected polymorphisms using IVG</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) is a genome browser made in Broad Institute.<br>
+Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a> is useful.<br>
+<a href = "Bsubtilis3.png" target = "_blank"><img src = "Bsubtilis3.png" height = "10%"></a>
+<a href = "Bsubtilis4.png" target = "_blank"><img src = "Bsubtilis4.png" height = "10%"></a> Click to large.
+      <ul>
+      <li>Download fasta file of reference genome <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200707BSUB/Bsubtilis.fasta" target = "_blank">Bsubtilis.fasta</a> and the index file <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200707BSUB/Bsubtilis.fasta.fai" target = "_blank">Bsubtilis.fasta.fai</a>.
+      <li>Select 'Local File ...' in pull down menu of 'Genome' and submit both Bsubtilis.fasta and Bsubtilis.fasta.fai files.
+      <li>Download gff file. <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200707BSUB/GCF_000009045.1_ASM904v1_genomic.gff.gz" target = "_blank">GCF_000009045.1_ASM904v1_genomic.gff.gz</a>
+      <li>Select 'Local File ...' in pull down menu of 'Tracks' and submit GCF_000009045.1_ASM904v1_genomic.gff.gz file.
+      <li>Download pre-analyzed vcf file <a href = "SRR7967955.vcf" target = "_blank">SRR7967955.vcf</a>.
+      <li>Import files by selecting 'Local file' in 'Tracks' pull down menu.
+      <li>Click '+' to zoom up. Vertical lines of mutations will be shown.
+      </ul>
+      <li>Or download from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
+Drag vcf files on main display panel of IVG, data will be imported.<br>
+Click at interested position, zoom up the region.<br>
+Mouse over at vertical line of polymorphism, detailed information will be shown.<br>
+      </ul>
+      <h2>Link of PED</h2>
+      <ul>
+       <li>Github: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>Docker: sudo docker pull akiomiyao/ped<br>
+       <li>Paper: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>Contact</h2>
+MIYAO Akio, Ph.D (miyao@affrc.go.jp) (Family name is MIYAO)<br>
+Institute of Crop Science / NARO<br>
+2-1-2, Kannondai, Tsukuba, Ibaraki, 305-8518, Japan<br>
+    </body>
+</html>
