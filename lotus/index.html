@@ -74,6 +74,63 @@ IVGを開いてGenomesのプルダウンメニューよりLoad Genome from File�
 ページのトップの<a href = "gifu.png" target = "_blank">画像</a>が表示例です。クリックすると大きくなります。<br>
 多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
       </ul>
+      <h2>解析事例</h2>
+<ul>
+<li><a href = "https://www.nature.com/articles/s41467-018-02831-x" target = "_blank">A NIN-LIKE PROTEIN mediates nitrate-induced control of root nodule symbiosis in  <i>Lotus japonicus</i> | Nature Communications</a><br>
+ミヤコグサは、マメ科の植物で、根粒菌の共生に関する遺伝子の解析が進められています。根粒菌の共生は肥料の中の窒素源が少ない場合に促進されますが、窒素源の量に関わらず共生が行われる変異体から原因遺伝子を特定した論文です。
+<li><a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?study=DRP004033" target = "_blank">Identification of the causative gene of <i>Lotus japonicus</i> nitrate unresponsive symbiosis 1 mutants</a><br>
+に、コントロールとして野生型のMG-20の配列と、変異体のnrsym1-1とnrsym1-2のNGS配列が公開されています。<br>
+<li>コントロールにMG-20が用いられているので、リファレンスゲノム配列には、GifuではなくMG-20(LJ3)を使用します。<br>
+<a href = "https://lotus.au.dk/data/download" target = "_blank">https://lotus.au.dk/data/download</a>より、<i>Lotus japonicus</i> MG20 v3.0 GenomeにあるLotusjaponicus_MG20_v3.0_genome.fa.gzをダウンロードします。
+<pre>$ cd ped
+$ mkdir LJ3
+$ mv Lotusjaponicus_MG20_v3.0_genome.fa.gz LJ3
+$ cd LJ3
+$ gzip -d Lotusjaponicus_MG20_v3.0_genome.fa.gz</pre>
+として、圧縮状態のgzファイルをfastaファイルに変換します。<br>
+また、同時にMG-20のgffファイル Lotusjaponicus_MG20_v3.0_annotations.gff3.gz もダウンロードしておきます。
+<li>ショートリード配列をダウンロードします。DDBJのDRAに登録されているので、<a href = "https://ddbj.nig.ac.jp/DRASearch/" target = "_blank">https://ddbj.nig.ac.jp/DRASearch/</a>を開いて、<br>
+DRR097247 DRR0972478 DRR097249 DRR097250 DRR097251 DRR097252<br> 
+を1つずつ順にAccessionにペーストしてSearchをクリックします。<br>
+検索結果のページの2行目のFASTQのリンクをクリックすると圧縮されたショートリード配列のペアがダウンロードできます。<br>
+<pre>$ mkdir MG-20
+$ mkdir MG-20/read
+$ mkdir nrsym1-1
+$ mkdir nrsym1-1/read
+$ mkdir nrsym1-2
+$ mkdir nrsym1-2/read </pre>
+として、それぞれコントロールとターゲットのディレクトリを作ります。<br>
+<pre>$ mv DRR097247_?.fastq.bz2 DRR097248_?.fastq.bz2 MG-20/read
+$ mv DRR097249_?.fastq.bz2 DRR097250_?.fastq.bz2 nrsym1-1/read
+$ mv DRR097251_?.fastq.bz2 DRR097252_?.fastq.bz2 nrsym1-2/read
+</pre>
+として、ダウンロードしたファイルを、それぞれのディレクトリに移します。
+<li>PEDでの多型検出は、<br>
+<pre>$ perl ped.pl target=nrsym1-1,control=MG-20,ref=LJ3
+$ perl ped.pl target=nrsym1-2,control=MG-20,ref=LJ3</pre>
+で、それぞれの多型が検出されます。
+<li><a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200521LJGF/LJ3.fasta">LJ3.fasta</a><br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200521LJGF/LJ3.fasta.fai">LJ3.fasta.fai</a><br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200521LJGF/Lotusjaponicus_MG20_v3.0_annotations.gff3.gz">Lotusjaponicus_MG20_v3.0_annotations.gff3.gz</a><br>
+を、それぞれダウンロードします。
+<li>解析済みvcfファイルは、<br>
+<a href = "nrsym1-1.vcf">nrsym1-1.vcf</a><br> 
+<a href = "nrsym1-2.vcf">nrsym1-2.vcf</a><br>
+からダウンロードできます。
+<li><a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a>をクリックして、WebのIGVを開きます。<br>
+Genomeのプルダウンメニューより、'Local File ...'を選んでダウンロードした、LJ3.fastaとLJ3.fasta.faiを両方一緒に選択してSubmitボタンをクリックします。<br>
+Tracksのプルダウンメニューより、'Local File ...'を選んで、Lotusjaponicus_MG20_v3.0_annotations.gff3.gz、nrsym1-1.vcf、nrsym1-2.vcfを順にアップロードします。<br>
+第5染色体を選んで、28.1MBのあたりを拡大します。<br>
+Lj5g3v1999250.2の遺伝子の中にあるSNPが目的の変異です。<br>
+同一遺伝子のコード領域の少しずれた位置に、2つ系統でそれぞれホモ型変異が入っているので、この遺伝子が原因遺伝だろうと見当がつきます。<br>
+<a href = "nrsym1-web.png" target = "_blank"><img src = "nrsym1-web.png" height = "20%"></a>
+<a href = "nrsym1-1-web.png" target = "_blank"><img src = "nrsym1-1-web.png" height = "20%"></a>
+<a href = "nrsym1-2-web.png" target = "_blank"><img src = "nrsym1-2-web.png" height = "20%"></a><br>
+図をクリックすると大きくなります。<br>
+論文に掲載されている変異は、<i>nrsym1-2</i>遺伝子の場合で、第5染色体の28,147,403の位置のCからTへの置換変異で、283番目のバリンがイソロイシンに変わっています。<br>
+この変異が原因で、窒素源の多少による根粒数の増減の調節ができなくなっていると考えられるので、この遺伝子が窒素源の量による根粒数のコントロールに関与していることが推察されます。
+</ul>
+
       <h2>PEDに関する資料</h2>
       <ul>
        <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
