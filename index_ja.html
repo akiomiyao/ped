@@ -36,8 +36,8 @@
       <li>githubからpedスクリプトを取得すると、pedディレクトリの中にスクリプトのセットがダウンロードされます。
       <li>上記の場合は、ped.plがあるディレクトリにターゲットとコントロールのディレクトリを作成し、それぞれのディレクトリの中にreadというディレクトリを作成し、その中にそれぞれのfastqファイルを保存します。
       <li>コントロールを指定しない場合は、リファレンスのゲノム配列をコントロールとして多型(リファレンスゲノムに対する多型)を検出します。
-	  <li>ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
-	  <li>gz, bz2, xz等の拡張子のついた圧縮ファイルもそのまま解析できます。
+	  <li>オプションは、ped.plの半角スペースの後に,で区切ってまとめて指定します。,の後ろにスペースを入れることはできません。
+	  <li>gz, bz2, xz等の拡張子のついた圧縮された配列のファイルもそのまま解析できます。
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       <li>多型部分を増幅するプライマー配列も同時に出力されます。
       </ul>
@@ -61,17 +61,23 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
       <li>docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=DRR054198,ref=IRGSP1.0,wd=/work<br>
       Dockerのコンテナを用いて、イネのIRGSP1.0のリファレンスに対するコシヒカリ(DRR054198)の多型を検出します。Dockerの設定は、<a href = "#Docker_install">こちら</a>
-	  <li>perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
-	  長さが不揃いなRT-PCRの配列データを146塩基にそろえて、新型コロナウイルスのリファレンス配列に対する多型を検出します。
+      <li>perl download.pl accession=SRR11513115<br>
+      NCBIのSRAアーカイブよりアクセッション番号SRR11513115のfastqファイルをダウンロードします。<br>
+      SRR11513115/read のディレクトリにfastqファイルが納められます。 
+      <li>perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
+	  長さが不揃いなRT-PCRの配列データを146塩基にそろえて、新型コロナウイルスのリファレンス配列に対する多型を検出します。<br>
+      結果はSRR11513115のディレクトリに納められます。
+      <li>perl check_size.pl target=SRR11513115<br>
+      長さが不揃いな配列データの各リード長に対するリード数を出力します。最大リード長より少し短めにしてclippingの値とすると効率がよくなります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した自然突然変異の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
       ショートリードデータやリファレンスデータの入ったディレクトリを置く作業ディレクトリを/home/your_id/dataに指定する場合です。<br>
       指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=14<br>
-	  最大スレッド(プロセス)数を指定する場合。<br>
+	  最大スレッド(プロセス)数を指定する場合。通常は設定する必要はありませんが、同じコンピュータで同時に別の作業もする場合は、プロセスの上限を下げると影響が少なくなります。<br>
       通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。<br>
-      最大値はLinux OSのデフォルトファイルオープン上限(1024)に収まる14スレッドです。デフォルトは8スレッドとなっています。<br>
+      最大値はLinux OSのデフォルトファイルオープン上限(1024)に収まる14スレッドです。デフォルトはOSが認識するコア数となっています。<br>
       ※ perlのスレッドのモジュールはメモリーリークを起こすことがわかりました。通常は問題ないのですが、PEDのように大きなデータのソートを行う場合はエラーが発生する場合があります。<br>
       スレッドの代わりに、別プロセスで実行するようにしたところ問題が回避されることがわかりましたので、現在はスレッドの代わりにプロセスで実行するように変更しました。<br>
       オプション名は、正確にはprocessとすべきですが、混乱をさけるためthreadのままにしてあります。
@@ -79,9 +85,22 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
 	  <i>k</i>-mer法で解析する場合。デフォルトは双方向整列法。
+　　　<li>perl ped.pl ref=hg19<br>
+      リファレンスのみを指定すると、リファレンスだけが作られます。<br>
+      <li>mkdir corn<br>
+      cp ref_maize.fasta.gz corn<br>
+      perl ped.pl ref=corn,file=ref_maize.fasta.gz<br>
+      cornというディレクトリに置いたfastaファイル(圧縮可)からリファレンス用データセットを作ります。<br>
+      ped.plでの解析では、ref=cornと指定します。
       <li>オプションは,で区切って複数組み合わせて指定することができます。ただし、同じ名称のオプションの重複指定はできません。,の前後にスペースを入れることもできません。
 	  </ul>
-	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。
+     <li><b>結果の確認</b>
+     <ul>
+     <li><a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a>にアクセスするとゲノムブラウザが開きます。
+     <li>Genomeのプルダウンメニューからリファレンスのディレクトリにあるfastaファイルを読み込ませ、Tracksのプルダウンメニューよりtargetのディレクトリに出力されたvcfファイルを読み込ませると地図の上に多型が表示されます。<br>
+     詳しくは、ページの一番最初にある「解析例のショートカット」をご参照ください。
+     </ul>
+	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。(最近対応した新型コロナウイルスはもっと早いです。)
 	 <ul>
      <li>ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
         pedのディレクトリ内で、<br>
@@ -246,6 +265,8 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
   Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
   B73v4          Corn (Zea mays B73) RefGen v4
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+  Bsubtilis      Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
+  Ecoli          Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2        Lotus japonicus Gifu 
   Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
@@ -429,8 +450,7 @@ clipping=100で解析しています。この場合は、100塩基以上のリ�
               mv DRR056225_1.fastq DRR056225_2.fastq DRR056226_1.fastq DRR056226_2.fastq early/read<br>
               mv DRR056227_1.fastq DRR056227_2.fastq DRR056228_1.fastq DRR056228_2.fastq DRR056229_1.fastq DRR056229_2.fastq DRR056230_1.fastq DRR056230_2.fastq late/read<br>
            <li>イネのリファレンスデータを作り、bidirectional法で多型情報を取得する。<br>
-              perl mkref.pl IRGSP1.0<br>
-              perl bidirectional.pl early late IRGSP1.0
+              perl ped.pl target=early,control=late,ref=IRGSP1.0
            <li>イネの全配列長を1000当分して、各ブロックに存在する早生型、晩稲型で検出されたSNP座位数を調べて、晩稲型SNP数 - 早生型SNP数をプロットした。<br>
               <a href = "delta.png" target = "_blank"><img src = "delta.png" width = "10%"></a>
            <li>第6染色体の上腕部分に早生型で検出されるSNPが多く検出され、その後に晩稲型SNPが多く検出される領域が続いている。<br>
