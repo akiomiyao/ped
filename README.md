@@ -72,7 +72,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
 - Options,  
   thread=8 : specify the max thread (thread was changed to process in current version) number.  
-  Default is the number of logical core or 8.  
+  Default is the number of logical core.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
   clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
@@ -86,7 +86,13 @@ or
 ```
 git clone https://github.com/akiomiyao/ped.git  
 ```
-If you got scripts by clone command of git, update to newest version is very easy using pull command of git.  
+- If your machine do not have git program, install git from package.  
+```
+sudo apt install git (Ubontu)
+sudo yum install git (CentOS)
+sudo pkg install git (FreeBSD)
+```
+- If you got scripts by clone command of git, update to newest version is very easy using pull command of git.  
 ```
 git pull  
 ```
@@ -106,7 +112,7 @@ sudo pkg install curl (FreeBSD)
 ```
 
 ## Setup of Docker
-If docker is installed, ped can be run with docker command without preinstall of ped.  
+- If docker is installed, ped can be run with docker command without preinstall of ped.  
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ```
 curl -fsSL https://get.docker.com -o get-docker.sh
@@ -117,25 +123,25 @@ or
 sudo apt install docker
 sudo apt install docker.io
 ```
-To get or update the container,
+- To get or update the container,
 ```
 sudo docker pull akiomiyao/ped
 ```
-To check running containers,
+- To check running containers,
 ```
 sudo docker stats
 ```
-To kill running container,
+- To kill running container,
 ```
 sudo docker kill Container_ID
 ```
-If you want to run the docker container without sudo or su,
+- If you want to run the docker container without sudo or su,
 ```
 sudo usermod -a -G docker your_username
 ```
 After the new login, docker commands can be execute with your account.  
 
-- Currently, supporting reference genomes are  
+## Supporting reference genomes
 ```
   Reference Name  Description  
   Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
@@ -175,52 +181,6 @@ mkdir IRGSP1.0
 cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
 perl ped.pl ref=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz  
 ```
-## Downloading fastq file
-- If you want to analyze public data in SRA.  
-```
-perl download.pl accession=accession  
-```
-For example,  
-```
-perl download.pl accession=ERR3063486  
-perl download.pl accession=ERR3063487   
-```
-- If you want to analyze your private file,  
-```
-mkdir mydata1  
-mkdir mydata1/read  
-cp somewhere/mydata1.fastq mydata1/read  
-perl ped.pl target=mydata1,control=control,ref=reference
-```
-
-## Output files of PED in target directory
-   ERR3063487.sv is the list of structural variation.  
-   ERR3063487.bi.snp is the list of SNPs.  
-   Line marked 'M' is homozygous mutation in target against control.  
-   Line marked 'H' is heterozygous mutation in target against control.  
-  
-   ERR3063487.vcf is the vcf format results.  
-   ERR3063487.bi.primer and ERR3063487.sv.primer is the list of primers to detect SNPs and structural variations, respectively.  
-   Primer files are experimental. The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
-   
-- Our verify process counts reads containing polymorphic region.  
-  Basically, counts are from target and reference.  
-  Quality score in vcf file is fixed to 1000.  
-  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
-  Please check quality of polymorphism with depth (DP) in vcf file.  
-- If control is specified, counts from target and control will be listed.  
-  For example,  
-```
-perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235  
-```
-  returns 'M' or 'H' marked SNPs and structural variations of ERR3063487 which are absent in ERR3063486.  
-- To confirm the alignment for detected polymorphisms,  
-  perl search.pl target chr position  
-  For example,  
-```
-perl search.pl target=ERR3063487,chr=II,pos=948033  
-```
-Alignments will be selected by the search script.  
 
 ## Instruction for *k*-mer method
 - For example,  
