@@ -135,23 +135,6 @@ sudo usermod -a -G docker your_username
 ```
 After the new login, docker commands can be execute with your account.  
 
-## Making reference data by mkref.pl 
-- If you want to make reference data separately,  
-```
-perl mkref.pl reference  
-```
-For example,  
-```
-perl mkref.pl WBcel235  
-```
-- Directory WBcel235 for reference of *Caenorhabditis elegans* WBcel235 will be created.  
-If ped runs without argument, help and supported reference will be listed.  
-If you want to new reference, add the reference information to the config file.    
-Format is described in the comment in config file.  
-To make reference of human,  
-```
-perl mkref.pl hg38  
-```
 - Currently, supporting reference genomes are  
 ```
   Reference Name  Description  
@@ -180,16 +163,17 @@ perl mkref.pl hg38
   hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
   sacCer3        Saccharomyces cerevisiae (UCSC sacCer3)
 ```
-  If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.  
+  If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.
+  Specify only reference, ped.pl will make the reference data only.  
 - Otherwise, if you want to make reference data absent in the config file,  
 ```
-perl mkref.pl reference fasta_file_name  
+perl ped.pl ref=reference,file=fasta_file_name  
 ```
 For example,  
 ```
 mkdir IRGSP1.0  
 cp somewhere/IRGSP-1.0_genome.fasta.gz IRGSP1.0  
-perl mkref.pl IRGSP1.0  IRGSP-1.0_genome.fasta.gz  
+perl ped.pl ref=IRGSP1.0,file=IRGSP-1.0_genome.fasta.gz  
 ```
 ## Downloading fastq file
 - If you want to analyze public data in SRA.  

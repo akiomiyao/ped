@@ -25,12 +25,20 @@ $usage = '
  If you want to specify both the working directory and tmp directory,
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
+ If you want to make only reference data.
+ perl ped.pl ref=hg38
+
+ If you want to make the special reference data absent in config file.
+ mkdir refname
+ cp refname.fasta refname
+ perl ped.pl ref=refname,file=refname.fasta
+
  If you want to set maximum number of threads (processes),
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
  Because default setting of ulimit is 1024, 14 threads is maximun for
  default setting of OS. Thread function has been switched to making new process
- in current version.
+ in current version. Deault number is the number of CPU core.
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
@@ -136,17 +144,16 @@ sudo yum install curl (CentOS)
 
 if ($uname eq "Darwin"){
     $max_process = 1;
-}elsif ($processor >= 8 ){
-    $max_process = 8;
 }else{
     $max_process = $processor;
 }
 $max_process = 3 if $max_process eq "";
 $max_process = $thread if $thread ne "";
 $max_process = 14 if $max_process > 14;
+$log .= "# max process: $max_process\n";
 
 $refdir = "$wd/$ref";
-if ($tmpdir eq ""){
+if ($tmpdir eq "" and $target ne ""){
     system("mkdir $wd/$target/tmp") if ! -e "$wd/$target/tmp";
     $tmpdir = "$wd/$target/tmp";
 }
@@ -198,6 +205,32 @@ if ($ARGV[0] eq ""){
     exit;
 }
 
+if ($sub ne ""){
+    my $child = "$wd/$target/child/child.$$";
+    system("touch $child");
+    &$sub($arg);
+    system("rm $child");
+    exit;
+}else{
+    if (-e "$wd/$target/child"){
+	system("rm -r $wd/$target/child");
+    }
+    system("mkdir $wd/$target/child");
+}
+
+open(REPORT, ">> $wd/$target/$target.log");
+print REPORT "# Log of ped.pl
+$log";
+report("Job begin: $method method");
+
+if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
+    &mkRef;
+}
+
+if ($target eq ""){
+    &finish;
+}
+
 if ($chr[0] eq ""){
     opendir(REF, $refdir);
     foreach(readdir(REF)){
@@ -208,29 +241,6 @@ if ($chr[0] eq ""){
 	}
     }
     closedir(REF);
-}
-
-if ($sub ne ""){
-    my $child = "$wd/$target/child/child.$$";
-    system("touch $child");
-    &$sub($arg);
-    system("rm $child");
-    exit;
-}else{
-    if (-e "$wd/$target/child"){
-	system("rm $wd/$target/child/*");
-    }else{
-	system("mkdir $wd/$target/child");
-    }
-}
-
-open(REPORT, ">> $wd/$target/$target.log");
-print REPORT "# Log of ped.pl
-$log";
-report("Job begin: $method method");
-
-if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
-    &mkRef;
 }
 
 if (! -e "$wd/$target/sort_uniq/$target.sort_uniq.TTT.gz"){
@@ -247,47 +257,52 @@ if ($method eq "kmer"){
     &bidirectional;
 }
 
-if ($tmpdir eq "$wd/$target/tmp"){
-    system("rm -r $tmpdir");
-}else{
-    system("rm $tmpdir/*");
-}
-system("rm -r $wd/$target/child");
-system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
-$end_time = time;
-$elapsed_time = $end_time - $start_time;
-$hour = int($elapsed_time / 3600);
-$min = $elapsed_time % 3600;
-$sec = $min % 60;
-$min = int($min / 60);
-if ($hour >= 24){
-    $day = int($hour / 24);
-    $hour = $hour % 24;
-}
+&finish;
 
-if ($day > 1){
-    $etime .= "$day days ";
-}elsif($day == 1){
-    $etime .= "$day day ";
-}
-if ($hour > 1){
-    $etime .= "$hour hours ";
-}elsif($hour == 1){
-    $etime .= "$hour hour ";
-}
-if ($min > 1){
-    $etime .= "$min minutes ";
-}elsif($min == 1){
-    $etime .= "$min minute ";
-}
-if ($second > 1){
-    $etime .= "$second seconds ";
-}elsif($second == 1){
-    $etime .= "$second second ";
-}
-
-report("Job completed: $method method.
+sub finish{
+    if ($tmpdir eq "$wd/$target/tmp"){
+	system("rm -r $tmpdir");
+    }else{
+	system("rm $tmpdir/*");
+    }
+    system("rm -r $wd/$target/child");
+    system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
+    $end_time = time;
+    $elapsed_time = $end_time - $start_time;
+    $hour = int($elapsed_time / 3600);
+    $min = $elapsed_time % 3600;
+    $sec = $min % 60;
+    $min = int($min / 60);
+    if ($hour >= 24){
+	$day = int($hour / 24);
+	$hour = $hour % 24;
+    }
+    
+    if ($day > 1){
+	$etime .= "$day days ";
+    }elsif($day == 1){
+	$etime .= "$day day ";
+    }
+    if ($hour > 1){
+	$etime .= "$hour hours ";
+    }elsif($hour == 1){
+	$etime .= "$hour hour ";
+    }
+    if ($min > 1){
+	$etime .= "$min minutes ";
+    }elsif($min == 1){
+	$etime .= "$min minute ";
+    }
+    if ($second > 1){
+	$etime .= "$second seconds ";
+    }elsif($second == 1){
+	$etime .= "$second second ";
+    }
+    
+    report("Job completed: $method method.
 $etime ($elapsed_time seconds) elapsed.");
+    exit;
+}
 
 sub kmer{
     &countKmer($target);
@@ -804,13 +819,16 @@ sub countKmerSub{
 
 sub mkRef{
     my (@row, $i, $remote_file);
-    if (! -e "$wd/$ref"){
-	system("mkdir $wd/$ref");
-    }
+    system("mkdir $wd/$ref") if ! -e "$wd/$ref";
+    system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     if ($file eq ""){
 	@row = split('/', $curl{$ref});
 	$remote_file = $row[$#row];
 	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
+	    if ($curl{$ref} !~/^[h|f]/){
+		&report($curl{$ref});
+		&finish;
+	    }
 	    &report("Downloading $curl{$ref}");
 	    system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
 	    if ($ref eq "sacCer3"){
@@ -829,7 +847,7 @@ sub mkRef{
 }
 
 sub mkChrFromFile{
-    &report("Making chromosome file.");
+    &report("Making chromosome file for $ref.");
     my $out;
     chdir "$wd/$ref";
     die "$file is not found in $wd/$ref." if ! -e "$wd/$ref/$file";
@@ -1015,7 +1033,6 @@ sub mk20mer{
 }
 
 sub mk20{
-    system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     if (! -e "$wd/$ref/ref20_uniq.AAA.gz"){
 	&report("Making 20mer position file.");
 	foreach $i (@chr){
@@ -1054,7 +1071,7 @@ sub mk20{
 }
 
 sub mkChrFasta{
-    &report("Making fasta file of reference.");
+    &report("Making fasta file of reference. $ref.fasta");
     open(OUT, "> $wd/$ref/$ref.fasta");
     foreach $chr (@chr){
 	print OUT ">$chr\n";

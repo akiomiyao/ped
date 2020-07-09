@@ -41,7 +41,7 @@ GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musc
 GRCm38	chromosome	1	19	X	Y
 
 Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2
-Gmax275v2.0	wget	ftp://ftp.jgi-psf.org/pub/compgen/phytozome/v9.0/early_release/Gmax_275_Wm82.a2.v1/assembly/Gmax_275_v2.0.fa.gz
+Gmax275v2.0	wget	Login to https://phytozome.jgi.doe.gov/ , download Gmax_275_v2.0.fa.gz and save the gz file into Gmax275v2.0 directory.
 Gmax275v2.0	chromosome	1	20
 
 WBcel235	description	Caenorhabditis elegans WBcel235	
