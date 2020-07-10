@@ -10,15 +10,22 @@
 <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194146" target = "_blank">ERR194146</a>と
       <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194147" target = "_blank">ERR194147</a>の配列データを例に解析手順を紹介します。<br>
       <table>
-      <tr><td><a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a></td><td><ul><li>IGVでの表示例です。図をクリックすると拡大されます。
+      <tr><td><a href = "http://software.broadinstitute.org/software/igv/" target = "_blank">IGV Desktop</a><br><a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a><td>
+<td><a href = "https://igv.org/app/" target = "_blank">IGV Web Application</a><br><a href = "ERR194146.png" target = "_blank"><img src = "ERR194146.png" height = "30%"></a></td><td><ul><li>IGVでの表示例です。図をクリックすると拡大されます。
 <li>SNP以外に、<b>挿入・欠失変異も正確に検出できる</b>特徴があります。
-<li>変異部分を増幅する<b>プライマー対の配列</b>も得られます。</ul></td></tr>
+<li>変異部分を増幅する<b>プライマー対の配列</b>も得られます。
+<li>PEDでの解析結果例(vcf形式)<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf" target = "_blank">ERR194146.vcf</a>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf.idx" target = "_blank">ERR194146.vcf.idx</a><br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf" target = "_blank">ERR194147.vcf</a>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br></ul></td></tr>
       </table>
 
       <h2>Ubuntuのインストール</h2>
       <ul>
       <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。18.04.3LTSでも、20.4 LTSでもどちらでも構いません。
-      <li><a href = "https://linuxfan.info/ubuntu-18-04-install-guide" target = "_blank">Ubuntu 18.04 LTSインストールガイド【スクリーンショットつき解説】</a>あるいは<a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
       マルチスレッドで動作しますので、4コア、あるいは8コアのCPUを用いると早く結果が得られます。
       </ul>
       <h2>PEDのセットアップと解析例</h2>
@@ -74,7 +81,12 @@ IVGのウェブアプリ <a href = "https://igv.org/app/" target = "_blank">http
 <a href = "igsf3.png" target = "_blank"><img src = "igsf3.png" height = "10%"></a>
 <a href = "ERR194146.png" target = "_blank"><img src = "ERR194146.png" height = "10%"></a> 図をクリックすると大きくなります。<br>
       少し下にリンクされている解析済みvcfファイルをダウンロードします。<br>
-      プルダウンメニューのTracksの中の'Local file'からvcfファイルを指定します。サイズが大きいので取り込みには数分かかることもあります。<br>
+      プルダウンメニューのTracksの中の'Local file ...'からvcfファイルを指定します。サイズが大きいので取り込みには数分かかることもあります。<br>
+      Tracksのプルダウンメニューの'Platinum Genomes ...'から、NA12877あるいはNA12878を選ぶとイルミナ社の解析データGoogle Public datasetから提供されている多型マップが表示されます。<a href = "http://dx.doi.org/10.1101/gr.210500.116" target = "_blank">(Eberle, MA et al., 2017)</a><br>
+NA12877、NA12878は個体番号で、それぞれ配列アクセッション名のERR194146、ERR194147に対応します。<br>
+いずれかの染色体を選んで、+をクリックしてどんどん拡大していくと、多型部位が見えてきます。<br>
+
+イルミナ社の解析データは、6種類の異なる多型検出プログラムを組み合わせた複雑なパイプラインで得られましたが、PEDの場合は、上記の1行のped.plの実行コマンドで高精度の結果が得られることがわかります。
 <li>ご自分のコンピュータでIGVを走らせたい場合は、<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
 
 ERR194146.vcfとERR194147.vcfをメインの表示ボックスにドラッグすれば、ヒトの多型データが取り込まれます。<br>
@@ -91,11 +103,14 @@ ERR194146.vcfとERR194147.vcfをメインの表示ボックスにドラッグす
       <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf" target = "_blank">ERR194147.vcf</a><br>
       <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br>
       に解析済みデータを置きました。比較検証にご利用ください。
+      <li><b>注意点</b> IVGでは長い欠失や転座の情報をうまく表示できない場合があるので、転座と80塩基以上の欠失に関しては、vcfファイルに出力しないように設定しています。<br>
+大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。
       </ul>
       <h2>PEDに関する資料</h2>
       <ul>
        <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
        <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+       <li>Platinum Genomeの論文: <a href = "http://dx.doi.org/10.1101/gr.210500.116" target = "_blank">Eberle, MA et al. (2017) A reference data set of 5.4 million phased human variants validated by genetic inheritance from sequencing a three-generation 17-member pedigree. Genome Research 27: 157-164. doi:10.1101/gr.210500.116</a>
       </ul> 
       <h2>お問い合わせ</h2>
 〒305-8518<br>

@@ -67,9 +67,19 @@ ped/DRR099981/read<br>
       <h2>IVGブラウザによる結果の確認</h2>
       <ul>
       <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>
-<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
+<a href = "https://igv.org/app/" target = "_blank">IGV Web App</a>が便利です。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/IRGSP1.0.fasta" target = "_blank">IRGSP1.0.fasta</a>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/IRGSP1.0.fasta.fai" target = "_blank">IRGSP1.0.fasta.fai</a>をダウンロードします。<br>
+Genomesのプルダウンメニューより'Local File ...'を選んで、IRGSP1.0.fastaとIRGSP1.0.fasta.faiの両方を同時に選んでロードします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/transcripts.gff" target = "_blank">transcripts.gff</a>をダウンロードして、
+Tracksのプルダウンメニューより'Local File ...'を選んでロードします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/DRR099981.vcf" target = "_blank">DRR099981.vcf</a>をダウンロードして、
+Tracksのプルダウンメニューより'Local File ...'を選んでロードします。<br>
+個別の染色体を選んで拡大していくと多型が表示されます。<br>
+fastaの右端にある設定ボタンより、Three-frame Translateを選ぶとアミノ酸配列が表示されます。Reverseを選ぶと相補鎖側の配列が表示されます。
+<li>デスクトップ版は、<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/IRGSP1.0.fasta" target = "_blank">IRGSP1.0.fasta</a>をダウンロードします。<br>
-IVGを開いてGenomesのプルダウンメニューよりLoad Genome from Fileを選んで、IRGSP1.0.fastaをロードします。<br>
+IVGを開いてGenomesのプルダウンメニューよりLoad Genome from Fileを選んで、IRGSP1.0.fastaを選んでロードします。<br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/locus.gff" target = "_blank">locus.gff</a><br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/transcripts.gff" target = "_blank">transcripts.gff</a><br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200501CWSA/transcripts_exon.gff" target = "_blank">transcripts_exon.gff</a><br>
@@ -82,6 +92,9 @@ IVGを開いてGenomesのプルダウンメニューよりLoad Genome from File�
 多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
 ページのトップの<a href = "DRR099981.png" target = "_blank">画像</a>が表示例です。クリックすると大きくなります。<br>
 多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
+      <li><b>注意点</b> IVGでは長い欠失や転座の情報をうまく表示できない場合があるので、転座と80塩基以上の欠失に関しては、vcfファイルに出力しないように設定しています。<br>
+大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。
+
       </ul>
       <h2>PEDに関する資料</h2>
       <ul>
