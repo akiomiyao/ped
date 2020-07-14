@@ -117,3 +117,7 @@ Ecoli	chromosome	0	0	NC_000913.3
 Bsubtilis	description	Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
 Bsubtilis	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/045/GCF_000009045.1_ASM904v1/GCF_000009045.1_ASM904v1_genomic.fna.gz
 Bsubtilis	chromosome	0	0	NC_000964.3
+
+Vcholerae	description	Vibrio cholerae O1 biovar El Tor str. N16961
+Vcholerae	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/745/GCF_000006745.1_ASM674v1/GCF_000006745.1_ASM674v1_genomic.fna.gz
+Vcholerae	chromosome	0	0	NC_002505.1	NC_002506.1

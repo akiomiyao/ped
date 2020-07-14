@@ -67,7 +67,7 @@ $ENV{LANG} = "C";
 
 $start_time = time;
 
-if ($ARGV[0] =~ /target|ref/){
+if ($ARGV[0] =~ /target/){
     my @arg = split(',', $ARGV[0]);
     foreach (sort @arg){
 	next if $_ eq "";
@@ -75,6 +75,10 @@ if ($ARGV[0] =~ /target|ref/){
 	$$name = $val;
 	$log .= "# $name: $val\n";
     }
+}elsif ($ARGV[0] =~ /ref/){
+    my ($name, $val) = split('=', $ARGV[0]);
+    $$name = $val;
+    $log .= "# $name: $val\n";
 }elsif ($ARGV[1] ne ""){
     $target = $ARGV[0];
     $control = $ARGV[1];
@@ -206,21 +210,27 @@ if ($ARGV[0] eq ""){
 }
 
 if ($sub ne ""){
-    my $child = "$wd/$target/child/child.$$";
+    my $child = "$wd/child/child.$$";
     system("touch $child");
     &$sub($arg);
     system("rm $child");
     exit;
 }else{
-    if (-e "$wd/$target/child"){
-	system("rm -r $wd/$target/child");
+    if (-e "$wd/child"){
+	system("rm -r $wd/child");
     }
-    system("mkdir $wd/$target/child");
+    system("mkdir $wd/child");
 }
 
-open(REPORT, ">> $wd/$target/$target.log");
+if ($target ne ""){
+    open(REPORT, ">> $wd/$target/$target.log");
+}elsif($ref ne ""){
+    open(REPORT, ">> $wd/$ref/$ref.log");
+}
+
 print REPORT "# Log of ped.pl
 $log";
+
 report("Job begin: $method method");
 
 if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
@@ -262,10 +272,10 @@ if ($method eq "kmer"){
 sub finish{
     if ($tmpdir eq "$wd/$target/tmp"){
 	system("rm -r $tmpdir");
-    }else{
+    }elsif($tmpdir ne ""){
 	system("rm $tmpdir/*");
     }
-    system("rm -r $wd/$target/child");
+    system("rm -r $wd/child") if -e "$wd/child";
     system("rm -r $wd/$control/tmp") if -e "$wd/$control/tmp";
     $end_time = time;
     $elapsed_time = $end_time - $start_time;
@@ -963,7 +973,7 @@ sub mkUniq{
     my $funiq = "tmpout.$tag";
     my $count = 0;
     open($funiq, "|gzip -c > $wd/$ref/ref20_uniq.$tag.gz");
-    open($fin, "sort $sort_opt -T $tmpdir $wd/$ref/tmp/ref20.$tag.* |");
+    open($fin, "sort $sort_opt -T $wd/$ref/tmp $wd/$ref/tmp/ref20.$tag.* |");
     while(<$fin>){
 	chomp;
 	@row = split;
@@ -3000,7 +3010,7 @@ sub canFork{
 	my $count = 0;
 	$wait_time = 0.1 if $wait_time eq "";
 	select undef, undef, undef, $wait_time;
-	opendir(CDIR, "$wd/$target/child");
+	opendir(CDIR, "$wd/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
 		$count++;
@@ -3018,7 +3028,7 @@ sub waitChild{
     while(1){
 	my $count = 0;
 	sleep 1;
-	opendir(CDIR, "$wd/$target/child");
+	opendir(CDIR, "$wd/child");
 	foreach(readdir(CDIR)){
 	    if (/child/){
 		$count++;

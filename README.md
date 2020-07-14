@@ -162,6 +162,7 @@ After the new login, docker commands can be execute with your account.
   SScrofa11.1    Pig (Sus scrofa) Release-97
   TAIR10         Arabidopsis thaliana version TAIR10
   UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  Vcholerae      Vibrio cholerae O1 biovar El Tor str. N16961
   WBcel235       Caenorhabditis elegans WBcel235
   danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
   dmel626        Drosophila melanogaster
