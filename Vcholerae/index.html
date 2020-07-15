@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>PEDを用いたコレラ菌の多型解析例</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b>ここでは、<i>Vibrio cholerae</i> strain IDH-06641の多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
+      <table>
+      <tr><td><a href = "Vcholerae.png" target = "_blank"><img src = "Vcholerae.png" height = "20%"></a>
+<a href = "NC_002505.png" target = "_blank"><img src = "NC_002505.png" height = "20%"></a>
+<a href = "30kb.png" target = "_blank"><img src = "30kb.png" height = "20%"></a>
+<a href = "31bp.png" target = "_blank"><img src = "31bp.png" height = "20%"></a>
+</td><td><ul><li>図をクリックすると拡大されます。
+<li>SNP以外に、挿入・欠失変異も正確に検出できる特徴があります。
+<li>変異部分を増幅するプライマー対の配列も得られます。</ul></td></tr>
+      </table>
+
+      <h2>Ubuntuのインストール</h2>
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+      PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
+使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのSRAアーカイブから<a href = "https://trace.ncbi.nlm.nih.gov/Traces/study/?acc=DRP006168&o=acc_s%3Aa" target = "_blank">サンプル名 IDH-06641</a>のfastq形式のファイル(<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=DRR178327" target = "_blank">DRR178327</a>)をダウンロードします。<br>
+上記サンプル名のリンクをクリックして表示される25系統の配列を解析すれば、非O1、非O139コレラ菌のゲノム比較解析ができます。
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=DRR178327</pre>
+git pullで最新のスクリプトに更新されます。git pullは毎回行う必要はありませんが、プログラムが更新されている場合はpullしてください。<br>
+pedのディレクトリの中に、DRR178327の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
+アメリカからのダウンロードなので時間がかかります。<br>
+時々エラーが表示されますが自動的に再接続されるので、気長に待ちます。<br>
+<li>DDBJのDRAからもダウンロードできます。<br>
+<a href = "https://ddbj.nig.ac.jp/DRASearch/run?acc=DRR178327" target = "_blank">DDBJからのDRR178327のダウンロード</a><br>
+2行目のFASTQをクリックしてbz2形式で圧縮されたファイルをダウンロードします。ダウンロードしたファイルを DRR178327/read のディレクトリに置きます。解凍する必要はありません。<br>
+同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。<br>
+      <li>DRR178327の配列をコレラ菌の参照配列Vcholeraeにマップして多型を検出します。
+<pre>$ perl ped.pl target=DRR178327,ref=Vcholerae</pre>
+コレラ菌の参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
+解析が無事終わるとDRR178327のディレクトリの中に、DRR178327.vcfという結果をまとめたファイルができます。<br>
+各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
+      </ul>
+      <h2>Dockerでの解析</h2>
+      <ul>
+      <li>Dockerを用いれば、必要な時に設定済み実行環境を取り込んで解析できます。<br>
+      グーグルクラウド(GCP)やアマゾンウェブサービス(AWS)などのクラウドでの実行も可能です。
+      <li>Dockerのセットアップ<br>
+      $ sudo apt install docker<br>
+      $ sudo apt install docker.io<br>
+      <li>解析例<br>
+      $ sudo docker pull akiomiyao/ped<br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=DRR178327,wd=/work <br>
+      $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=DRR178327,ref=Vcholerae,wd=/work <br>
+      上記のコマンドをコピーしてターミナルウインドウにペーストして実行してください。<br>
+      </ul>
+      <h2>IVGブラウザによる結果の確認</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>
+<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200715VCOL/GCF_000006745.1_ASM674v1_genomic.fna" target = "_blank">GCF_000006745.1_ASM674v1_genomic.fna</a>をクリックしてダウンロードします。<br>
+IVGを開いてGenomesのプルダウンメニューよりLoad Genome from Fileを選んで、GCF_000006745.1_ASM674v1_genomic.fnaをロードします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200715VCOL/GCF_000006745.1_ASM674v1_genomic.gff.gz" target = "_blank">GCF_000006745.1_ASM674v1_genomic.gff.gz</a>
+をクリックしてダウンロードして、メインの表示ボックスの下のサブのボックスにドラッグします。<br>
+<a href = "DRR178327.vcf" target = "_blank">DRR178327.vcf(クリックしてダウンロードできます)</a><br>
+をメインの表示ボックスにドラッグすれば、<i>Vibrio cholerae</i> strain IDH-06641の多型データが取り込まれます。<br>
+各染色体の番号をクリックすると、染色体ごとの多型情報が表示されます。<br>
+興味のある部分をクリックすると、どんどん拡大されます。<br>
+多型をマウスで指すと詳細情報が表示されます。<br>
+多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
+ページのトップの<a href = "31bp.png" target = "_blank">画像</a>が表示例です。<br>
+多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
+      </ul>
+
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+    </body>
+</html>

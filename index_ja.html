@@ -10,13 +10,14 @@
 	  <a href = "https://akiomiyao.github.io/ped/hbv/index.html" target = "_blank">[B型肝炎ウイルス(HBV)]</a>
 	  <a href = "https://akiomiyao.github.io/ped/Ecoli/index.html" target = "_blank">[大腸菌]</a>
 	  <a href = "https://akiomiyao.github.io/ped/Bsubtilis/index.html" target = "_blank">[枯草菌]</a>
+	  <a href = "https://akiomiyao.github.io/ped/Vcholerae/index.html" target = "_blank">[コレラ菌]</a>
 	  <a href = "https://akiomiyao.github.io/ped/yeast/index.html" target = "_blank">[酵母]</a>
 	  <a href = "https://akiomiyao.github.io/ped/human/index.html" target = "_blank">[ヒト]</a>
 	  <a href = "https://akiomiyao.github.io/ped/rice/index.html" target = "_blank">[イネ]</a>
 	  <a href = "https://akiomiyao.github.io/ped/lotus/index.html" target = "_blank">[ミヤコグサ]</a>
 	  <a href = "https://akiomiyao.github.io/ped/arabidopsis/index.html" target = "_blank">[アラビドプシス]</a>
      <h2>PEDとは</h2>
-      <p>Polymorphic Edge Detection (PED)は、DNAの多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。非常に正確にSNPとindel等構造変異を得ることができます。
+      <p><a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic Edge Detection (PED)</a>は、DNAの多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。非常に正確にSNPとindel等構造変異を得ることができます。
       <p>次世代シーケンサーの配列を解析する場合、まず配列(ショートリード)をリファレンスゲノム配列にマップして、不一致の部分を抽出するのが一般的ですが、大部分のショートリードは多型を含まないため効率はあまりよくありません。
       <p>PEDでは、ショートリードから多型のエッジになる部分を早い段階で抽出するアルゴリズムで、これまでにない新しい手法です。
       <p>エッジを検出する方法として、<a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/1" target = "_blank">ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)</a>と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
@@ -25,7 +26,7 @@
       <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。<br>
 
 	<a name = "simple_tutorial">
-	<h2>ped.plでの多型検出 (簡単なチュートリアル)</h2>
+	<h2>ped.plでの多型検出</h2>
 	 <ul>
 	  <li>ped.plは、マルチスレッド(マルチプロセス)で高速に解析できます。Linuxをインストールした4コアや8コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
 	  時間はかかりますが、シングルコアや2コアのCPUでも動作します。<br>
@@ -41,6 +42,9 @@
 	  <li>初回の実行でリファレンスデータが見つからない場合、ダウンロードして自動作成します。
       <li>多型部分を増幅するプライマー配列も同時に出力されます。
       </ul>
+      <li>PED実行に必要な環境設定
+      Linux(Unix)OSのインストールされたコンピュータが必要です。Windows7で使えなくなった古いコンピュータでも、OSをLinuxに入れ替えれば動作します。
+      <ul>
       <li>Linux(Ubuntu)のインストール
       <ul>
       <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
@@ -54,9 +58,11 @@ $ sudo apt install curl
 $ sudo apt install git
 $ sudo apt install sra-toolkit
 $ git clone https://github.com/akiomiyao/ped.git</pre>
- 
-	  <li><b>実行例</b>
+      </ul>
+      </ul>
+	  <li><b>実行例</b><br>
 	  <ul>
+      <li>cd ped で、git cloneで作成されたpedのディレクトリに移って操作します。
 	  <li>perl ped.pl target=ERR194146,ref=hg38<br>
 	  ヒトのhg38のリファレンスに対して、イルミナのプラチナゲノム配列の一つERR194146(CEPH/UTAH家系の父親)の多型を検出します。
       <li>docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=DRR054198,ref=IRGSP1.0,wd=/work<br>
@@ -87,14 +93,15 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
 	  <i>k</i>-mer法で解析する場合。デフォルトは双方向整列法。
 　　　<li>perl ped.pl ref=hg19<br>
       リファレンスのみを指定すると、リファレンスだけが作られます。<br>
-      <li>mkdir corn<br>
+      <li>サポートされていないリファレンスゲノムのデータセットを作る場合。ここではcornというリファレンスセットを作る例を示します。<br>
+      mkdir corn<br>
       cp ref_maize.fasta.gz corn<br>
       perl ped.pl ref=corn,file=ref_maize.fasta.gz<br>
-      cornというディレクトリに置いたfastaファイル(圧縮可)からリファレンス用データセットを作ります。<br>
+      cornというディレクトリに置いたfastaファイル(圧縮可)からリファレンス用データセットができます。<br>
       ped.plでの解析では、ref=cornと指定します。
       <li>オプションは,で区切って複数組み合わせて指定することができます。ただし、同じ名称のオプションの重複指定はできません。,の前後にスペースを入れることもできません。
 	  </ul>
-     <li><b>結果の確認</b>
+     <li><b>IGVを用いた結果の確認</b>
      <ul>
      <li><a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a>にアクセスするとゲノムブラウザが開きます。
      <li>Genomeのプルダウンメニューからリファレンスのディレクトリにあるfastaファイルを読み込ませ、Tracksのプルダウンメニューよりtargetのディレクトリに出力されたvcfファイルを読み込ませると地図の上に多型が表示されます。<br>
@@ -102,7 +109,7 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
 大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。<br>
      詳しくは、ページの一番最初にある「解析例のショートカット」をご参照ください。
      </ul>
-	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。(最近対応した新型コロナウイルスはもっと早いです。)
+	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。(最近対応した<a href = "https://akiomiyao.github.io/ped/covid19/index.html" target = "_blank">新型コロナウイルス</a>はもっと早いです。)
 	 <ul>
      <li>ERR3063486とERR3063487のfastqファイルのダウンロードとディレクトリのセットアップは、<br>
         pedのディレクトリ内で、<br>
@@ -121,7 +128,7 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
         とすると、現在のカレントディレクトリ上に存在するERR3063486、ERR3063487、WBcel235のディレクトリ内のファイルが解析対象になります。<br>
         結果は、ターゲットのERR3063487のディレクトリに結果が出力されます。<br>
         
-	 <li>targetのディレクトリに以下の結果がまとめて出力されます。
+	 <li>target(上記の場合はERR3063487)のディレクトリに出力される結果ファイルのリスト
 	 <table>
 	 <tr><td>target.vcf</td><td>HとMでマークされた多型をvcf形式で出力されたファイル</td></tr>
 	 <tr><td>target.aln</td><td>双方向整列法による整列データ</td></tr>
@@ -140,7 +147,9 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
 	 <b>例</b><br>
      perl search.pl target=ERR3063487,chr=II,pos=948033<br>
      Dockerコマンドで実行する場合は、<br>
-	 docker run -v `pwd`:/work -w /ped -t akiomiyao/ped perl search.pl target=ERR3063487,chr=II,pos=948033,wd=/work
+	 docker run -v `pwd`:/work -w /ped -t akiomiyao/ped perl search.pl target=ERR3063487,chr=II,pos=948033,wd=/work<br>
+     vcfファイルでは挿入・欠失の開始位置が、多型の一つ前の塩基となっています。<br>
+     挿入・欠失のアラインメントをsearch.plで検索する場合は、posの値はvcf形式の結果ファイルの位置に1を加えた値にしてください。
 	 </ul>
 	 </ul>
 	 </ul>
@@ -282,6 +291,7 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
   SScrofa11.1    Pig (Sus scrofa) Release-97
   TAIR10         Arabidopsis thaliana version TAIR10
   UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  Vcholerae      Vibrio cholerae O1 biovar El Tor str. N16961
   WBcel235       Caenorhabditis elegans WBcel235
   danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
   dmel626        Drosophila melanogaster
@@ -460,6 +470,7 @@ clipping=100で解析しています。この場合は、100塩基以上のリ�
            <li>文献: <a href = "https://www.jstage.jst.go.jp/article/jsbbs/67/2/67_16096/_article" target = "_blank">Detection of novel QTLs qDTH4.5 and qDTH6.3, which confer late heading under short-day conditions, by SSR marker-based and QTL-seq analysis. Breed Sci. 67(2):101-109 (2017).</a>
            <li><a href = "https://github.com/akiomiyao/ped/wiki/Bulked-segrigant-analysis-of-rice" target = "_blank">英文リンク</a>
          </ul>
+    </ul>
     <h2>PEDに関する資料</h2>
       <ul>
        <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
