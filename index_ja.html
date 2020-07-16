@@ -11,6 +11,8 @@
 	  <a href = "https://akiomiyao.github.io/ped/Ecoli/index.html" target = "_blank">[大腸菌]</a>
 	  <a href = "https://akiomiyao.github.io/ped/Bsubtilis/index.html" target = "_blank">[枯草菌]</a>
 	  <a href = "https://akiomiyao.github.io/ped/Vcholerae/index.html" target = "_blank">[コレラ菌]</a>
+	  <a href = "https://akiomiyao.github.io/ped/kod1/index.html" target = "_blank">[高度好熱菌]</a>
+	  <a href = "https://akiomiyao.github.io/ped/koji/index.html" target = "_blank">[麹菌]</a>
 	  <a href = "https://akiomiyao.github.io/ped/yeast/index.html" target = "_blank">[酵母]</a>
 	  <a href = "https://akiomiyao.github.io/ped/human/index.html" target = "_blank">[ヒト]</a>
 	  <a href = "https://akiomiyao.github.io/ped/rice/index.html" target = "_blank">[イネ]</a>
@@ -105,8 +107,8 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
      <ul>
      <li><a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a>にアクセスするとゲノムブラウザが開きます。
      <li>Genomeのプルダウンメニューからリファレンスのディレクトリにあるfastaファイルを読み込ませ、Tracksのプルダウンメニューよりtargetのディレクトリに出力されたvcfファイルを読み込ませると地図の上に多型が表示されます。<br>
-      <li><b>注意点</b> IVGでは長い欠失や転座の情報をうまく表示できない場合があるので、転座と80塩基以上の欠失に関しては、vcfファイルに出力しないように設定しています。<br>
-大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。<br>
+     <li><b>注意点</b> IVGでは長い欠失や転座の情報をうまく表示できない場合があるので、転座と80塩基以上の欠失に関しては、vcfファイルに出力しないように設定しています。<br>
+     大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。<br>
      詳しくは、ページの一番最初にある「解析例のショートカット」をご参照ください。
      </ul>
 	 <li><b>デモ</b>　データのサイズが小さく数時間で結果が確認できますので、動作の確認には以下の線虫のデータセットをお勧めします。(最近対応した<a href = "https://akiomiyao.github.io/ped/covid19/index.html" target = "_blank">新型コロナウイルス</a>はもっと早いです。)
@@ -285,7 +287,9 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
   IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  KOD1           Thermococcus kodakarensis KOD1 (NC_006624.1)
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  RIB40          Aspergillus oryzae RIB40 (ASM18445v3) 
   SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
   SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   SScrofa11.1    Pig (Sus scrofa) Release-97

@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>PEDを用いた高度好熱菌の多型解析例</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b>ここでは、<i>Thermococcus kodakarensis</i> KOD1の多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
+      <table>
+      <tr><td><a href = "kod1.png" target = "_blank"><img src = "kod1.png" height = "20%"></a>
+<a href = "43bp.png" target = "_blank"><img src = "43bp.png" height = "20%"></a>
+
+</td><td><ul><li>図をクリックすると拡大されます。
+<li>SNP以外に、挿入・欠失変異も正確に検出できる特徴があります。
+<li>変異部分を増幅するプライマー対の配列も得られます。</ul></td></tr>
+      </table>
+
+      <h2>Ubuntuのインストール</h2>
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+      PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
+使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt update
+$ sudo apt install curl
+$ sudo apt install git
+$ sudo apt install sra-toolkit
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのSRAアーカイブから<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP110621&o=acc_s%3Aa" target = "_blank">サンプル名 ERS2739520</a>のfastq形式のファイル(<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR2796891" target = "_blank">ERR2796891</a>)をダウンロードします。<br>
+      <pre>$ cd ped
+$ git pull
+$ perl download.pl accession=ERR2796891</pre>
+git pullで最新のスクリプトに更新されます。git pullは毎回行う必要はありませんが、プログラムが更新されている場合はpullしてください。<br>
+pedのディレクトリの中に、ERR2796891の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
+      <li>ERR2796891の配列は長さが不ぞろいなので、check_length.plで事前の長さ別のリード数の分布を調べます。
+<pre>$ perl check_length.pl target=ERR2796891
+前半略
+90      244
+91      262
+92      357
+93      496
+94      688
+95      1034
+96      1509
+97      2035
+98      3119
+99      4317
+100     22298
+101     156098
+</pre>
+この場合は、101塩基が最長で、100塩基もそこそこあるので、clipping=100で計算します。
+      <li>ERR2796891の配列を高度好熱菌の参照配列KOD1にマップして多型を検出します。
+<pre>$ perl ped.pl target=ERR2796891,ref=KOD1,clipping=100</pre>
+高度好熱菌の参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
+解析が無事終わるとERR2796891のディレクトリの中に、ERR2796891.vcfという結果をまとめたファイルができます。<br>
+各座位に対してプライマーが作成可能な場合は、プライマーペアの配列データも出力されます。
+     <li><b>注意点</b> IVGでは長い欠失の情報をうまく表示できない場合があるので、80塩基以上の欠失に関しては、vcfファイルに出力しないように設定しています。<br>
+大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。<br>
+      </ul>
+      <h2>Dockerでの解析</h2>
+      <ul>
+      <li>Dockerを用いれば、必要な時に設定済み実行環境を取り込んで解析できます。<br>
+      グーグルクラウド(GCP)やアマゾンウェブサービス(AWS)などのクラウドでの実行も可能です。
+      <li>Dockerのセットアップ<br>
+      <pre>$ sudo apt install docker
+$ sudo apt install docker.io</pre>
+      <li>解析例<br>
+      <pre>$ sudo docker pull akiomiyao/ped<br>
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR2796891,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl check_length.pl target=ERR2796891,wd=/work
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR2796891,ref=KOD1,clipping=100,wd=/work</pre>
+      上記のコマンドをコピーしてターミナルウインドウにペーストして実行してください。<br>
+      </ul>
+      <h2>IVGブラウザによる結果の確認</h2>
+      <ul>
+      <li>Integrative Genomics Viewer (IVG) はBroad Instituteで作成されたゲノムブラウザです。<br>
+<a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a> からダウンロードできます。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200716KOD1/KOD1.fasta" target = "_blank">KOD1.fasta</a>をクリックしてダウンロードします。<br>
+IVGを開いてGenomesのプルダウンメニューよりLoad Genome from Fileを選んで、KOD1.fastaをロードします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200716KOD1/GCF_000009965.1_ASM996v1_genomic.gff" target = "_blank">GCF_000009965.1_ASM996v1_genomic.gff</a>
+をクリックしてダウンロードして、メインの表示ボックスにドラッグします。<br>
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200716KOD1/ERR2796891.vcf" target = "_blank">ERR2796891.vcf(クリックしてダウンロードできます)</a><br>
+をメインの表示ボックスにドラッグすれば、<i>Thermococcus kodakarensis</i> KOD1 strain ERS2739520の多型データが取り込まれます。<br>
+各染色体の番号をクリックすると、染色体ごとの多型情報が表示されます。<br>
+興味のある部分をクリックすると、どんどん拡大されます。<br>
+多型をマウスで指すと詳細情報が表示されます。<br>
+多型の種類や多型頻度、また、プライマー対の配列情報と増幅産物のサイズも表示されます。<br>
+ページのトップの<a href = "43bp.png" target = "_blank">画像</a>が表示例です。<br>
+多型の部分を増幅するプライマー配列も表示されます。至適配列が見つからない部位では表示されません。
+      </ul>
+
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+    </body>
+</html>
