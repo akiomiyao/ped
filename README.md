@@ -156,7 +156,9 @@ After the new login, docker commands can be execute with your account.
   IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
   IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
   IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  KOD1           Thermococcus kodakarensis KOD1 (NC_006624.1)
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  RIB40          Aspergillus oryzae RIB40 (ASM18445v3) 
   SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
   SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   SScrofa11.1    Pig (Sus scrofa) Release-97

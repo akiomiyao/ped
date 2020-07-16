@@ -121,3 +121,11 @@ Bsubtilis	chromosome	0	0	NC_000964.3
 Vcholerae	description	Vibrio cholerae O1 biovar El Tor str. N16961
 Vcholerae	wget	https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/006/745/GCF_000006745.1_ASM674v1/GCF_000006745.1_ASM674v1_genomic.fna.gz
 Vcholerae	chromosome	0	0	NC_002505.1	NC_002506.1
+
+KOD1	description	Thermococcus kodakarensis KOD1 (NC_006624.1)
+KOD1	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/009/965/GCF_000009965.1_ASM996v1/GCF_000009965.1_ASM996v1_genomic.fna.gz
+KOD1	chromosome	0	0	NC_006624.1
+
+RIB40	description	Aspergillus oryzae RIB40 (ASM18445v3) 
+RIB40	wget	ftp://ftp.ensemblgenomes.org/pub/fungi/release-47/fasta/aspergillus_oryzae/dna/Aspergillus_oryzae.ASM18445v3.dna.toplevel.fa.gz
+RIB40	chromosome	0	0	NOP	1	2	3	4	5	6	7	8	AP007160	AP007177	AP007156
