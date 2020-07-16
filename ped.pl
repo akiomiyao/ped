@@ -1084,6 +1084,7 @@ sub mkChrFasta{
     &report("Making fasta file of reference. $ref.fasta");
     open(OUT, "> $wd/$ref/$ref.fasta");
     foreach $chr (@chr){
+	next if $chr eq "NOP";
 	print OUT ">$chr\n";
 	open(IN, "$wd/$ref/chr$chr");
 	while(<IN>){
