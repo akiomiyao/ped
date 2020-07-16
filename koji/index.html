@@ -18,9 +18,10 @@
 <li>変異部分を増幅するプライマー対の配列も得られます。</ul></td></tr>
       </table>
 
-      <h2>Ubuntuのインストール</h2>
+      <h2>Linux OS (Ubuntu)のインストール</h2>
       <ul>
-      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li>PEDはUnix系のOSで動作するため、ここでは動作が確認されているUbuntuをインストールします。<br>
+      <a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
       <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
       PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
 使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
@@ -40,6 +41,10 @@ $ git pull
 $ perl download.pl accession=DRR163504</pre>
 git pullで最新のスクリプトに更新されます。git pullは毎回行う必要はありませんが、プログラムが更新されている場合はpullしてください。<br>
 pedのディレクトリの中に、DRR163504の名称のディレクトリができて、その中のreadというディレクトリの中にfastqファイルがダウンロードされます。<br>
+       <li>DDBJのDRAからもダウンロードできます。<br>
+<a href = "https://ddbj.nig.ac.jp/DRASearch/run?acc=DRR163504" target = "_blank">DDBJからのDRR163504のダウンロードページ</a><br>
+2行目のFASTQをクリックしてbz2形式で圧縮されたファイルをダウンロードします。ダウンロードしたファイルを DRR163504/read のディレクトリに置きます。解凍する必要はありません。<br>
+同様の構造の任意の名前のディレクトリを作れば手持ちのデータの解析ができます。<br>
       <li>DRR163504の配列を麹菌の参照配列RIB40にマップして多型を検出します。
 <pre>$ perl ped.pl target=DRR163504,ref=RIB40</pre>
 麹菌の参照配列は設定済みなので自動的にダウンロードして解析用データを作成して一連の作業が自動的に進みます。<br>
