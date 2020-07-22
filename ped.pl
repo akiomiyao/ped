@@ -3018,7 +3018,11 @@ sub canFork{
 	    }
 	}
 	closedir(CDIR);
-	$wait_time = 1 if $count > $max_process;
+	if ($count > $max_process){
+	    $wait_time = 1;
+	}else{
+	    $wait_time = 0.1;
+	}
 	if ($max_process > $count){
 	    return 1;
 	}
