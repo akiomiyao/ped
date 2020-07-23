@@ -10,10 +10,19 @@
     <ul>
     <li><b>Install PED into linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
     $ sudo apt update<br>
+    $ sudo apt upgrade<br>
     $ sudo apt install curl<br>
     $ sudo apt install git<br>
     $ sudo apt install sra-toolkit<br>
     $ git clone https://github.com/akiomiyao/ped.git<br>
+    <ul>
+    <li>If installing of sra-toolkit is failed, download file from NCBI site.<br>
+    URL: <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
+    $ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz<br>
+$ cd xvfz sratoolkit.2.x.x-ubuntu64/bin<br>
+$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump<br>
+.x.x is version number, will be changed with update by NCBI.
+</ul>
     <li><b>Download fastq sequence data from NCBI sequence read archive</b><br>
     $ cd ped<br>
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11513115" target = "_blank">SRR11513115</a><br>

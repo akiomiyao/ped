@@ -32,10 +32,17 @@ PEDは解析時間をできるだけ短くするため、CPUの限界近くま�
       <ul>
       <li>必要なソフトをダウンロードとインストールを行います。
       <pre>$ sudo apt update
+$ sudo apt upgrade
 $ sudo apt install curl
 $ sudo apt install git
 $ sudo apt install sra-toolkit
 $ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>Ubuntuのバージョンによっては、sra-toolkitのインストールに失敗することがあります。<br>
+その場合は、 <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>からUbuntu Linux 64 bit architectureのToolkitをダウンロードします。<br>
+      <pre>$ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz
+$ cd xvfz sratoolkit.2.x.x-ubuntu64/bin
+$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump</pre>
+      tar コマンドで展開したfastq-dumpを/usr/local/binに移せば大丈夫です。-orig以下の名前は削って、fastq-dumpという名称にして移します。<br>
       <li>NCBIのSRAアーカイブからヒトのプラチナゲノム配列のfastq形式のファイル(ERR194146とERR194147)をダウンロードします。
       <pre>$ cd ped
 $ git pull
