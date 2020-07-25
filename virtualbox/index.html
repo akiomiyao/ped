@@ -4,7 +4,7 @@
     <link rel = "stylesheet" href = "../default.css">
   <head>
     <body>
-      <h1>VirtualBoxを用いたWindows(Mac)のコンピュータでの解析</h1>
+      <h1>VirtualBoxを用いたWindows(Mac)のコンピュータでの解析(設定法)</h1>
       <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
       <b>Linuxの走るコンピュータを、すぐには準備できないかもしれません。<br>
       VirtualBoxは、現在オラクルが提供している仮想化ソフトウェアで、WindowsやマッキントッシュのOS上でLinuxを動かすことができます。</b><br><br>
@@ -19,7 +19,7 @@
 
       <h2>インストール</h2>
       <ul>
-      <li><a href = "https://www.virtualbox.org/wiki/Downloads" target = "_blank">VirtualBoxのダウンロードサイト</a>よりWindowsあるいはOS Xホスト用ののファイルをダウンロードします。
+      <li><a href = "https://www.virtualbox.org/wiki/Downloads" target = "_blank">VirtualBoxのダウンロードサイト</a>よりWindowsあるいはOS Xホスト用のファイルをダウンロードします。
       <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
       <li>BIOSのVirtualization TechnologyがEnabeledになっている必要があります。<br>
       パソコンをF2やF10(機種によって違います)キーを押しながら再起動して、BIOS画面を表示させて、<br>
@@ -28,7 +28,7 @@
       <a href = "bios.JPG" target = "_blank"><img src = "bios.JPG" height = "20%"></a>
       <li>インストールしたOracle VM virtualBoxマネージャーを起動して、新規をクリックします。<br>
       <a href = "new.png" target = "_blank"><img src = "new.png" height = "50%"></a><br>
-      名前にUbuntuと入れると、タイプ:Linux、バージョン: Ubunty(64-bit)が自動的に選択されるようです。違っている場合は、図のように選択してください。
+      名前にUbuntuと入れると、タイプ: Linux、バージョン: Ubuntu(64-bit)が自動的に選択されるようです。違っている場合は、図のように選択してください。
       <li>メモリサイズは4Gバイトにします。<br>
       <a href = "memory.png" target = "_blank"><img src = "memory.png" height = "50%"></a><br>
       <li>「仮想ハードディスクを作成する」を選んで作成をクリックします。<br>
@@ -39,13 +39,13 @@
       <a href = "disk_size.png" target = "_blank"><img src = "disk_size.png" height = "50%"></a><br>
       <li>サイズはウイルスやバクテリアの解析なら50Gバイトあれば充分です。ヒトなどの大きなゲノムサイズでは数100GBは必要です。<br>
       <a href = "disk_size2.png" target = "_blank"><img src = "disk_size2.png" height = "50%"></a><br>
-      <li>光学ドライブのリンクをクリックして、ubuntu-ja-20.04-desktop-amd64.isoを指定します。<br>
+      <li>光学ドライブのリンクをクリックして、事前にダウンロードしておいたubuntu-ja-20.04-desktop-amd64.isoを指定します。<br>
       <a href = "select_iso.png" target = "_blank"><img src = "select_iso.png" height = "50%"></a><br>
       <li>起動をクリックすると、isoファイルが読み込まれてインストール画面が表示されます。<br>
       Ubuntuをインストールをクリックして、指示に従い、すべてデフォルトでインストールします。<br>
       <a href = "install.png" target = "_blank"><img src = "install.png" height = "50%"></a><br>
       <li>インストールが完了したら、設定したパスワードでログインします。<br>
-      左下のアプリケーションを起動するのボタンをクリックして、アプリをすべて表示にしてページを繰って「端末」をクリックして起動します。
+      左下のアプリケーションを起動するのボタンをクリックして、アプリをすべて表示にして、ページを繰って「端末」をクリックして起動します。
       <a href = "VirtualBox_Ubuntu.png" target = "_blank"><img src = "VirtualBox_Ubuntu.png" height = "50%"></a><br>
       <li>開いた端末で、必要なソフトをダウンロードとインストールを行います。
  <pre>$ sudo apt update
