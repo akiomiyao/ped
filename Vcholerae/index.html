@@ -37,7 +37,7 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
       <li>Ubuntuのバージョンによっては、sra-toolkitのインストールに失敗することがあります。<br>
 その場合は、 <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>からUbuntu Linux 64 bit architectureのToolkitをダウンロードします。<br>
       <pre>$ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz
-$ cd xvfz sratoolkit.2.x.x-ubuntu64/bin
+$ cd sratoolkit.2.x.x-ubuntu64/bin
 $ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump</pre>
       tar コマンドで展開したfastq-dumpを/usr/local/binに移せば大丈夫です。-orig以下の名前は削って、fastq-dumpという名称にして移します。
       <li>NCBIのSRAアーカイブから<a href = "https://trace.ncbi.nlm.nih.gov/Traces/study/?acc=DRP006168&o=acc_s%3Aa" target = "_blank">サンプル名 IDH-06641</a>のfastq形式のファイル(<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=DRR178327" target = "_blank">DRR178327</a>)をダウンロードします。<br>
