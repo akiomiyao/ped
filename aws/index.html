@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>クラウドでのPEDを用いた解析例</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b>クラウドのコンピュータを時間借りすれば、コンピュータを整備しなくても次世代シーケンサからの配列の解析ができます。<br>
+      ここでは、Amazon Web Service (AWS)のクラウドでの実行例を紹介します。</b>
+      <h2>準備</h2>
+      クラウドにログインするためにGit Bash、ファイルの転送にWinSCPが必要です。
+      <ul>
+      <li><a href = "https://gitforwindows.org/" target = "_blank">https://gitforwindows.org/</a>よりインストーラーをダウンロードします。
+      <li>インストーラを起動して、すべてデフォルトでインストールします。GitHubでのバージョン管理ができますが、ここでは、一緒にインストールされるGit Bashを使ってクラウドのコンピュータへの接続を行います。
+      <li><a href = "https://winscp.net/eng/download.php" target = "_blank">https://winscp.net/eng/download.php</a>よりWinscpのインストーラをダウンロードします。<br>
+      <li>インストーラを起動して、こちらもデフォルトの設定でインストールします。
+      </ul>
+      <h2>AWSでの解析</h2>
+      <ul>
+      <li><a href = "https://aws.amazon.com/jp/" target = "_blank">https://aws.amazon.com/jp/</a>のページを開き、ユーザ登録を行います。ユーザIDとパスワードは忘れないように控えておきます。<br>
+      コンソールにサインインをクリックすると「新しいAWSアカウント作成」のボタンが現れます。<br>
+      図をクリックすると大きくなります。<br>
+      <a href = "aws.png" target = "_blank"><img src = "aws.png" height = "50%"></a><br><br>
+      <li>コンソールにログインをクリックして、登録したIDとパスワードでログインします。<br>
+      <a href = "login.png" target = "_blank"><img src = "login.png" height = "50%"></a><br><br>
+      <li>「仮想マシンを起動する」EC2を使用、を選んで作成をクリックします。<br>
+      リンクが見つからない場合は検索ボックスにEC2と入力して検索すると現れます。<br>
+      <a href = "ec2.png" target = "_blank"><img src = "ec2.png" height = "50%"></a><br><br>
+      <li>ここでは、一番上のAmazon Linux 2 AMI (HVM), SSD Volume Type 64ビット (x86)を選んでみました。<br>
+      <a href = "console.png" target = "_blank"><img src = "console.png" height = "50%"></a><br><br>
+      <li>今回は、無料利用枠の対象の t2.micro を選びました。<br>
+      大きなゲノムサイズの生物の解析は計算量が多く時間がかかるので、サイズに合わせて8コアなど、複数コアのマシンを選択します。<br>
+      <a href = "select_instance.png" target = "_blank"><img src = "select_instance.png" height = "50%"></a><br><br>
+      <li>インスタンスの設定は、そのままで大丈夫です。<br>
+      <a href = "set_instance.png" target = "_blank"><img src = "set_instance.png" height = "50%"></a><br><br>
+      <li>ストレージ無料利用枠の30GBのままにします。必要に応じて追加します。<br>
+      <a href = "set_strage.png" target = "_blank"><img src = "set_strage.png" height = "50%"></a><br><br>
+      <li>セキュリティグループの設定では「ソース」のプルダウンをマイIPを指定します。<br>
+      デフォルトのままだと、世界中の誰からでも接続できます。必要に応じて接続可能なIPを追加します。<br>
+      自宅等で固定のIPアドレスを持っていな場合は、仕方がないので、0.0.0.0を指定します。<br>
+      誰でも接続できますが、キーを持っていないとログインできません。<br>
+      <a href = "security.png" target = "_blank"><img src = "security.png" height = "50%"></a><br><br>
+      <li>確認画面で一通り確認して、起動ボタンをクリックします。<br>
+      <a href = "final.png" target = "_blank"><img src = "final.png" height = "50%"></a><br><br>
+      <li>クラウド上で起動したマシンに接続するためのキーを作成します。<br>
+      ここでは、aws_testという名前で作ってみました。<br>
+      <a href = "make_key.png" target = "_blank"><img src = "make_key.png" height = "50%"></a><br><br>
+      <li>キーを作るとインスタンス作成中の画面に移ります。<br>
+      作成ログの表示をクリックして、作成完了後にログインします。<br>
+      <a href = "making_instance.png" target = "_blank"><img src = "making_instance.png" height = "50%"></a><br><br>
+      <li>作成後にコンソールを表示させて、割り当てられたIPアドレスを調べます。<br>
+      今回は、名称が ec2-3-112-30-161.ap-northeast-1.compute.amazonaws.com でIPアドレスは、3.112.30.161 でした。
+      <a href = "ec2_console.png" target = "_blank"><img src = "ec2_console.png" height = "50%"></a><br><br>
+      <li>インスタンスを選んで接続をクリックすると、接続の仕方が表示されます。<br>
+      説明では、Puttyを用いた接続方法が記載されていますが、ここでは、準備でインストールしたGit Bashで接続します。
+      <a href = "connect.png" target = "_blank"><img src = "connect.png" height = "50%"></a><br><br>
+      <li>Git Bashを起動して、sshの接続例をペーストして実行するとログインできます。<br>
+      SSLのキーはDownloadsにセーブされていますので、Git BashでDownloadsのディレクトリに移ってから実行しています。<br>
+      <a href = "ssh.png" target = "_blank"><img src = "ssh.png" height = "30%"></a><br><br>
+      ログインして、プロンプトが表示されたら、<br>
+      <pre>$ sudo yum update
+$ sudo yum install git
+$ curl -O https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-centos_linux64.tar.gz
+$ tar xvfz sratoolkit.2.10.8-centos_linux64.tar.gz
+$ mkdir bin
+$ mv sratoolkit.2.10.8-centos_linux64/bin/fastq-dump-orig.2.10.8 bin/fastq-dump
+$ git clone https://github.com/akiomiyao/ped.git
+$ cd ped
+$ perl download.pl accession=SRR11513115
+$ perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146
+</pre>
+を順に実行します。sra-toolkitやfastq-dumpのバージョン番号は変化するので、<br>
+<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>でリンクの位置を確認してください。<br>
+AWS LinuxはCentOS系ですので、CentOS Linux 64 bit architectureのファイルをダウンロードします。
+      <li>PEDの結果は5分ほどで得られます。以下は、クラウドでのPEDの実行結果です。<br>
+      <a href = "ped.png" target = "_blank"><img src = "ped.png" height = "50%"></a><br>
+      <a href = "ped_result.png" target = "_blank"><img src = "ped_result.png" height = "50%"></a><br><br>
+      <li>WinSCPでクラウド側に接続します。<br>
+      IPアドレス、ユーザ名を入力して、設定をクリックします。<br>
+      <a href = "winscp1.png" target = "_blank"><img src = "winscp1.png" height = "50%"></a><br><br>
+      <li>設定をクリックしてSSHの認証をクリックします。<br>
+      ダウンロードした秘密鍵を指定すると確認画面が表示されます。<br>
+      WinSCPはPutty形式のキーにしか対応していないので、キー形式を変換してから指定します。<br>
+      <a href = "winscp2.png" target = "_blank"><img src = "winscp2.png" height = "50%"></a><br><br>
+      <li>PEDの結果のディレクトリに移り、vcfファイルをダウンロードします。<br>
+      <a href = "winscp3.png" target = "_blank"><img src = "winscp3.png" height = "50%"></a><br><br>
+      <li>すべて解析して結果が回収できたら、Git Bash画面でlogoutと入力して、接続を切ります。<br>
+      
+      <a href = "finish.png" target = "_blank"><img src = "finish.png" height = "50%"></a><br><br>
+     以上が、AWSでの解析の一連の作業となります。<br>
+     AWSコンソールより停止を指定し、停止後、終了をクリックしてインスタンスを破棄します。<br>
+     今回は、無料利用枠での作業でしたが、有料の場合、インスタンスが残っているとその分課金されますので、解析後に破棄した方が経済的です。
+      </ul>
+
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+    </body>
+</html>
