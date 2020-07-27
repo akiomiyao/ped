@@ -357,7 +357,7 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
        <li>新型コロナウイルスのNGSデータからの多型検出
 <pre>cd ped
 perl download.pl accession=SRR11542243
-perl ped.pl target=SRR11542243,ref=COVID19,clipping=100
+perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
 
 miyao:~/ped/SRR11542243$ egrep 'H|M' SRR11542243.bi.snp
 1       6312    C       A       50      0       0       68      M
@@ -430,7 +430,7 @@ TCGCAATGGCTTGTCTTGTAGGCTTGATGTGGCTCAGCTACTTCATTGCTTCTTTCAGACTGTTTGCGCGTACGCGTTCC
 
 
 perl download.pl accession=SRR11542244
-perl ped.pl target=SRR11542244,ref=COVID19,clipping=100
+perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100
 
 miyao:~/ped/SRR11542244$ egrep 'H|M' SRR11542244.bi.snp
 1       9507    A       T       50      0       17      13      H
