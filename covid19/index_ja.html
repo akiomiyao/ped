@@ -1,21 +1,26 @@
 <html>
   <head>
+    <meta charset = "utf-8">
     <link rel = "stylesheet" href = "../default.css">
   </head>
   <body>
     <h1>PEDを用いたSARS-CoV-2 (COVID-19)の変異検出</h1>
-    <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br>
+    <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+    NCBI（米国立バイオテクノロジー情報センター）で塩基配列情報が公開させていますが、COVID-19に感染した患者から得られたウイルスの配列も公開されています。<br>
+    例 <a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP121228&f=platform_s%3An%3Aillumina%3Ac&o=acc_s%3Aa" target = "_blank">[イギリスの患者の配列のリンク]</a>
     <ul>
-    <li>図をクリックすると大きくなります。<br>
+    <li>配列をPEDで解析すると以下の図のように患者から得られたウイルスのゲノム上に起きた変異を見ることができます。図をクリックすると大きくなります。<br>
     <a href = "SARS-CoV-2.png" target = "_blank"><img src = "SARS-CoV-2.png" width = "30%"></a>
     </ul>
     <h2>Ubuntuのインストール</h2>
+解析にはLinux(Unix)のインストールされたコンピュータが必要です。以下は、Linux(Ubuntu)のインストールの手引きです。
       <ul>
       <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
       <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
       PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
 使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
-マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。
+マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。<br>
+<a href = "../virtualbox/index.html" target = "_blank">VirtualBoxを用いてWindowsマシンで解析する方法</a>や、<a href = "../aws/index.html" target = "_blank">クラウドで実行する方法</a>もあります。
       </ul>
       <h2>PEDのセットアップと解析例</h2>
       <ul>
