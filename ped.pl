@@ -315,8 +315,8 @@ $etime ($elapsed_time seconds) elapsed.");
 }
 
 sub kmer{
-#    &countKmer($target);
-#    &countKmer($control);
+    &countKmer($target);
+    &countKmer($control);
     &joinKmer;
     if($ref eq ""){
 	system("cat $tmpdir/$target.snp.* > $wd/$target/$target.kmer.snp");
