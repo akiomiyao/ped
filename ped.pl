@@ -315,8 +315,8 @@ $etime ($elapsed_time seconds) elapsed.");
 }
 
 sub kmer{
-    &countKmer($target);
-    &countKmer($control);
+#    &countKmer($target);
+#    &countKmer($control);
     &joinKmer;
     if($ref eq ""){
 	system("cat $tmpdir/$target.snp.* > $wd/$target/$target.kmer.snp");
@@ -598,7 +598,7 @@ sub mapKmerSub{
     }
     close($fin);
     open($fout, "> $tmpdir/$target.map.$tag");
-    open($fref, "$zcat $wd/$ref/ref20_uniq.$tag.gz|");
+    open($fref, "zcat $wd/$ref/ref20_uniq.$tag.gz|");
     while(<$fref>){
 	chomp;
 	@row = split;
@@ -618,7 +618,7 @@ sub mapKmerSub{
 		$seq = complement($seq);
 		$nuc = complement($nuc);
 		if ($nuc eq $dat[0]){
-		    print $fout "$row[1]\t$pos\t$seq\t$nuc\t$dat[0]\t$dat[1]\t$row[3]\t$dat[2]\t$dat[3]\t$dat[4]\t$dat[5]\t$dat[6]\t$dat[7]\t$dat[8]\t$dat[9]\n";
+		    print $fout "$row[1]\t$pos\t$seq\t$nuc\t$dat[0]\t$dat[1]\t$row[3]\t$dat[5]\t$dat[4]\t$dat[3]\t$dat[2]\t$dat[9]\t$dat[8]\t$dat[7]\t$dat[6]\n";
 		}
 	    }
 	}
@@ -636,7 +636,7 @@ sub joinKmer{
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
 		&report("Detection SNPs between $target and $control. $tag");
-		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
+		system("perl $cwd/ped.pl target=$target,control=$control,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
     }
@@ -648,8 +648,8 @@ sub joinKmerSub{
     $cutoff = 10 if $cutoff eq "";
     my $fin = "join.in.$tag";
     my $fout = "join.out.$tag";
-    system("$zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
-    system("$zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
+    system("zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
+    system("zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
 
     open($fout, "> $tmpdir/$target.snp.$tag");
     open($fin, "join $tmpdir/$control.lbc.$tag $tmpdir/$target.lbc.$tag |");
@@ -780,7 +780,8 @@ sub countKmerMerge{
     print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
     close($fin);
     close($fout);
-    system("gzip $wd/$target/lbc/$target.lbc.$parent && rm $tmpdir/$parent.count");
+#    system("gzip $wd/$target/lbc/$target.lbc.$parent && rm $tmpdir/$parent.count");
+    system("gzip $wd/$target/lbc/$target.lbc.$parent");
 }
 
 sub countKmerSub{
@@ -1461,7 +1462,7 @@ sub bi2vcf{
 	}
 	
 	next if $reference eq $alt or $alt eq "|";
-	next if $alt !~ /[ACGT]/;
+#	next if $alt !~ /[ACGT]/;
 	$dp = $row[9] + $row[10];
 	next if $dp == 0;
 	$af = int(1000 * $row[10]/$dp)/1000;
@@ -1488,8 +1489,8 @@ sub bi2vcf{
     close(ALN);
     my $timestamp = `date '+%Y-%m-%d %H:%M:%S %z'`;
     chomp($timestamp);
-    open(OUT, "> $wd/$target/$target.vcf");
-    print OUT "##fileformat=VCFv4.2
+
+    my $header = "##fileformat=VCFv4.2
 ##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
 ##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
@@ -1510,9 +1511,13 @@ sub bi2vcf{
 ##source=<PROGRAM=ped.pl,Method=\"Bidirectional method\",target=$target,control=$control,reference=$ref>
 ##created=<TIMESTAMP=\"$timestamp\">
 #CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
+
+
+    open(OUT, "> $wd/$target/$target.full.vcf");
+    print OUT $header;
     close(OUT);
 
-    open(OUT, ">> $wd/$target/$target.vcf");
+    open(OUT, ">> $wd/$target/$target.full.vcf");
     open(IN, "sort $sort_opt -T $wd/$target $wd/$target/$target.tmp |");
     while(<IN>){
 	@row = split;
@@ -1523,6 +1528,17 @@ sub bi2vcf{
     }
     close(IN);
     close(OUT);
+    
+    open(OUT, "> $wd/$target/$target.vcf");
+    open(IN, "$wd/$target/$target.full.vcf");
+    while(<IN>){
+	next if /<DEL>|<INS>|<INV>/;
+	print OUT $_;
+    }
+    close(IN);
+    close(OUT);
+
+
     system("rm $wd/$target/$target.tmp");
 }
 
