@@ -1391,8 +1391,10 @@ sub bi2vcf{
 	    $info .= ";PL=$row[9];PR=$row[10];PCRLEN=$row[11]";
 	}
 	
-	if (/M|H/){
+	if (/M/){
 	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	}elsif(/H/){
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
 	}else{
 	    $qual = $row[7] * 10;
 	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tAD:DP\t$row[6],$row[7]:$dp\n";
@@ -1453,7 +1455,7 @@ sub bi2vcf{
 	    $info = "SVTYPE=INV;END=$row[3];";	
 	    $alt = "<INV>";
 	}elsif ($row[5] eq "translocation"){
-	    next; # IVG is not supported ?
+#	    next; # IVG is not supported ?
 	    $pos = $row[1] - 1;
 	    seek(CHR, $pos -1, 0);
 	    read(CHR, $reference, 1);
@@ -1532,7 +1534,7 @@ sub bi2vcf{
     open(OUT, "> $wd/$target/$target.vcf");
     open(IN, "$wd/$target/$target.full.vcf");
     while(<IN>){
-	next if /<DEL>|<INS>|<INV>/;
+	next if /<DEL>|<INS>|<INV>|BND/;
 	print OUT $_;
     }
     close(IN);
