@@ -1716,7 +1716,7 @@ sub snpMkT{
 	foreach (@dat){
 	    ($tpos, $iref, $ialt) = split;
 	    $i = $tpos - ($pos - $length) -1;
-	    if ($i > 0 and $i < $length * 2){
+	    if ($i > 0 and $i < $length * 2 and $i != $length - 1){
 		$head = substr($mut_seq, 0, $i);
 		$tail = substr($mut_seq, $i + 1);
 		$mut_seq = $head . $ialt . $tail;
@@ -1805,7 +1805,7 @@ sub snpMkC{
 	foreach (@dat){
 	    ($tpos, $iref, $ialt) = split;
 	    $i = $tpos - ($pos - $clength) -1;
-	    if ($i > 0 and $i < $clength * 2){
+	    if ($i > 0 and $i < $clength * 2 and $i != $clength - 1){
 		$head = substr($mut_seq, 0, $i);
 		$tail = substr($mut_seq, $i + 1);
 		$mut_seq = $head . $ialt . $tail;
