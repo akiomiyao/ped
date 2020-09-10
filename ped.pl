@@ -1707,6 +1707,7 @@ sub snpMkT{
 		shift(@dat);
 	    }
 	}
+	next if $pos - $length < 0;
 	seek(IN, $pos - $length, 0);
 	read(IN, $ref_seq, $length * 2 -1);
 	next if length($ref_seq) != $length * 2 -1;
@@ -1795,6 +1796,7 @@ sub snpMkC{
 		shift(@dat);
 	    }
 	}
+	next if $pos - $clength < 0;
 	seek(IN, $pos - $clength, 0);
 	read(IN, $ref_seq, $clength * 2 -1);
 	next if length($ref_seq) != $clength * 2 -1;
@@ -1835,6 +1837,7 @@ sub snpMkC{
 
 sub svReadCount{
     my (@row, $dat, %count, $cm, $cw, $tm, $tw, $count, @prev, $prev, $genotype);
+    &getLength;
     open(OUT, "> $wd/$target/$target.sv");
     open(IN, "cat $tmpdir/*.target $tmpdir/*.control |");
     while(<IN>){
@@ -1844,6 +1847,7 @@ sub svReadCount{
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
+	next if $row[1] < $length or $row[1] < $clength;
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(" ", @row);
@@ -1914,6 +1918,7 @@ sub svReadCount{
 
 sub kmerReadCount{
     my (@row, $dat, %count, $cm, $cw, $tm, $tw, $count, @prev, $prev, $genotype);
+    &getLength;
     open(OUT, "| sort $sort_opt -T $tmpdir > $tmpdir/$target.map");
     open(IN, "cat $tmpdir/$target.map.* |");
     while(<IN>){
@@ -1923,6 +1928,7 @@ sub kmerReadCount{
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
+	next if $row[1] < $length or $row[1] < $clength;
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	print OUT "$row[0]:$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\t$row[6]\t$row[7]\t$row[8]\t$row[9]\t$row[10]\t$row[11]\t$row[12]\t$row[13]\t$row[14]\n";
@@ -2026,6 +2032,7 @@ sub kmerReadCount{
 
 sub snpReadCount{
     my (@row, $dat, %count, $cm, $cw, $tm, $tw, $count, @prev, $prev, $genotype);
+    &getLength;
     open(OUT, "| sort $sort_opt -T $tmpdir | uniq -c > $tmpdir/bi.snp");
     open(IN, "cat $tmpdir/*.target $tmpdir/*.control |");
     while(<IN>){
@@ -2035,6 +2042,7 @@ sub snpReadCount{
 	    $row[0] = "000" . $row[0];
 	    $row[0] = substr($row[0], length($row[0]) -3, 3);
 	}
+	next if $row[1] < $length or $row[1] < $clength;
 	$row[1] = "000000000000" . $row[1];
 	$row[1] = substr($row[1], length($row[1]) -11, 11);
 	$dat = join(":", @row);
