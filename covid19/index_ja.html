@@ -84,6 +84,7 @@ Webアプリケーション <a href = "https://igv.org/app/" target = "_blank">h
     もしIVGを自分のコンピュータで起動させて見たい場合は from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>よりプログラムをダウンロードしてインストールしてください。<br>
     IVG のGenomesのタブをクリックして、"SARS-CoV-2.fasta"と"SARS-CoV-2.gff"をロードします。<br>
     Fileタブをクリックして"ped/SRR11513115/SRR11513115.vcf"等にあるvcfファイルをロードして多型を表示させます。<br>
+    <li>プログラムを一部修正したので、以前と少し見え方が変わっています。5'末端に近い変異で、正確にリード数がカウントできず、曖昧な部分がありましたので、末端からリード長分進んだところまでの変異は表示しないようにしました。
     <li>双方向アラインメント上の多型の確認<br>
     pedディレクトリで<br><br>
 $ perl search.pl target=target,chr=chromosome,pos=position<br><br>

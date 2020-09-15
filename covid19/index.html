@@ -68,6 +68,7 @@ Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https:
     If you want to view by your computer, download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
     Click Genomes tab of IVG and load "SARS-CoV-2.fasta" and "SARS-CoV-2.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
+    <li>Old vcf data contain ambiguous mutations near the 5'-end. I update the PED program. New version filters mutations from 5'-end to the length of reads.
     <li><b>Check mutation in bidirectional alignments</b><br>
     In the ped directory,<br>
 $ perl search.pl target=target,chr=chromosome,pos=position<br><br>
