@@ -68,6 +68,10 @@ $ perl ped.pl target=ERR194147,ref=hg19</pre>
 Since hg19 reference file is already configured, data are automatically downloaded and calculated.<br>
 When all processes are done, ERR194146.vcf and ERR194147.vcf are created in ERR194146 and ERR194147 directory.<br>
 Sequences of primer pair are also outputted into vcf file.
+      <li>If you have control sequences for the target,
+<pre>$ perl ped.pl target=ERR194146,control=ERR194158,ref=hg19
+$ perl ped.pl target=ERR194146,control=ERR194159,ref=hg19</pre>
+      Specific polymorphisms for the target will be outputted.
       </ul>
       <h2>For Docker users</h2>
       <ul>
