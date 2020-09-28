@@ -1536,7 +1536,7 @@ sub bi2vcf{
     while(<IN>){
 	next if /<DEL>|<INS>|<INV>|BND/;
 	@row = split;
-	next if $row[5] ne "1000";
+	next if $row[5] ne "1000" and $row[0] !~/^#/;
 	print OUT $_;
     }
     close(IN);
