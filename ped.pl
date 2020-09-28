@@ -1535,6 +1535,8 @@ sub bi2vcf{
     open(IN, "$wd/$target/$target.full.vcf");
     while(<IN>){
 	next if /<DEL>|<INS>|<INV>|BND/;
+	@row = split;
+	next if $row[5] ne "1000";
 	print OUT $_;
     }
     close(IN);
