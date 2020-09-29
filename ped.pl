@@ -1624,14 +1624,6 @@ sub snpMkT{
     &getLength;
     my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr, $dat);
 
-    foreach $nuca (@nuc){
-	foreach $nucb (@nuc){
-	    foreach $nucc (@nuc){
-		$tag = $nuca . $nucb . $nucc;
-		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
-	    }
-	}
-    }
     my $fin = "in-mkt";
     my $fout = "out-mkt";
     open($fout, "|sort $sort_opt -T $tmpdir | uniq > $tmpdir/snp.tmp");
@@ -1675,6 +1667,16 @@ sub snpMkT{
     }
     close($fin);
     close($fout);
+
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		open($tag, "|gzip -c > $tmpdir/$tag.tmp.gz");
+	    }
+	}
+    }
+
     open($fin, "$tmpdir/snp.tmp");
     open($fout, "| uniq -c > $tmpdir/snp.list");
     while(<$fin>){
@@ -1701,6 +1703,7 @@ sub snpMkT{
 	    @dat = ();
 	    report("Making data for verification of snp. target chr$chr");
 	}
+	$prev_chr = $chr;
 	$count = int(1 + $count/4);
 	$pos += 0;
 	if ($count >= 5){
@@ -1733,7 +1736,6 @@ sub snpMkT{
 	    $tag = substr($tm, 0, 3);
 	    print $tag "$tm\t$chr $pos $ref $alt tm\n";
 	}
-	$prev_chr = $chr;
     }
     close($fin);
     close(IN);
@@ -1790,6 +1792,7 @@ sub snpMkC{
 	    @dat = ();
 	    report("Making data for verification of snp. control chr$chr");
 	}
+	$prev_chr = $chr;
 	$count = int(1 + $count/4);
 	$pos += 0;
 	if ($count >= 5){
@@ -1823,7 +1826,6 @@ sub snpMkC{
 	    $tag = substr($cm, 0, 3);
 	    print $tag "$cm\t$chr $pos $ref $alt cm\n";
 	}
-	$prev_chr = $chr;
     }
     close($fin);
     close(IN);
