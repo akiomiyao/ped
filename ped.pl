@@ -368,7 +368,11 @@ sub bidirectional{
     &snpReadCount;
     &primer(sv);
     &primer;
-    &bi2vcf;
+    &canFork;
+    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=bi2vcf,wd=$wd &");
+    &canFork;
+    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=biCount2vcf,wd=$wd &");
+    &waitChild;
 }
 
 sub primer{
@@ -1353,6 +1357,202 @@ sub toVcf{
 	    }
 	}
     }
+}
+
+sub biCount2vcf{
+    my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, %count, $total, $limit, $sum);
+    report("Convert count data to vcf format");
+
+    open(IN, "$wd/$target/$target.bi.snp.count");
+    while(<IN>){
+	chomp;
+	@row = split;
+	$count{$row[4]} ++;
+	$total++;
+    }
+    foreach (sort bynumber keys %count){
+	$sum += $count{$_};
+	if ($sum >= $total * 0.999){
+	    $limit = $_;
+	    last;
+	}
+    }
+    open(IN, "$wd/$target/$target.bi.snp.count");
+    open(OUT, "> $wd/$target/$target.filter");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($row[4] >= $limit){
+	    print OUT "$_\n";
+	}
+    }
+    close(IN);
+    close(OUT);
+
+    open(ALN, "$wd/$target/$target.aln");
+    open(TMP, "|sort -S 1M -T $wd/$target > $wd/$target/$target.count");
+    open(IN, "$wd/$target/$target.filter");
+    while(<IN>){
+	chomp;
+	@row = split('\t', $_);
+	$dp = $row[$#row] -1;
+	$chr= $row[0];
+	$pos = $row[1];
+	if ($chr =~ /[0-9]/ and $chr !~ /[a-z]/i){
+	    $chr = "000$chr";
+	    $chr = substr($chr, length($chr) - 3, 3);
+	}
+	$pos = "00000000000" . $pos;
+	$pos = substr($pos, length($pos) - 11, 11);
+	
+	$info = "DP=$row[4]";
+	
+	print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tDP\t$row[4]\n";
+    }
+
+    %count = ();
+    $sum = 0;
+    $limit = 0;
+    $total = 0;
+
+    open(IN, "$wd/$target/$target.sv.count");
+    while(<IN>){
+	chomp;
+	@row = split;
+	$count{$row[7]}++;
+	$total ++;
+   }
+    close(IN);
+    foreach (sort bynumber keys %count){
+	$sum += $count{$_};
+	if ($sum >= $total * 0.999){
+	    $limit = $_;
+	    last;
+	}
+    }
+    open(IN, "$wd/$target/$target.sv.count");
+    open(OUT, "> $wd/$target/$target.filter");
+    while(<IN>){
+	chomp;
+	@row = split;
+	if ($row[7] >= $limit){
+	    print OUT "$_\n";
+	}
+    }
+    close(IN);
+    close(OUT);
+   
+    open(IN, "$wd/$target/$target.filter");
+    while(<IN>){
+	chomp;
+	
+	$info = "";
+	
+	@row = split('\t', $_);
+	if ($prev_chr ne $row[0]){
+	    open(CHR, "$wd/$ref/chr$row[0]");
+	    binmode($fchr);
+	}
+	$prev_chr = $row[0];
+	
+	$dp = $row[$#row] -1;
+	if (length($row[0]) <= 3 or $row[0] =~ /^[0-9]+$/){
+	    $chr =  $row[0];
+	}
+	
+	if ($row[5] eq "deletion"){
+	    $pos = $row[1] - 1;
+	    seek(CHR, $pos -1, 0);
+	    read(CHR, $seq, abs($row[6]) + 1);
+	    $alt = substr($seq, 0, 1);
+	    $reference = $seq;
+	    ($homseq = $row[12]) =~ y/\_//d;
+	    $homlen = length($homseq);
+	    $end = $row[3] + 1;
+	    if ($homlen > 0){
+		$info = "SVTYPE=DEL;END=$end;HOMLEN=$homlen;HOMSEQ=$homseq;SVLEN=$row[6];";
+	    }else{
+		$info = "SVTYPE=DEL;END=$end;SVLEN=$row[6];";
+	    }
+	    if ($row[6] <= -80){
+		$reference = $alt;
+		$alt = "<DEL>";
+	    }
+	}elsif ($row[5] eq "insertion"){
+	    $alt = &searchInsertion($row[0], $row[1]);
+	    $pos = $row[1] - 1;
+	    seek(CHR, $pos -1, 0);
+	    read(CHR, $reference, 1);
+	    $end = $row[3] + 1;
+	    $info = "SVTYPE=INS;END=$end;SVLEN=$row[6];";	
+	    if ($alt =~/[0-9]/){
+		$alt = "<INS>";
+	    }
+	}elsif ($row[5] eq "inversion"){
+	    $pos = $row[1] - 1;
+	    seek(CHR, $pos -1, 0);
+	    read(CHR, $reference, 1);
+	    $info = "SVTYPE=INV;END=$row[3];";	
+	    $alt = "<INV>";
+	}elsif ($row[5] eq "translocation"){
+	    #	    next; # IVG is not supported ?
+	    $pos = $row[1] - 1;
+	    seek(CHR, $pos -1, 0);
+	    read(CHR, $reference, 1);
+	    $info = "SVTYPE=BND;";	
+	    $alt = $reference . "]$row[2]:$row[3]";
+	}
+	
+	next if $reference eq $alt or $alt eq "|";
+	#	next if $alt !~ /[ACGT]/;
+	$dp = $row[7];
+	next if $dp == 0;
+	if ($chr =~ /[0-9]/ and $chr !~ /[a-z]/i){
+	    $chr = "000$chr";
+	    $chr = substr($chr, length($chr) - 3, 3);
+	}
+	$pos = "00000000000" . $pos;
+	$pos = substr($pos, length($pos) - 11, 11);
+	print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "DP=$dp\tDP\t$dp\n";
+    }	
+    close(TMP);
+    close(ALN);
+    my $timestamp = `date '+%Y-%m-%d %H:%M:%S %z'`;
+    chomp($timestamp);
+
+    my $header = "##fileformat=VCFv4.2
+##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
+##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description=\"Length of base pair identical micro-homology at event breakpoints\">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description=\"Sequence of base pair identical micro-homology at event breakpoints\">
+##INFO=<ID=SVLEN,Number=.,Type=Float,Description=\"Difference in length between REF and ALT alleles\">
+##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description=\"Type of structural variant\">
+##ALT=<ID=DEL,Description=\"Deletion\">
+##ALT=<ID=INS,Description=\"Insertion of novel sequence\">
+##ALT=<ID=INV,Description=\"Inversion of reference sequence\">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
+##source=<PROGRAM=ped.pl,Method=\"Bidirectional method\",target=$target,control=$control,reference=$ref>
+##created=<TIMESTAMP=\"$timestamp\">
+#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t$target\n";
+
+
+    open(OUT, "> $wd/$target/$target.count.vcf");
+    print OUT $header;
+    close(OUT);
+
+    open(OUT, ">> $wd/$target/$target.count.vcf");
+    open(IN, "sort $sort_opt -T $wd/$target $wd/$target/$target.count |");
+    while(<IN>){
+	@row = split;
+	$row[0] =~ s/^0+//;
+	$row[1] =~ s/^0+//;
+	$out = join("\t", @row);
+	print OUT "$out\n";
+    }
+    close(IN);
+    close(OUT);
+    
+    system("rm $wd/$target/$target.count $wd/$target/$target.filter");
 }
 
 sub bi2vcf{
