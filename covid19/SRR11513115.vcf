@@ -17,7 +17,7 @@
 ##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
 ##source=<PROGRAM=ped.pl,Method="Bidirectional method",target=SRR11513115,control=SARS-CoV-2,reference=SARS-CoV-2>
-##created=<TIMESTAMP="2020-09-15 14:40:09 +0900">
+##created=<TIMESTAMP="2020-12-03 17:09:53 +0900">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SRR11513115
 NC_045512.2	241	.	C	T	1000	.	GT=1/1;AF=1;DP=113;PL=CAGCCGATCATCAGCACATC;PR=AGGGACAAGGCTCTCCATCT;PCRLEN=70	GT:AD:DP	1/1:0,113:113
 NC_045512.2	3037	.	C	T	1000	.	GT=1/1;AF=1;DP=103;PL=GTGTTGTGGCAGATGCTGTC;PR=CTTCATCCTCATCTGGAGGG;PCRLEN=177	GT:AD:DP	1/1:0,103:103

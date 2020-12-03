@@ -1,0 +1,41 @@
+##fileformat=VCFv4.2
+##INFO=<ID=AF,Number=.,Type=Float,Description="Allele Frequency">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth)">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.">
+##INFO=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=PCRLEN,Number=.,Type=Integer,Description="PCR product length">
+##INFO=<ID=PL,Number=.,Type=String,Description="Left primer sequence">
+##INFO=<ID=PR,Number=.,Type=String,Description="Right primer sequence">
+##INFO=<ID=SVLEN,Number=.,Type=Float,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description="Type of structural variant">
+##ALT=<ID=DEL,Description="Deletion">
+##ALT=<ID=INS,Description="Insertion of novel sequence">
+##ALT=<ID=INV,Description="Inversion of reference sequence">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the reference and alternate alleles in the order listed">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+##source=<PROGRAM=ped.pl,Method="Bidirectional method",target=SRR11542243,control=SARS-CoV-2,reference=SARS-CoV-2>
+##created=<TIMESTAMP="2020-12-03 17:26:53 +0900">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SRR11542243
+NC_045512.2	4775	.	A	G	1000	.	GT=0/1;AF=0.151;DP=50	GT:DP	0/1:50
+NC_045512.2	6312	.	C	A	1000	.	GT=0/1;AF=0.381;DP=126	GT:DP	0/1:126
+NC_045512.2	10376	.	C	T	1000	.	GT=0/1;AF=0.184;DP=61	GT:DP	0/1:61
+NC_045512.2	11082	.	TG	T	1000	.	GT=1/1;AF=1;DP=44	GT:DP	1/1:44
+NC_045512.2	11083	.	G	T	1000	.	GT=0/1;AF=0.624;DP=206	GT:DP	0/1:206
+NC_045512.2	13328	.	A	T	1000	.	GT=0/1;AF=0.16;DP=53	GT:DP	0/1:53
+NC_045512.2	13730	.	C	T	1000	.	GT=0/1;AF=0.2;DP=66	GT:DP	0/1:66
+NC_045512.2	15554	.	A	G	1000	.	GT=0/1;AF=0.169;DP=56	GT:DP	0/1:56
+NC_045512.2	15819	.	T	A	1000	.	GT=0/1;AF=0.209;DP=69	GT:DP	0/1:69
+NC_045512.2	18687	.	C	T	1000	.	GT=0/1;AF=0.157;DP=52	GT:DP	0/1:52
+NC_045512.2	18781	.	G	T	1000	.	GT=0/1;AF=0.16;DP=53	GT:DP	0/1:53
+NC_045512.2	18873	.	G	C	1000	.	GT=0/1;AF=0.221;DP=73	GT:DP	0/1:73
+NC_045512.2	18874	.	T	G	1000	.	GT=0/1;AF=0.169;DP=56	GT:DP	0/1:56
+NC_045512.2	19524	.	C	T	1000	.	GT=0/1;AF=0.378;DP=125	GT:DP	0/1:125
+NC_045512.2	23575	.	C	T	1000	.	GT=0/1;AF=0.157;DP=52	GT:DP	0/1:52
+NC_045512.2	23929	.	C	T	1000	.	GT=0/1;AF=0.33;DP=109	GT:DP	0/1:109
+NC_045512.2	24798	.	C	G	1000	.	GT=0/1;AF=0.187;DP=62	GT:DP	0/1:62
+NC_045512.2	27256	.	A	G	1000	.	GT=0/1;AF=0.16;DP=53	GT:DP	0/1:53
+NC_045512.2	27401	.	T	C	1000	.	GT=0/1;AF=0.166;DP=55	GT:DP	0/1:55
+NC_045512.2	28311	.	C	T	1000	.	GT=1/1;AF=1;DP=330	GT:DP	1/1:330

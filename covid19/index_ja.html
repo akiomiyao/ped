@@ -110,15 +110,20 @@ TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCA
     <li>確認用ファイル<br>
     <a href = "SARS-CoV-2.fasta" target = "_blank">SARS-CoV-2.fasta</a> From NCBI<br>
     <a href = "SARS-CoV-2.gff" target = "_blank">SARS-CoV-2.gff</a> From NCBI<br>
-    <a href = "SRR11542243.vcf" target = "_blank">SRR11542243.vcf</a> Sample from University Malaya<br>
-    <a href = "SRR11542244.vcf" target = "_blank">SRR11542244.vcf</a> Sample from University Malaya<br>
-    <a href = "SRR11513115.vcf" target = "_blank">SRR11513115.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513116.vcf" target = "_blank">SRR11513116.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11542243.count.vcf" target = "_blank">SRR11542243.count.vcf</a> Sample from University Malaya<br>
+    <a href = "SRR11542244.count.vcf" target = "_blank">SRR11542244.count.vcf</a> Sample from University Malaya<br>
+    <a href = "SRR11513115.count.vcf" target = "_blank">SRR11513115.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513116.count.vcf" target = "_blank">SRR11513116.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513117.count.vcf" target = "_blank">SRR11513117.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513118.count.vcf" target = "_blank">SRR11513118.count.vcf</a> Sample from Utah Public Health Laboratory<br>
     <li>コメント<br>
     Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memoryのコンピュータで2分ほどで結果がでます。<br>
-    イルミナのシーケンサではきれいな結果が得られますが、nanoporeではノイズが多い結果になります。さらなる条件検討が必要です。
+    イルミナのシーケンサではきれいな結果が得られますが、nanoporeではノイズが多い結果になります。さらなる条件検討が必要です。<br>
+    vcfファイルはtarget.vcf、target.full.vcf、target.count.vcfの3種類が出力されます。<br>
+    ・target.vcfは検出された多型を持つリードと持たないリードを数えて遺伝子型が出力されています。IGVでは転座に関して対応していないのと、大きな欠失があると見づらくなるので、80bpの欠失や転座は出力しないようにしています。<br>
+    ・target.full.vcfは、上記のフィルターをかける前の結果です。<br>
+    ・target.count.vcfは多型を持つリードと持たないリードの数を調べずに、単純にリードから検出された多型の数でまとめた結果です。<br>
+    SARS-CoV-2の場合、ウイルス自体が単一でなく変異が異なる複数の種類のウイルスが混在しているので、厚く読んだデータの場合通常のvcfファイルでは、うまく検出されない場合が多いことがわかりました。検算をしないで、それぞれの部位で何回変異が検出されたかを出力しているtarget.count.vcfファイルで変異を確認することをお勧めします。
     <li>謝辞<br>
     Dr Ilkka HavukkalaにPEDのテストをしてもらいました。また、IVGに関する有益なアドバイスをもらいました。<br>
     </ul>
