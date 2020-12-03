@@ -1360,7 +1360,7 @@ sub toVcf{
 }
 
 sub biCount2vcf{
-    my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, %count, $total, $limit, $sum);
+    my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, %count, $total, $limit, $sum, $max);
     report("Convert count data to vcf format");
 
     open(IN, "$wd/$target/$target.bi.snp.count");
@@ -1370,12 +1370,13 @@ sub biCount2vcf{
 	$count{$row[4]} ++;
 	$total++;
     }
+    $limit = 0;
     foreach (sort bynumber keys %count){
 	$sum += $count{$_};
 	if ($sum >= $total * 0.999){
-	    $limit = $_;
-	    last;
+	    $limit = $_ if $limit == 0;
 	}
+	$max = $_;
     }
     open(IN, "$wd/$target/$target.bi.snp.count");
     open(OUT, "> $wd/$target/$target.filter");
@@ -1404,10 +1405,13 @@ sub biCount2vcf{
 	}
 	$pos = "00000000000" . $pos;
 	$pos = substr($pos, length($pos) - 11, 11);
+
+	$gt = "1/1";
+	$af = int($row[4]*1000/$max)/1000;
+	$gt = "0/1" if $af < 1;
+	$info = "GT=$gt;AF=$af;DP=$row[4]";
 	
-	$info = "DP=$row[4]";
-	
-	print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tDP\t$row[4]\n";
+	print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:DP\t$gt:$row[4]\n";
     }
 
     %count = ();
@@ -1421,14 +1425,14 @@ sub biCount2vcf{
 	@row = split;
 	$count{$row[7]}++;
 	$total ++;
-   }
+    }
     close(IN);
     foreach (sort bynumber keys %count){
 	$sum += $count{$_};
 	if ($sum >= $total * 0.999){
-	    $limit = $_;
-	    last;
+	    $limit = $_ if $limit == 0;
 	}
+	$max = $_;
     }
     open(IN, "$wd/$target/$target.sv.count");
     open(OUT, "> $wd/$target/$target.filter");
@@ -1513,7 +1517,14 @@ sub biCount2vcf{
 	}
 	$pos = "00000000000" . $pos;
 	$pos = substr($pos, length($pos) - 11, 11);
-	print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "DP=$dp\tDP\t$dp\n";
+
+	$gt = "1/1";
+	$af = int($dp*1000/$max)/1000;
+	$gt = "0/1" if $af < 1;
+	$info = "GT=$gt;AF=$af;";
+
+	
+	print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "DP=$dp\tGT:DP\t$gt:$dp\n";
     }	
     close(TMP);
     close(ALN);
@@ -1521,15 +1532,22 @@ sub biCount2vcf{
     chomp($timestamp);
 
     my $header = "##fileformat=VCFv4.2
+##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">
 ##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Approximate read depth)\">
 ##INFO=<ID=END,Number=1,Type=Integer,Description=\"End position of the variant described in this record. Edge position of the alignment from 3'-end of short read is shown as END.\">
+##INFO=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
 ##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description=\"Length of base pair identical micro-homology at event breakpoints\">
 ##INFO=<ID=HOMSEQ,Number=.,Type=String,Description=\"Sequence of base pair identical micro-homology at event breakpoints\">
+##INFO=<ID=PCRLEN,Number=.,Type=Integer,Description=\"PCR product length\">
+##INFO=<ID=PL,Number=.,Type=String,Description=\"Left primer sequence\">
+##INFO=<ID=PR,Number=.,Type=String,Description=\"Right primer sequence\">
 ##INFO=<ID=SVLEN,Number=.,Type=Float,Description=\"Difference in length between REF and ALT alleles\">
 ##INFO=<ID=SVTYPE,Number=1,Type=Integer,Description=\"Type of structural variant\">
 ##ALT=<ID=DEL,Description=\"Deletion\">
 ##ALT=<ID=INS,Description=\"Insertion of novel sequence\">
 ##ALT=<ID=INV,Description=\"Inversion of reference sequence\">
+##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read depth\">
 ##source=<PROGRAM=ped.pl,Method=\"Bidirectional method\",target=$target,control=$control,reference=$ref>
 ##created=<TIMESTAMP=\"$timestamp\">
