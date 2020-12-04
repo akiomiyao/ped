@@ -20,6 +20,7 @@
 	  <a href = "https://akiomiyao.github.io/ped/arabidopsis/index.html" target = "_blank">[アラビドプシス]</a><br>
 	  <a href = "https://akiomiyao.github.io/ped/virtualbox/index.html" target = "_blank">[VirtualBoxでの利用例]</a>
 	  <a href = "https://akiomiyao.github.io/ped/aws/" target = "_blank">[クラウド(AWS)での利用例]</a>
+	  <a href = "https://akiomiyao.github.io/ped/sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>
      <h2>PEDとは</h2>
       <p><a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic Edge Detection (PED)</a>は、次世代シーケンサーを用いて得られた塩基配列(ショートリード)より、配列の多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。
       <p>非常に正確にゲノム全体に渡るSNPとindel等構造変異を得ることができます。
@@ -66,12 +67,8 @@ $ sudo apt install git
 $ sudo apt install sra-toolkit
 $ git clone https://github.com/akiomiyao/ped.git</pre>
       <li>Ubuntuのバージョンによっては、sra-toolkitのインストールに失敗することがあります。<br>
-      その場合は、<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>からUbuntu Linux 64 bit architectureのToolkitをダウンロードします。<br>
-      <pre>$ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz
-$ cd xvfz sratoolkit.2.x.x-ubuntu64/bin
-$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump</pre>
-      tar コマンドで展開したfastq-dumpを/usr/local/binに移せば大丈夫です。<br>
-      ブラウザでダウンロードした場合は、ブラウザで展開までできますので、展開したファイル(origの名称がついているもの)をfastq-dumpの名前で/usr/local/binに移します。
+また最近のバージョンのfastq-dumpは使用前にvdb-configコマンドで実行環境を設定する必要があります。<br>
+設定方法は、<a href = "./sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>のページに記載しました。
       </ul>
       </ul>
 	  <li><b>実行例</b><br>

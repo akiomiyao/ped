@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>fastq-dumpの設定</h1>
+    <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+    fastq-dumpはNCBI（米国立バイオテクノロジー情報センター）で作成・公開されているソフトで、NCBIから次世代シーケンサーの配列データをダウンロードする場合に必要です。<br>
+    <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">[NCBIのソフトのダウンロードサイトのリンク]</a>から、
+<a href = "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-ubuntu64.tar.gz" target = "_blank">Ubuntu Linux 64 bit architecture - non-sudo tar archive</a>をクリックしてダウンロードします。
+    <pre>tar xvfz sratoolkit.2.10.8-ubuntu64.tar.gz
+    </pre>
+    としてファイルを展開します。
+    <pre>cd sratoolkit.2.10.8/bin
+    </pre>
+    として、実行ファイルが展開されたディレクトリに移ります。
+    <pre>./vdb-config --interactive
+    </pre>
+    と入力して、展開されたディレクトリにあるvdb-configを起動します。<br><br>
+    <img src = "main.png"><br><br>
+    画面は矢印キーではカーソルは動きません。赤で示されている一文字を入力すると対応するメニューが開いたり操作ができます。<br>
+    MAIN画面は、Enable Remote Accessが選択した状態(デフォルト)にします。<br><br>
+    <img src = "cache.png"><br><br>
+    cを入力して、キャッシュの画面に移ります。<br>
+    local file-chachingとlocation of user-repositoryはデフォルトのまま。<br>
+    uを入力して次に+を入力すると使用するRAMの値が増えていきます。<br>
+    ここでは、1MB使用することにしました。<br><br>
+    <img src = "tools.png"><br><br>
+    toolsはデフォルトのままでいいと思います。<br>
+    current directoryにするとダウンロード時の中間ファイルがカレントディレクトリになります。<br>
+    sを入力して、設定をセーブしてxを入力してvdb-configを抜ければ設定完了です。<br><br>
+    <pre>sudo ln -s /home/miyao/sratoolkit.2.10.8-ubuntu64/bin/fastq-dump /usr/bin/fastq-dump
+</pre>
+    のようにtarで展開したfastq-dumpのフルパスを/usr/bin/fastq-dumpとしてリンクすれば完了です。<br><br><br><br>
+  </body>
+</html>
