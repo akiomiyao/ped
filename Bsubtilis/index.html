@@ -30,16 +30,12 @@ Reference: <a href = "https://doi.org/10.1093/nar/gkz260" target = "_blank">Topo
 $ sudo apt upgrade
 $ sudo apt install curl
 $ sudo apt install git
-$ sudo apt install sra-toolkit
 $ git clone https://github.com/akiomiyao/ped.git</pre>
-<ul>
-    <li>If installing of sra-toolkit is failed, download file from NCBI site.<br>
-    URL: <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
-    <pre>$ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz
-$ cd sratoolkit.2.x.x-ubuntu64/bin
-$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump</pre>
-.x.x is version number, will be changed with update by NCBI.
-</ul>
+      <li>To download sequence data, fastq-dump from NCBI is required.<br>
+Tool kit can be download from
+<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
+Details of setup fastq-dump is described in
+<a href = "https://akiomiyao.github.io/ped/sratoolkit/index.html" target = "_blank">https://akiomiyao.github.io/ped/sratoolkit/index.html</a>
       <li>Download fastq files from NCBI Sequence read archive site.
       <pre>$ cd ped
 $ git pull

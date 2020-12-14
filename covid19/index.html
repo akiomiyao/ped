@@ -13,16 +13,10 @@
     $ sudo apt upgrade<br>
     $ sudo apt install curl<br>
     $ sudo apt install git<br>
-    $ sudo apt install sra-toolkit<br>
     $ git clone https://github.com/akiomiyao/ped.git<br>
-    <ul>
-    <li>If installing of sra-toolkit is failed, download file from NCBI site.<br>
-    URL: <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a><br>
-    $ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz<br>
-$ cd sratoolkit.2.x.x-ubuntu64/bin<br>
-$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump<br>
-.x.x is version number, will be changed with update by NCBI.
-</ul>
+
+    <li><b>Install and setup fastq-dump.</b><br>
+    <a href = "https://akiomiyao.github.io/ped/sratoolkit/index.html" target = "_blank">Details for setup is Here.</a>
     <li><b>Download fastq sequence data from NCBI sequence read archive</b><br>
     $ cd ped<br>
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11513115" target = "_blank">SRR11513115</a><br>
@@ -93,16 +87,23 @@ TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCA
     <li><b>Files</b><br>
     <a href = "SARS-CoV-2.fasta" target = "_blank">SARS-CoV-2.fasta</a> From NCBI<br>
     <a href = "SARS-CoV-2.gff" target = "_blank">SARS-CoV-2.gff</a> From NCBI<br>
-    <a href = "SRR11542243.vcf" target = "_blank">SRR11542243.vcf</a> Sample from University Malaya<br>
-    <a href = "SRR11542244.vcf" target = "_blank">SRR11542244.vcf</a> Sample from University Malaya<br>
-    <a href = "SRR11513115.vcf" target = "_blank">SRR11513115.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513116.vcf" target = "_blank">SRR11513116.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513117.vcf" target = "_blank">SRR11513117.vcf</a> Sample from Utah Public Health Laboratory<br>
-    <a href = "SRR11513118.vcf" target = "_blank">SRR11513118.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11542243.count.vcf" target = "_blank">SRR11542243.count.vcf</a> Sample from University Malaya<br>
+    <a href = "SRR11542244.count.vcf" target = "_blank">SRR11542244.count.vcf</a> Sample from University Malaya<br>
+    <a href = "SRR11513115.count.vcf" target = "_blank">SRR11513115.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513116.count.vcf" target = "_blank">SRR11513116.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513117.count.vcf" target = "_blank">SRR11513117.count.vcf</a> Sample from Utah Public Health Laboratory<br>
+    <a href = "SRR11513118.count.vcf" target = "_blank">SRR11513118.count.vcf</a> Sample from Utah Public Health Laboratory<br>
     <li><b>Comments</b><br>
-    Run time is about 2 min for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br>
+    Run time is about 2 min for each accession using Intel Core i5-4210M CPU @ 2.60 GHz (2 cores, 4 threads), 8GB memory.<br><br>
     Reads from Illumina platform returns fine results. On the other hand, results from nanopore contains a lot of false positives.<br>
-    Higher threshold may be required for analysis of nanopore data.
+    Higher threshold may be required for analysis of nanopore data.<br><br>
+    PED outputs three vcf format files.<br>
+    'target.vcf' is selected data for IGV.<br>
+    'target.full.vcf' is full output before the selection.<br>
+    'target.count.vcf' is from raw data before the verification.<br>
+    Some mutations have been filtered out by the verification step, because of too much coverage of short reads.<br>
+    In addition, two mutations in closed position but on different RNA strand (from mixtue of viruses) will be filtered out by verification step.<br>
+    Usage of count.vcf files from raw count data before verification step is recommended. 
     <li><b>Acknowledgement</b><br>
     I thank Dr Ilkka Havukkala for test the PED update for SARS-CoV-2 and advice about integration of IVG.<br>
     <li><b>Citing PED</b><br>
