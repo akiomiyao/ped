@@ -77,7 +77,20 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
   perl check_length.pl target=ERR3063487  
-
+- Result files,  
+```
+File name               Description
+ERR3063487.aln          Bidirectional alignment
+ERR3063487.bi.primer    Primer data for PCR
+ERR3063487.bi.snp       SNP data (original format)
+ERR3063487.index        Index file for alignemt search
+ERR3063487.log          Process log
+ERR3063487.sv           Structural variation data
+ERR3063487.sv.primer    Primer data for PCR
+ERR3063487.vcf          SNP and SV data (vcf format, for IGV)
+ERR3063487.full.vcf     SNP and SV data (vcf format, full output)
+ERR3063487.count.vcf    SNP and SV data (vcf format, full output with unverified data)
+```
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
 - Programs run on Unix platforms (FreeBSD or Linux) and Mac.  
@@ -98,11 +111,9 @@ git pull
 ```
 - To download sequence data, fastq-dump from NCBI is required.  
     Tool kit can be download from  
-    https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/ 
-  or
-  ```
-  sudo apt install sra-toolkit (Ubontu)
-  ```
+    https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software  
+  Details of setup fastq-dump is described in  
+  https://akiomiyao.github.io/ped/sratoolkit/index.html
 - To download reference data, curl is required.  
     If your machine do not have curl program, install curl from package.  
 ```
@@ -111,7 +122,7 @@ sudo yum install curl (CentOS)
 sudo pkg install curl (FreeBSD)
 ```
 
-## Setup of Docker
+## Setup of Docker (For Docker users, Optional)
 - If docker is installed, ped can be run with docker command without preinstall of ped.  
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 ```
