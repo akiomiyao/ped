@@ -126,7 +126,7 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
         pedのディレクトリ内で、<br>
         perl download.pl accession=ERR3063486<br>
         perl download.pl accession=ERR3063487<br>
-        を実行します。(アメリカからのダウンロードなので、数時間程度かかります。fastq-dumpが必要です。インストール法は<a href = "#fastq-dump">こちら</a>)<br>
+        を実行します。(アメリカからのダウンロードなので、数時間程度かかります。fastq-dumpが必要です。インストール法は<a href = "sratoolkit/index_ja.html" target = "_blank">こちら</a>)<br>
         dockerで実行する場合は、<br>
         docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063486,wd=/work<br>
         docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=ERR3063487,wd=/work<br>
@@ -141,7 +141,9 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
         
 	 <li>target(上記の場合はERR3063487)のディレクトリに出力される結果ファイルのリスト
 	 <table>
-	 <tr><td>target.vcf</td><td>HとMでマークされた多型をvcf形式で出力されたファイル</td></tr>
+	 <tr><td>target.vcf</td><td>HとMでマークされた多型をvcf形式で出力されたファイル。IGVで表示させるために転座や大きな欠失は除いている</td></tr>
+	 <tr><td>target.full.vcf</td><td>HとMでマークされた多型をvcf形式で出力されたファイル。大きな欠失等を除く前のデータ</td></tr>
+	 <tr><td>target.count.vcf</td><td>HとMでマークする前の、target.alnで検出された多型の検出回数で整理し、vcf形式で出力されたファイル</td></tr>
 	 <tr><td>target.aln</td><td>双方向整列法による整列データ</td></tr>
 	 <tr><td>target.bi.snp</td><td>双方向整列法によるSNPリスト　確度の高いSNPはH(ヘテロ)とM(変異型ホモ)でマークされます</td></tr>
 	 <tr><td>target.bi.primer</td><td>双方向整列法によるSNPリストに加えてプライマー配列が出力されます</td></tr>
@@ -323,6 +325,7 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
 	 <a name = "Docker_install">
 	 <h2>Dockerを用いた解析</h2>
      Dockerを用いると、dockerhubに登録済みの実行環境をダウンロードして一連の解析を行うことができます。解析が完了すると実行環境はクリアされて結果のみが残ります。<br>
+     手動でfastq-dumpをインストールして、設定がうまくいかずダウンロードできないような場合は、動作確認済みのDockerの系をお勧めします。<br><br>
 	 CentOSやUbuntuにインストールする場合<br>
      <ul>
 	 <li>参照 <a href = "https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script" target = "_blank">https://docs.docker.com/install/linux/docker-ce/ubuntu/</a><br>

@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>Setup of fastq-dump</h1>
+    <a href = "../index.html">[Link to top page]</a><br><br>
+Download <a href = "https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-ubuntu64.tar.gz" target = "_blank">Ubuntu Linux 64 bit architecture - non-sudo tar archive</a> from <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">download site from NCBI</a>
+     <pre>tar xvfz sratoolkit.2.10.8-ubuntu64.tar.gz
+cd sratoolkit.2.10.8/bin
+./vdb-config --interactive
+    </pre>
+    Bellow is the MAIN window of vdb-config.<br><br>
+    <img src = "main.png"><br><br>
+    Input <font color = "red">Red</font> character to move window or next action.<br>
+    In the 'MAIN' window, select 'Enable Remote Access'.<br><br>
+    <img src = "cache.png"><br><br>
+    Push <font color = "red">c</font> key to move 'CACHE' window.<br>
+    If you want to change of user-repository, push <font color = "red">o</font> key and specify full path of directory.<br>
+    Push <font color = "red">u</font> key and then input <font color = "red">+</font>. Value of RAM usage will be increased.<br>
+    In this case, 1MB is specified.<br><br>
+    <img src = "tools.png"><br><br>
+    'TOOLS' window specifies directory for prefetch.<br><br>
+    Push <font color = "red">s</font> key for saving settings and then push <font color = "red">x</font> to exit the vdb-config.<br><br>
+    Link extracted fastq-dump to /usr/bin/fastq-dump. For example,<br>
+    <pre>sudo ln -s /home/miyao/sratoolkit.2.10.8-ubuntu64/bin/fastq-dump /usr/bin/fastq-dump
+</pre>
+<br><br><br><br>
+  </body>
+</html>

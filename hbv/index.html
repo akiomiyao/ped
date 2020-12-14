@@ -31,12 +31,8 @@ $ sudo apt install git
 $ sudo apt install sra-toolkit
 $ git clone https://github.com/akiomiyao/ped.git</pre>
       <li>Ubuntuのバージョンによっては、sra-toolkitのインストールに失敗することがあります。<br>
-その場合は、 <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>からUbuntu Linux 64 bit architectureのToolkitをダウンロードします。<br>
-      <pre>$ tar xvfz sratoolkit.2.x.x-ubuntu64.tar.gz
-$ cd sratoolkit.2.x.x-ubuntu64/bin
-$ sudo mv fastq-dump-orig.2.x.x /usr/local/bin/fastq-dump</pre>
-      tar コマンドで展開したfastq-dumpを/usr/local/binに移せば大丈夫です。-orig以下の名前は削って、fastq-dumpという名称にして移します。<br>
-  
+また最近のバージョンのfastq-dumpは使用前にvdb-configコマンドで実行環境を設定する必要があります。<br>
+設定方法は、<a href = "../sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>のページに記載しました。
       <li>NCBIのSRAアーカイブからB型肝炎ウイルス(HBV)に感染した患者から得られたウイルスのショートリードののfastq形式のファイルをダウンロードします。
       <pre>$ cd ped
 $ git pull
