@@ -63,16 +63,29 @@ foreach (readdir(DIR)){
 	if ($line % 4 == 2 and ! /N/){
 	    chomp;
 	    $len = length($_);
-	    $length{$len}++; 
+	    $count{$len}++;
+	    $total ++;
 	}
     }
     close(IN);
 }
 close(DIR);
 
-
-foreach (sort bynumber keys %length){
-    print "$_\t$length{$_}\n";
+print "Length\tCount\tPercent\n";
+foreach (reverse sort bynumber keys %count){
+    $sum += $count{$_};
+    $percent = int($sum * 100 / $total);
+    print "$_\t$count{$_}\t$percent%\n";
+    if ($percent >= 95 and $flag == 0){
+	print STDERR "Please choose optimal clipping length. Around 90% is enough.
+Press c and Enter to continue or press Enter to exit.\n";
+	$input = <STDIN>;
+	if ($input =~ /c/i){
+	    $flag = 1
+	}else{
+	    exit;
+	}
+    }
 }
 
 sub bynumber{
