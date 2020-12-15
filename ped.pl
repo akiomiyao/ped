@@ -36,17 +36,17 @@ $usage = '
  If you want to set maximum number of threads (processes),
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
- Because default setting of ulimit is 1024, 14 threads is maximun for
- default setting of OS. Thread function has been switched to making new process
- in current version. Deault number is the number of CPU core.
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
- If short reads have different length sequences, clipping is required.
+ Results will be saved in the target directory.
+
+ If short reads have different length sequences, sequence will be clipped.
+ If you want to specify the clipping length,
  perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
 
- Results will be saved in the target directory.
+ If clipping value is omitted, the value will be adjusted by the program.
 
  An example,
  perl download.pl accession=SRR11542243
@@ -66,6 +66,10 @@ my $sort_opt = "-S 1M";
 $ENV{LANG} = "C";
 
 $start_time = time;
+$start_timestamp = `date`;
+
+$log = "script : ped.pl
+argument : $ARGV[0]\n";
 
 if ($ARGV[0] =~ /target/){
     my @arg = split(',', $ARGV[0]);
@@ -73,12 +77,12 @@ if ($ARGV[0] =~ /target/){
 	next if $_ eq "";
 	my ($name, $val) = split('=', $_);
 	$$name = $val;
-	$log .= "# $name: $val\n";
+	$log .= "$name : $val\n";
     }
 }elsif ($ARGV[0] =~ /ref/){
     my ($name, $val) = split('=', $ARGV[0]);
     $$name = $val;
-    $log .= "# $name: $val\n";
+    $log .= "$name : $val\n";
 }elsif ($ARGV[1] ne ""){
     $target = $ARGV[0];
     $control = $ARGV[1];
@@ -112,6 +116,7 @@ if ($method eq ""){
     }else{
 	$method = "bidirectional";
     }
+    $log .= "method : $method\n";
 }
 
 $zcat = "zcat";
@@ -152,9 +157,9 @@ if ($uname eq "Darwin"){
     $max_process = $processor;
 }
 $max_process = 3 if $max_process eq "";
-$max_process = $thread if $thread ne "";
 $max_process = 14 if $max_process > 14;
-$log .= "# max process: $max_process\n";
+$max_process = $thread if $thread ne "";
+$log .= "max process : $max_process\n";
 
 $refdir = "$wd/$ref";
 if ($tmpdir eq "" and $target ne ""){
@@ -223,13 +228,13 @@ if ($sub ne ""){
 }
 
 if ($target ne ""){
-    open(REPORT, ">> $wd/$target/$target.log");
+    open(REPORT, "> $wd/$target/$target.report");
+    open(LOG, "> $wd/$target/$target.log");
 }elsif($ref ne ""){
-    open(REPORT, ">> $wd/$ref/$ref.log");
+    open(REPORT, "> $wd/$ref/$ref.log");
 }
 
-print REPORT "# Log of ped.pl
-$log";
+print LOG $log;
 
 report("Job begin: $method method");
 
@@ -308,9 +313,17 @@ sub finish{
     }elsif($second == 1){
 	$etime .= "$second second ";
     }
-    
-    report("Job completed: $method method.
+    $end_timestamp = `date`;
+    chomp($start_timestamp);
+    chomp($end_timestamp);
+    report("Job completed: $method method.$additionalReport
 $etime ($elapsed_time seconds) elapsed.");
+    print LOG "start : $start_timestamp
+end : $end_timestamp
+elapsed : $etime
+seconds : $elapsed_time\n";
+    close(LOG);
+    close(REPORT);
     exit;
 }
 
@@ -1254,7 +1267,7 @@ sub sortUniqSub{
     my ($cmd, $subject) = @_;
     my $count = 0;
     my $total = 0;
-    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement, $readLength, $prev, $subseq, $pos);
+    my ($nuca, $nucb, $nucc, $nucd, $nuce, $nucf, $tag, $complement, $readLength, $prev, $subseq, $pos, %count, $clippingFlag, $sum, $total);
     system("mkdir $wd/$subject/sort_uniq") if ! -e "$wd/$subject/sort_uniq";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
@@ -1269,12 +1282,67 @@ sub sortUniqSub{
 	if ($count == 1 and !/N/){
 	    chomp;
 	    $readLength = length($_);
-	    die "Length of short reads is not fixed. clipping option is required.
-For nanopore reads clipping=100 or 150 is recommended.
-perl check_length.pl target=$target
-will list the distibution of read length.\n" if $readLength != $prev and $prev != 0 and $clipping eq "";
+	    $count{$readLength} ++;
+	    if ($readLength != $prev and $prev != 0 and $clipping eq ""){
+		$clippingFlag = 1;
+	    }
 	    $prev = $readLength;
-	    if ($clipping ne ""){
+	    if (! $clippingFlag){
+		if ($clipping ne ""){
+		    if ($readLength >= $clipping){
+			$pos = 0;
+			while(1){
+			    $subseq = substr($_, $pos, $clipping);
+			    last if length($subseq) < $clipping;
+			    $pos += $clipping;
+			    $tag = substr($subseq, 0, 3);
+			    print $tag "$subseq\n";
+			    $complement = &complement($subseq);
+			    $tag = substr($complement, 0, 3);
+			    print $tag "$complement\n";
+			}
+		    }
+		}else{
+		    $tag = substr($_, 0, 3);
+		    print $tag "$_\n";
+		    $complement = &complement($_);
+		    $tag = substr($complement, 0, 3);
+		    print $tag "$complement\n";
+		}
+	    }
+	    $total ++;
+	    if ($total % 1000000 == 0){
+		report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
+	    }
+	}elsif($count == 4){
+	    $count = 0;
+	}
+	$count++;
+    }
+    close(IN);
+    
+    if ($clippingFlag){
+	foreach (reverse sort bynumber keys %count){
+	    $sum += $count{$_};
+	    $percent = int($sum * 100 / $total);
+	    if ($percent >= 90){
+		$clipping = $_;
+		last;
+	    }
+	}
+	$count = 0;
+	$total = 0;
+	if ($clipping > 200){
+	    $clipping = int($clipping /int($clipping / 100));
+	}
+	$additionalReport = "\nValue of clipping has been adjusted to $clipping.";
+	print LOG "clipping : $clipping\n";
+	report("Value of clipping has been adjusted to $clipping.");
+	open(IN, $cmd);
+	while(<IN>){
+	    if ($count == 1 and !/N/){
+		chomp;
+		$readLength = length($_);
 		if ($readLength >= $clipping){
 		    $pos = 0;
 		    while(1){
@@ -1288,23 +1356,18 @@ will list the distibution of read length.\n" if $readLength != $prev and $prev !
 			print $tag "$complement\n";
 		    }
 		}
-	    }else{
-		$tag = substr($_, 0, 3);
-		print $tag "$_\n";
-		$complement = &complement($_);
-		$tag = substr($complement, 0, 3);
-		print $tag "$complement\n";
+		$total ++;
+		if ($total % 1000000 == 0){
+		    report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
+		}
+	    }elsif($count == 4){
+		$count = 0;
 	    }
-	    $total ++;
-	    if ($total % 1000000 == 0){
-		report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
-	    }
-	}elsif($count == 4){
-	    $count = 0;
+	    $count++;
 	}
-	$count++;
+	close(IN);
     }
-    close(IN);
+
     &closeTag;
 }
 
