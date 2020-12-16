@@ -30,16 +30,25 @@ All short reads from Individual_A and Individual_B are sliced to *k*-mer (*e.g. 
 ## For analysis of SARS-CoV-2(COVID-19) data
 ```
 perl download.pl accession=SRR11542244
-perl check_length.pl target=SRR11542244
-perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100
+perl ped.pl target=SRR11542244,ref=SARS-CoV-2
 ```
 or
 ```
 docker run -v `pwd`:/work -w /ped akiomiyao/ped perl download.pl accession=SRR11542244,wd=/work
-docker run -v `pwd`:/work -w /ped akiomiyao/ped perl check_length.pl target=SRR11542244,wd=/work
-docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100,wd=/work
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=SRR11542244,ref=SARS-CoV-2,wd=/work
 ```
 Run time of ped.pl is only two minutes for one accession using a standard desktop computer installed Linux (Ubuntu).  
+If you want to analyze your private sequences,  
+```
+cd ped
+mkdir your_sample_name
+mkdir your_sample_name/read
+cp somewhere/read_data.fastq your_sample_name/read
+perl ped.pl target=your_sample_name,ref=SARS-CoV-2
+or 
+docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=your_sample_name,ref=SARS-CoV-2,wd=/work
+```
+Target name for ped.pl is the directory name.  
 [Detailed Link for COVID-19 analysis](https://akiomiyao.github.io/ped/covid19/index.html)  
 
 ## Simplified instruction
@@ -74,9 +83,11 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   thread=8 : specify the max thread (thread was changed to process in current version) number.  
   Default is the number of logical core.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
-  clipping=100 : If length of short reads is not fixed, clipping to fixed length is required.  
+  clipping=100 : If length of short reads is not fixed, ped.pl determine the suitable clipping length.  
+  If you want to force the clipping length, add the clipping option.  
   Distribution of counts by sequence length can be obtained by check_length.pl  
   perl check_length.pl target=ERR3063487  
+  Clipping length between 90-95% coverage is enough.  
 - Result files,  
 ```
 File name               Description
@@ -85,6 +96,7 @@ ERR3063487.bi.primer    Primer data for PCR
 ERR3063487.bi.snp       SNP data (original format)
 ERR3063487.index        Index file for alignemt search
 ERR3063487.log          Process log
+ERR3063487.report       Log of ped.pl
 ERR3063487.sv           Structural variation data
 ERR3063487.sv.primer    Primer data for PCR
 ERR3063487.vcf          SNP and SV data (vcf format, for IGV)
