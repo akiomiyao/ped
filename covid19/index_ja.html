@@ -63,6 +63,17 @@ $ git clone https://github.com/akiomiyao/ped.git</pre>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=SARS-CoV-2,wd=/work <br>
     上記コマンドをコピー・ペーストしてアクセッション名等の値を修正して実行するのが楽です。<br>
     Googleのクラウドやアマゾンウェブサービス(AWS)でも実行可能です。
+    <li>プライベートなデータの解析<br>
+    お持ちのプライベートなfastqファイルを解析する場合は、download.plを実行した時にできるディレクトリ構造と同じディレクトリ構造でリードデータを配置します。<br>
+    例<br>
+    $ cd ped<br>
+    $ mkdir your_sample1<br>
+    $ mkdir your_sample1/read<br>
+    $ cp read_data_dir/foo.fastq your_sample1/read<br>
+    $ perl ped.pl target=your_sample1,ref=ref=SARS-CoV-2<br>
+    ped.plのターゲット名は、作ったディレクトリ名を指定します。<br>
+    fastqファイルは、.gz、.bzip2、.xz等の拡張子のついた圧縮ファイルの状態でも、そのままped.plで解析できます。<br>
+    解析結果一式は、your_sample1のディレクトリに出力されます。
     <li>clippingについて<br>
     ped.plはリード長が一定の配列データを解析するように作られています。RNA由来の配列データは、リード長が不ぞろいな場合が多いです。<br>
     以前は、check_length.plで至適のclipping長を求めて、ped.plを走らせるときに指定する必要がありましたが、ped.plに自動でclippingする機能を持たせました。<br>
