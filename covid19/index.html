@@ -26,12 +26,12 @@
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11542243" target = "_blank">SRR11542243</a><br>
     $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR11542244" target = "_blank">SRR11542244</a><br>
     <li><b>Detection of polymorphism</b><br>
-    $ perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
-    $ perl ped.pl target=SRR11513116,ref=SARS-CoV-2,clipping=146<br>
-    $ perl ped.pl target=SRR11513117,ref=SARS-CoV-2,clipping=146<br>
-    $ perl ped.pl target=SRR11513118,ref=SARS-CoV-2,clipping=143<br>
-    $ perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100<br>
-    $ perl ped.pl target=SRR11542244,ref=SARS-CoV-2,clipping=100<br>
+    $ perl ped.pl target=SRR11513115,ref=SARS-CoV-2<br>
+    $ perl ped.pl target=SRR11513116,ref=SARS-CoV-2<br>
+    $ perl ped.pl target=SRR11513117,ref=SARS-CoV-2<br>
+    $ perl ped.pl target=SRR11513118,ref=SARS-CoV-2<br>
+    $ perl ped.pl target=SRR11542243,ref=SARS-CoV-2<br>
+    $ perl ped.pl target=SRR11542244,ref=SARS-CoV-2<br>
     Currently, fastq files of Illmina and Oxford nanopore are supported.
     <li><b>For Docker users</b><br>
     $ sudo apt install docker<br>
@@ -39,11 +39,22 @@
     Example of analysis,<br>
     $ sudo docker pull akiomiyao/ped<br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR11513115,wd=/work <br>
-    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146,wd=/work <br>
-    Copy and paste commands described above to your terminal window, change values of accession, target and clipping, and run.<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR11513115,ref=SARS-CoV-2,wd=/work <br>
+    Copy and paste commands described above to your terminal window, change values of accession, target and run.<br>
     Both the ped.pl script and the docker container can be run on Google Cloud Platform and Amazon Web Services.
-    <li><b>Size of clipping</b><br>
+    <li><b>For private data</b><br>
+    $ mkdir your_data1 (target name for ped.pl is the directory name)<br>
+    $ mkdir your_data1/read<br>
+    $ cp ~/your_data_directory/foo.fastq your_data1/read (compressed file with gz, bzip2 and xz extentions are appricable)<br>
+    $ perl ped.pl target=your_data1,ref=SARS-CoV-2<br>
+    or<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=your_data1,ref=SARS-CoV-2,wd=/work<br>
+    <li><b>About clipping</b><br>
     Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
+    The new ped.pl determines optimal clipping length. If you want to force the clipping length, add clipping option.<br>
+    For example,<br>
+    $ perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
+    To know the optimal clipping length, run check_length.pl.<br> 
     $ perl check_length.pl target=SRR11513115<br>
     'check_length.pl' outputs read counts in each length.<br>
     Choose the optimal length for clipping.<br>
@@ -62,7 +73,6 @@ Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https:
     If you want to view by your computer, download and install IVG from <a href = "http://software.broadinstitute.org/software/igv/download" target = "_blank">http://software.broadinstitute.org/software/igv/download</a>.<br>
     Click Genomes tab of IVG and load "SARS-CoV-2.fasta" and "SARS-CoV-2.gff" files.<br>
     Click File tab and load "ped/SRR11513115/SRR11513115.vcf" and other vcf files or drop files on the main window.<br>
-    <li>Old vcf data contain ambiguous mutations near the 5'-end. I update the PED program. New version filters mutations from 5'-end to the length of reads.
     <li><b>Check mutation in bidirectional alignments</b><br>
     In the ped directory,<br>
 $ perl search.pl target=target,chr=chromosome,pos=position<br><br>
@@ -84,6 +94,8 @@ TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCA
                                                |
                                                ChrNC_045512.2 5870
 </pre>
+    The position for indel in vcf file is one base before the junction position. On the other hand, alignment of ped shows the position of junction.<br>
+    In the case of no alignment, search with vcf position plus one.<br>
     <li><b>Files</b><br>
     <a href = "SARS-CoV-2.fasta" target = "_blank">SARS-CoV-2.fasta</a> From NCBI<br>
     <a href = "SARS-CoV-2.gff" target = "_blank">SARS-CoV-2.gff</a> From NCBI<br>
