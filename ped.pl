@@ -2,8 +2,6 @@
 #
 # This file is a script for Polymorphic Edge Detection.
 #
-# All in one version.
-#
 # Copyright (C) 2019 National Agriculture and Food Research Organization. All Rights Reserved.
 #
 # License: refer to https://github.com/akiomiyao/ped
@@ -16,6 +14,8 @@ $usage = '
 
  e.g. perl ped.pl target=ERR194147,ref=hg38
 
+ Results will be saved in the target directory.
+
  If you want to detect polymorphisms between target and control,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235
 
@@ -25,10 +25,10 @@ $usage = '
  If you want to specify both the working directory and tmp directory,
  perl ped.pl target=ERR194147,ref=hg38,wd=/home/you/work,tmpdir=/mnt/ssd
 
- If you want to make only reference data.
+ To make only reference data.
  perl ped.pl ref=hg38
 
- If you want to make the special reference data absent in config file.
+ To make the special reference data absent in config file.
  mkdir refname
  cp refname.fasta refname
  perl ped.pl ref=refname,file=refname.fasta
@@ -40,24 +40,41 @@ $usage = '
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
- Results will be saved in the target directory.
-
  If short reads have different length sequences, sequence will be clipped.
  If you want to specify the clipping length,
  perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
 
  If clipping value is omitted, the value will be adjusted by the program.
 
+ To know the optimal clipping length,
+ perl check_length.pl SRR11542243
+
  An example,
  perl download.pl accession=SRR11542243
- perl check_length.pl SRR11542243
- perl ped.pl target=SRR11542243,ref=SARS-CoV-2,clipping=100
+ perl ped.pl target=SRR11542243,ref=SARS-CoV-2
+
+ It takes 5 minuits.
 
  SRR11542243.vcf in SRR11542243 directioy is the result.
- It takes 5 minuits.
-  
+ SRR11542243.full.vcf : Unfilterd but verified result.
+ SRR11542243.count.vcf : Unfilterd raw result.
+ SRR11542243.bi.snp : PED format SNP result.
+ SRR11542243.sv : PED format structural variation result.
+
+ Some polymorphisms from mixed genome sequence like as viruses from human
+ will be filtered out during verify process.
+ In this casee, count.vcf is more informative.
+
  perl search.pl target=SRR11542243,chr=NC_045512.2,pos=11185
  will show bidirectional alignments.
+
+ Analysis for your fastq files
+ mkdir target_name
+ mkdir target_name/read
+ cp somewhere/fastq_files target_name/read
+ perl ped.pl.target=target_name,ref=ref_name
+ Results will be saved in the target directory.
+ Complessed fastq files with gz, bzip2 and xz format can be analyzed.  
 
 ';
 
@@ -209,6 +226,9 @@ if ($ARGV[0] eq ""){
     }
     print "
  Author: MIYAO Akio <miyao\@affrc.go.jp>
+ Scripts: https://github.com/akiomiyao/ped
+ Web page: https://akiomiyao.github.io/ped
+ Docker: https://hub.docker.com/r/akiomiyao/ped  
 
 ";
     exit;
@@ -1334,6 +1354,8 @@ sub sortUniqSub{
 	$total = 0;
 	if ($clipping > 200){
 	    $clipping = int($clipping /int($clipping / 100));
+	}elsif($clipping < 75){
+	    $clipping = 75;
 	}
 	$additionalReport = "\nValue of clipping has been adjusted to $clipping.";
 	print LOG "clipping : $clipping\n";
