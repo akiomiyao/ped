@@ -1388,6 +1388,8 @@ sub sortUniqSub{
 	    $count++;
 	}
 	close(IN);
+    }else{
+	print LOG "clipping : $readLength\n";
     }
 
     &closeTag;
