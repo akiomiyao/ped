@@ -6,7 +6,7 @@
     <h1>Polymorphic Edge Detection (PED)<font size = "4"> - An efficient polymorphism detector for NGS data</font></h1>
     <a href = "../index.html">[Link to Top Page]</a>
     <h2>Example of SARS-CoV-2 Mutation Detection</h2>
-    <a href = "SARS-CoV-2.png" target = "_blank"><img src = "SARS-CoV-2.png" width = "30%"></a> Click to large.<br>
+    <a href = "SARS-CoV-2.png" target = "_blank"><img src = "SARS-CoV-2.png" width = "30%"></a> Click to enlarge.<br>
     <ul>
     <li><b>Install PED into linux machine (<a href = "http://ubuntu.com/" target = "_blank">Ubuntu</a>),</b><br>
     $ sudo apt update<br>
@@ -32,7 +32,7 @@
     $ perl ped.pl target=SRR11513118,ref=SARS-CoV-2<br>
     $ perl ped.pl target=SRR11542243,ref=SARS-CoV-2<br>
     $ perl ped.pl target=SRR11542244,ref=SARS-CoV-2<br>
-    Currently, fastq files of Illmina and Oxford nanopore are supported.
+    Currently, fastq files of Illumina and Oxford nanopore are supported.
     <li><b>For Docker users</b><br>
     $ sudo apt install docker<br>
     $ sudo apt install docker.io<br>
@@ -45,7 +45,7 @@
     <li><b>For private data</b><br>
     $ mkdir your_data1 (target name for ped.pl is the directory name)<br>
     $ mkdir your_data1/read<br>
-    $ cp ~/your_data_directory/foo.fastq your_data1/read (compressed file with gz, bzip2 and xz extentions are appricable)<br>
+    $ cp ~/your_data_directory/foo.fastq your_data1/read (compressed file with gz, bzip2 and xz extentions can be used)<br>
     $ perl ped.pl target=your_data1,ref=SARS-CoV-2<br>
     or<br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=your_data1,ref=SARS-CoV-2,wd=/work<br>
@@ -114,10 +114,10 @@ TTACAAAGTCCTCAGAATACAAAGGTCCTATTACGGATGTTTTCTACAAAGAAAACAGTTACACAACAACCATAAAACCA
     'target.full.vcf' is full output before the selection.<br>
     'target.count.vcf' is from raw data before the verification.<br>
     Some mutations have been filtered out by the verification step, because of too much coverage of short reads.<br>
-    In addition, two mutations in closed position but on different RNA strand (from mixtue of viruses) will be filtered out by verification step.<br>
+    In addition, two mutations in nearby position (within the clipping length) but on different RNA strand (from mixture of viruses) will be filtered out by verification step.<br>
     Usage of count.vcf files from raw count data before verification step is recommended. 
     <li><b>Acknowledgement</b><br>
-    I thank Dr Ilkka Havukkala for test the PED update for SARS-CoV-2 and advice about integration of IVG.<br>
+    I thank Dr Ilkka Havukkala for testing the PED update for SARS-CoV-2 and advice about integration of IVG.<br>
     <li><b>Citing PED</b><br>
 Cite this article as: Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data<br>
 Akio Miyao, Jianyu Song Kiyomiya, Keiko Iida, Koji Doi, Hiroshi Yasue<br>
