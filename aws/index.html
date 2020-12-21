@@ -58,20 +58,17 @@
       <li>Git Bashを起動して、sshの接続例をペーストして実行するとログインできます。<br>
       SSLのキーはDownloadsにセーブされていますので、Git BashでDownloadsのディレクトリに移ってから実行しています。<br>
       <a href = "ssh.png" target = "_blank"><img src = "ssh.png" height = "30%"></a><br><br>
-      ログインして、プロンプトが表示されたら、<br>
+      ログインして、プロンプトが表示されたら、まず、<a href = "../sratoolkit/index_ja.html" target = "_blank">ここをクリックしてsra-toolkitをインストールと設定</a>を行います。<br>
+      PEDの解析は、
       <pre>$ sudo yum update
 $ sudo yum install git
-$ curl -O https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.10.8/sratoolkit.2.10.8-centos_linux64.tar.gz
-$ tar xvfz sratoolkit.2.10.8-centos_linux64.tar.gz
-$ mkdir bin
-$ mv sratoolkit.2.10.8-centos_linux64/bin/fastq-dump-orig.2.10.8 bin/fastq-dump
 $ git clone https://github.com/akiomiyao/ped.git
 $ cd ped
 $ perl download.pl accession=SRR11513115
 $ perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146
 </pre>
-を順に実行します。sra-toolkitやfastq-dumpのバージョン番号は変化するので、<br>
-<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software" target = "_blank">https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software</a>でリンクの位置を確認してください。<br>
+を順に実行します。
+<br>
 AWS LinuxはCentOS系ですので、CentOS Linux 64 bit architectureのファイルをダウンロードします。
       <li>PEDの結果は5分ほどで得られます。以下は、クラウドでのPEDの実行結果です。<br>
       <a href = "ped.png" target = "_blank"><img src = "ped.png" height = "50%"></a><br>
