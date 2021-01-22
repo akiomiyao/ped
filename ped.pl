@@ -328,10 +328,10 @@ sub finish{
     }elsif($min == 1){
 	$etime .= "$min minute ";
     }
-    if ($second > 1){
-	$etime .= "$second seconds ";
-    }elsif($second == 1){
-	$etime .= "$second second ";
+    if ($sec > 1){
+	$etime .= "$sec seconds ";
+    }elsif($sec == 1){
+	$etime .= "$sec second ";
     }
     $end_timestamp = `date`;
     chomp($start_timestamp);
