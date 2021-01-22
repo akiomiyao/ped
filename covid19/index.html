@@ -49,17 +49,6 @@
     $ perl ped.pl target=your_data1,ref=SARS-CoV-2<br>
     or<br>
     $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=your_data1,ref=SARS-CoV-2,wd=/work<br>
-    <li><b>About clipping</b><br>
-    Fastq sequence of RT-PCR products is not fixed length. Since PED requires fixed length sequences, clipping of sequences is required.<br>
-    The new ped.pl determines optimal clipping length. If you want to force the clipping length, add clipping option.<br>
-    For example,<br>
-    $ perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
-    To know the optimal clipping length, run check_length.pl.<br> 
-    $ perl check_length.pl target=SRR11513115<br>
-    'check_length.pl' outputs read counts in each length.<br>
-    Choose the optimal length for clipping.<br>
-    NCBI also shows the optimal length. See the metadata of each run.<br>
-    For data of Oxford nanopore, clipping=100 or 150 is recommended.
     <li><b>Viewing mutations with Integrative Genomics Viewer</b><br>
     Integrative Genomics Viewer (IVG) is a product of Broad Institute.<br>
 Web application of IVG <a href = "https://igv.org/app/" target = "_blank">https://igv.org/app/</a> is useful.<br>
