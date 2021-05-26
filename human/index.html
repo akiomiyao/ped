@@ -9,33 +9,34 @@
       <b>ここでは、<a href = "https://www.illumina.com/platinumgenomes.html" target = "_blank">Illumina社が解析して公開したプラチナゲノムの配列データ</a>の多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b><br><br>
 <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194146" target = "_blank">ERR194146</a>と
       <a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR194147" target = "_blank">ERR194147</a>の配列データを例に解析手順を紹介します。<br>
-      <table>
-      <tr><td><a href = "http://software.broadinstitute.org/software/igv/" target = "_blank">IGV Desktop</a><br><a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a><td>
-<td><a href = "https://igv.org/app/" target = "_blank">IGV Web Application</a><br><a href = "ERR194146.png" target = "_blank"><img src = "ERR194146.png" height = "30%"></a></td><td><ul><li>IGVでの表示例です。図をクリックすると拡大されます。
+      <ul>
+      <li><a href = "http://software.broadinstitute.org/software/igv/" target = "_blank">IGV Desktop</a><br>
+<a href = "ERR194146_ERR194147.png" target = "_blank"><img src = "ERR194146_ERR194147.png" height = "30%"></a><br>
+<a href = "https://igv.org/app/" target = "_blank">IGV Web Application</a><br><a href = "ERR194146.png" target = "_blank"><img src = "ERR194146.png" height = "30%"></a>
+<li>IGVでの表示例です。図をクリックすると拡大されます。
 <li>SNP以外に、<b>挿入・欠失変異も正確に検出できる</b>特徴があります。
 <li>変異部分を増幅する<b>プライマー対の配列</b>も得られます。
 <li>PEDでの解析結果例(vcf形式)<br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf" target = "_blank">ERR194146.vcf</a>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146.vcf.idx" target = "_blank">ERR194146.vcf.idx</a><br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf" target = "_blank">ERR194147.vcf</a>
-<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br></ul></td></tr>
-      </table>
-      <table>
-<tr><td><hr></td><td><hr></td></tr>
-<tr><td><a href = "https://github.com/akiomiyao/ped/blob/gh-pages/human/ERR194146_ERR194158_ERR194159.png?raw=true" target = "_blank"><img src = "https://github.com/akiomiyao/ped/blob/gh-pages/human/ERR194146_ERR194158_ERR194159.png?raw=true" height = "37%"></a></td><td><ul>
-<li><b>ERR194158</b>は<b>ERR194146</b>の父、<b>ERR194159</b>は母のショートリードデータです。
-<li>ERR194158とERR194159を、それぞれコントロールにしてPEDでERR194146の多型を検出しました。
-<li>コントロール側で検出された多型はvcfファイルから除かれて出力されます。
+<a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194147.vcf.idx" target = "_blank">ERR194147.vcf.idx</a><br><br>
+
+<li>次に、ショートリードデータ<b>ERR194158</b>に対する父由来<b>ERR194146</b>および母由来<b>ERR194159</b>の多型を検出しました。<br>
+<a href = "https://github.com/akiomiyao/ped/blob/gh-pages/human/ERR194146_ERR194158_ERR194159.png?raw=true" target = "_blank"><img src = "https://github.com/akiomiyao/ped/blob/gh-pages/human/ERR194146_ERR194158_ERR194159.png?raw=true" height = "37%"></a>
+
+<li>ERR194158とERR194159をそれぞれコントロールにして、PEDでERR194146に対する多型を検出しました。
+<li>PEDではコントロール側で検出された多型はvcfファイルから除かれて出力されます。
 <li>ERR194146vsERR194159は父親特異的、ERR194146vsERR194158は母親特異的多型のデータとなります。
 <li>左のIGVの画面では、父親由来、および、母親由来のセグメントが明瞭に確認できます。
 <li>以下は、解析済みの特異的多型のvcfファイルのリンクです。<br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146vsERR194158.vcf" target = "_blank">ERR194146vsERR194158.vcf</a> (母親特異的多型のvcfファイル)<br>
 <a href = "https://tos.nias.affrc.go.jp/~miyao/pub/20200511AMVT/ERR194146vsERR194159.vcf" target = "_blank">ERR194146vsERR194159.vcf</a> (父親特異的多型のvcfファイル)
-</ul></td></tr>      </table>
+</ul>
 
       <h2>Ubuntuのインストール</h2>
       <ul>
-      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。18.04.3LTSでも、20.4 LTSでもどちらでも構いません。
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
       <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
 PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
       マルチスレッドで動作しますので、4コア、あるいは8コアのCPUを用いると早く結果が得られます。
@@ -137,7 +138,7 @@ ERR194146.vcfとERR194147.vcfをメインの表示ボックスにドラッグす
       <h2>お問い合わせ</h2>
 〒305-8518<br>
 茨城県つくば市観音台2-1-2<br>
-農研機構次世代作物開発研究センター<br>
+農研機構作物研究部門<br>
 宮尾安藝雄 (miyao@affrc.go.jp)<br>
     </body>
 </html>
