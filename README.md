@@ -166,11 +166,12 @@ After the new login, docker commands can be execute with your account.
 
 ## Supporting reference genomes
 ```
-  Reference Name  Description  
+  Name           Description
   Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
   B73v4          Corn (Zea mays B73) RefGen v4
   Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
   Bsubtilis      Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
+  Camarosa1.0    Fragaria x ananassa Camarosa (Strawberry) genome assembly v1.0
   Ecoli          Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
   GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2        Lotus japonicus Gifu 
@@ -182,6 +183,7 @@ After the new login, docker commands can be execute with your account.
   KOD1           Thermococcus kodakarensis KOD1 (NC_006624.1)
   LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
   RIB40          Aspergillus oryzae RIB40 (ASM18445v3) 
+  Reikou2.3      Reikou (Strawberry) genome v2.3
   SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
   SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
   SScrofa11.1    Pig (Sus scrofa) Release-97
