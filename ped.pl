@@ -88,7 +88,7 @@ $start_timestamp = `date`;
 $log = "script : ped.pl
 argument : $ARGV[0]\n";
 
-if ($ARGV[0] =~ /target/){
+if ($ARGV[0] =~ /target|file/){
     my @arg = split(',', $ARGV[0]);
     foreach (sort @arg){
 	next if $_ eq "";
@@ -174,7 +174,6 @@ if ($uname eq "Darwin"){
     $max_process = $processor;
 }
 $max_process = 3 if $max_process eq "";
-$max_process = 14 if $max_process > 14;
 $max_process = $thread if $thread ne "";
 $log .= "max process : $max_process\n";
 
