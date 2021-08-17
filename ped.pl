@@ -870,21 +870,25 @@ sub mkRef{
     system("mkdir $wd/$ref") if ! -e "$wd/$ref";
     system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     if ($file eq ""){
-	@row = split('/', $curl{$ref});
-	$remote_file = $row[$#row];
-	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
-	    if ($curl{$ref} !~/^[h|f]/){
-		&report($curl{$ref});
-		&finish;
+	if ($file{$ref} ne "" and -e "$wd/$ref/$file{$ref}" and $chr[0] ne ""){
+	    &mkChr;
+	}else{
+	    @row = split('/', $curl{$ref});
+	    $remote_file = $row[$#row];
+	    if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
+		if ($curl{$ref} !~/^[h|f]/){
+		    &report($curl{$ref});
+		    &finish;
+		}
+		&report("Downloading $curl{$ref}");
+		system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
+		if ($ref eq "sacCer3"){
+		    system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
+		    system("mv S288C_reference_genome_R64-1-1_20110203/S288C_reference_sequence_R64-1-1_20110203.fsa $wd/$ref");
+		}
 	    }
-	    &report("Downloading $curl{$ref}");
-	    system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
-	    if ($ref eq "sacCer3"){
-		system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
-		system("mv S288C_reference_genome_R64-1-1_20110203/S288C_reference_sequence_R64-1-1_20110203.fsa $wd/$ref");
-	    }
+	    &mkChr;
 	}
-	&mkChr;
     }else{
 	&mkChrFromFile($file);
     }
