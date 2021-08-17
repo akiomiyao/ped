@@ -88,7 +88,7 @@ $start_timestamp = `date`;
 $log = "script : ped.pl
 argument : $ARGV[0]\n";
 
-if ($ARGV[0] =~ /target/){
+if ($ARGV[0] =~ /target|file/){
     my @arg = split(',', $ARGV[0]);
     foreach (sort @arg){
 	next if $_ eq "";
@@ -174,7 +174,6 @@ if ($uname eq "Darwin"){
     $max_process = $processor;
 }
 $max_process = 3 if $max_process eq "";
-$max_process = 14 if $max_process > 14;
 $max_process = $thread if $thread ne "";
 $log .= "max process : $max_process\n";
 
@@ -870,21 +869,25 @@ sub mkRef{
     system("mkdir $wd/$ref") if ! -e "$wd/$ref";
     system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     if ($file eq ""){
-	@row = split('/', $curl{$ref});
-	$remote_file = $row[$#row];
-	if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
-	    if ($curl{$ref} !~/^[h|f]/){
-		&report($curl{$ref});
-		&finish;
+	if ($file{$ref} ne "" and -e "$wd/$ref/$file{$ref}" and $chr[0] ne ""){
+	    &mkChr;
+	}else{
+	    @row = split('/', $curl{$ref});
+	    $remote_file = $row[$#row];
+	    if (! -e "$wd/$ref/$remote_file" and $curl{$ref} ne ""){
+		if ($curl{$ref} !~/^[h|f]/){
+		    &report($curl{$ref});
+		    &finish;
+		}
+		&report("Downloading $curl{$ref}");
+		system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
+		if ($ref eq "sacCer3"){
+		    system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
+		    system("mv S288C_reference_genome_R64-1-1_20110203/S288C_reference_sequence_R64-1-1_20110203.fsa $wd/$ref");
+		}
 	    }
-	    &report("Downloading $curl{$ref}");
-	    system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
-	    if ($ref eq "sacCer3"){
-		system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
-		system("mv S288C_reference_genome_R64-1-1_20110203/S288C_reference_sequence_R64-1-1_20110203.fsa $wd/$ref");
-	    }
+	    &mkChr;
 	}
-	&mkChr;
     }else{
 	&mkChrFromFile($file);
     }
