@@ -217,10 +217,10 @@ close(IN);
 if ($ARGV[0] eq ""){
     print " Currently, reference genomes listed below are suported.
 
-  Name           Description\n";
+  Name             Description\n";
     foreach (sort keys %desc){
 	my $name = "$_                  ";
-	$name = substr($name, 0, 14);
+	$name = substr($name, 0, 16);
 	print "  $name $desc{$_}\n";
     }
     print "
@@ -250,6 +250,8 @@ if ($target ne ""){
     open(REPORT, "> $wd/$target/$target.report");
     open(LOG, "> $wd/$target/$target.log");
 }elsif($ref ne ""){
+    system("mkdir $wd/$ref") if ! -e "$wd/$ref";
+    system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     open(REPORT, "> $wd/$ref/$ref.log");
 }
 
@@ -866,8 +868,6 @@ sub countKmerSub{
 
 sub mkRef{
     my (@row, $i, $remote_file);
-    system("mkdir $wd/$ref") if ! -e "$wd/$ref";
-    system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     if ($file eq ""){
 	if ($file{$ref} ne "" and -e "$wd/$ref/$file{$ref}" and $chr[0] ne ""){
 	    &mkChr;

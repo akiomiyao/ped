@@ -166,36 +166,38 @@ After the new login, docker commands can be execute with your account.
 
 ## Supporting reference genomes
 ```
-  Name           Description
-  Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
-  B73v4          Corn (Zea mays B73) RefGen v4
-  Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  Bsubtilis      Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
-  Camarosa1.0    Fragaria x ananassa Camarosa (Strawberry) genome assembly v1.0
-  Ecoli          Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
-  GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
-  Gifu1.2        Lotus japonicus Gifu 
-  Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
-  HBV            Hepatitis B virus (strain ayw, NC_003977.2)
-  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
-  IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
-  IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
-  KOD1           Thermococcus kodakarensis KOD1 (NC_006624.1)
-  LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
-  RIB40          Aspergillus oryzae RIB40 (ASM18445v3) 
-  Reikou2.3      Reikou (Strawberry) genome v2.3
-  SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
-  SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
-  SScrofa11.1    Pig (Sus scrofa) Release-97
-  TAIR10         Arabidopsis thaliana version TAIR10
-  UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
-  Vcholerae      Vibrio cholerae O1 biovar El Tor str. N16961
-  WBcel235       Caenorhabditis elegans WBcel235
-  danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
-  dmel626        Drosophila melanogaster
-  hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
-  hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
-  sacCer3        Saccharomyces cerevisiae (UCSC sacCer3)
+  Name             Description
+  97103            Water melon (Citrullus lanatus subsp. vulgaris) cv. 97213v2
+  Asagao1.2        Asagao (Ipomoea nil) Japanese morning glory
+  B73v4            Corn (Zea mays B73) RefGen v4
+  Bomo             Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+  Bsubtilis        Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
+  Camarosa1.0      Strawberry (Fragaria x ananassa) Camarosa genome assembly v1.0
+  CharlestonGray2  Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
+  Ecoli            Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
+  GRCm38           Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gifu1.2          Lotus japonicus Gifu 
+  Gmax275v2.0      Soybean (Glycine max) genome project assemble version 2
+  HBV              Hepatitis B virus (strain ayw, NC_003977.2)
+  IBSC2            Barley (Hordeum vulgare L. cv. Molex) Release 47
+  IRGSP1.0         Rice (Olyza sativa L. cv. Nipponbare) version 1.0
+  IWGSC1.0         Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  KOD1             Thermococcus kodakarensis KOD1 (NC_006624.1)
+  LJ3              Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  RIB40            Aspergillus oryzae RIB40 (ASM18445v3) 
+  Reikou2.3        Strawberry Reikou genome v2.3
+  SARS-CoV-2       Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
+  SL3              Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  SScrofa11.1      Pig (Sus scrofa) Release-97
+  TAIR10           Arabidopsis thaliana version TAIR10
+  UMD3.1           Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  Vcholerae        Vibrio cholerae O1 biovar El Tor str. N16961
+  WBcel235         Caenorhabditis elegans WBcel235
+  danRer11         Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
+  dmel626          Drosophila melanogaster
+  hg19             Human (Homo sapiens) Genome Reference Consortium Human Build 19
+  hg38             Human (Homo sapiens) Genome Reference Consortium Human Build 38
+  sacCer3          Saccharomyces cerevisiae (UCSC sacCer3)
 ```
   If fetch the fasta file is failed by the script, fetch the file separately and save in the reference directory and run the script.
   Specify only reference, ped.pl will make the reference data only.  

@@ -130,15 +130,20 @@ RIB40	description	Aspergillus oryzae RIB40 (ASM18445v3)
 RIB40	wget	ftp://ftp.ensemblgenomes.org/pub/fungi/release-47/fasta/aspergillus_oryzae/dna/Aspergillus_oryzae.ASM18445v3.dna.toplevel.fa.gz
 RIB40	chromosome	0	0	NOP	1	2	3	4	5	6	7	8	AP007160	AP007177	AP007156
 
-Camarosa1.0	description	Fragaria x ananassa Camarosa (Strawberry) genome assembly v1.0
+Camarosa1.0	description	Strawberry (Fragaria x ananassa) Camarosa genome assembly v1.0
 Camarosa1.0	wget	https://www.rosaceae.org/rosaceae_downloads/Fragaria_x_ananassa/Fragaria_x_ananassa_Camarosa_Genome_v1.0.a1/assembly/F_ana_Camarosa_6-28-17.fasta.gz
 Camarosa1.0	chromosome	0	0	1-1	1-2	1-3	1-4	2-1	2-2	2-3	2-4	3-1	3-2	3-3	3-4	4-1	4-2	4-3	4-4	5-1	5-2	5-3	5-4	6-1	6-2	6-3	6-4	7-1	7-2	7-3	7-4
 
-Reikou2.3       description     Reikow (Strawberry) genome v2.3
-Reikou2.3       wget    Access to http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome > Download > FAN_r2.3 > FAN_r2.c.chr1-7.fasta.gz  Save FAN_r2.c.chr1-7.fasta.gz into Reikou2.3 directory
-Reikou2.3       chromosome      0       0       1Ava    1Avb    1Bia    1Bib    1X1a    1X1b    1X2a    1X2b    1X3a    1X3b    2Ava    2Avb    2Bia    2Bib    2X1a    2X1b    2X2a    2X2b    3Ava    3Avb    3Bia 3Bib     3X1a    3X1b    3X2a    3X2b    4Ava    4Avb    4Bia    4Bib    4X1a    4X1b    4X2a    4X2b    5Ava    5Avb    5Bia    5Bib    5X1a    5X1b    5X2a    5X2b    6Av1a   6Av1b   6Av2a   6Av2b   6Bia    6Bib 6X1a     6X1b    6X2a    6X2b    6X3a    6X3b    7Ava    7Avb    7Bia    7Bib    7X1a    7X1b    7X2a    7X2b
-
-Reikou2.3	description	Reikou (Strawberry) genome v2.3
+Reikou2.3	description	Strawberry Reikou genome v2.3
 Reikou2.3	wget	Access to http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome > Download > FAN_r2.3 > FAN_r2.3.chr1-7.fasta.gz Save  FAN_r2.3.chr1-7.fasta.gz into Reikou2.3 directory
 Reikou2.3	file	FAN_r2.3.chr1-7.fasta.gz
 Reikou2.3	chromosome	0	0	1Ava	1Avb	1Bia	1Bib	1X1a	1X1b	1X2a	1X2b	1X3a	1X3b	2Ava	2Avb	2Bia	2Bib	2X1a	2X1b	2X2a	2X2b	3Ava	3Avb	3Bia	3Bib	3X1a	3X1b	3X2a	3X2b	4Ava	4Avb	4Bia	4Bib	4X1a	4X1b	4X2a	4X2b	5Ava	5Avb	5Bia	5Bib	5X1a	5X1b	5X2a	5X2b	6Av1a	6Av1b	6Av2a	6Av2b	6Bia	6Bib	6X1a	6X1b	6X2a	6X2b	6X3a	6X3b	7Ava	7Avb	7Bia	7Bib	7X1a	7X1b	7X2a	7X2b
+
+97103	description	Water melon (Citrullus lanatus subsp. vulgaris) cv. 97213v2
+97103	wget	http://cucurbitgenomics.org/ftp/genome/watermelon/97103/v2/97103_genome_v2.fa.gz
+97103	chromosome	1	11
+
+CharlestonGray2	description	Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
+CharlestonGray2	wget	http://cucurbitgenomics.org/ftp/genome/watermelon/WCG/v2/WCG_genome_v2.fa.gz
+CharlestonGray2	chromosome	1	11
+
