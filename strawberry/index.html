@@ -1,0 +1,160 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>PEDを用いたイチゴの変異検出</h1>
+    <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+    栽培イチゴは異質8倍体(2n=8x=56)と複雑なゲノム構成で、解析の難易度は高いです。ここでは、PEDを用いた多型検出について紹介します。<br><br>
+<a href = "compare.png" target = "_blank"><img src = "compare.png" width = "25%"></a> 構造変異の検出例です。表をクリックすると拡大されます。
+
+    </ul>
+    <h2>Ubuntuのインストール</h2>
+解析にはLinux(Unix)のインストールされたコンピュータが必要です。以下は、Linux(Ubuntu)のインストールの手引きです。
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+      PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
+使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。<br>
+<a href = "../virtualbox/index.html" target = "_blank">VirtualBoxを用いてWindowsマシンで解析する方法</a>や、<a href = "../aws/index.html" target = "_blank">クラウドで実行する方法</a>もあります。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install curl
+$ sudo apt install git
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのアーカイブのダウンロードにはsratoolkitに含まれるfastq-dumpが必要です。<br>
+最近のバージョンのfastq-dumpは使用前にvdb-configコマンドで実行環境を設定する必要があります。<br>
+設定方法は、<a href = "../sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>のページに記載しました。
+
+    <li>NCBI sequence read archive (SRA)からイチゴの配列をダウンロードします。<br>
+    $ cd ped<br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR14477896" target = "_blank">SRR14477896</a><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=SRR14477897" target = "_blank">SRR14477897</a><br>
+    <li>ped.plで多型検出を行います。<br>
+    $ perl ped.pl target=SRR14477896,ref=Camarosa1.0<br>
+    $ perl ped.pl target=SRR14477897,ref=Camarosa1.0<br>
+    解析結果は、targetディレクトリの中に出力されます。
+    <li>Dockerを用いる場合は、以下のようにします。ped.plを直接実行する場合は不要です。<br>
+    $ sudo apt install docker<br>
+    $ sudo apt install docker.io<br>
+    で、docker関連のプログラムがインストールできます。<br>
+    実行例<br>
+    $ sudo docker pull akiomiyao/ped<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=SRR14477896,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=SRR14477896,ref=Camarosa1.0,wd=/work <br>
+    上記コマンドをコピー・ペーストしてアクセッション名等の値を修正して実行するのが楽です。<br>
+    Googleのクラウドやアマゾンウェブサービス(AWS)でも実行可能です。
+    <li>プライベートなデータの解析<br>
+    お持ちのプライベートなfastqファイルを解析する場合は、download.plを実行した時にできるディレクトリ構造と同じディレクトリ構造でリードデータを配置します。<br>
+    例<br>
+    $ cd ped<br>
+    $ mkdir tochiotome<br>
+    $ mkdir tochiotome/read<br>
+    $ cp read_data_dir/foo.fastq tochiotome/read<br>
+    $ perl ped.pl target=tochiotome,ref=ref=Camarosa1.0<br>
+    ped.plのターゲット名は、作ったディレクトリ名を指定します。<br>
+    fastqファイルは、.gz、.bzip2、.xz等の拡張子のついた圧縮ファイルの状態でも、そのままped.plで解析できます。<br>
+    解析結果一式は、tochiotomeのディレクトリに出力されます。
+
+    <li>双方向アラインメント上の多型の確認<br>
+    pedディレクトリで<br><br>
+$ perl search.pl target=target,chr=chromosome,pos=position<br><br>
+を実行します。
+例えば<br><br>
+$ perl search.pl target=SRR14477896,chr=4-3,pos=96599312<br><br>
+あるいは<br><br>
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl search.pl target=SRR14477896,chr=4-3,pos=96599312,wd=/work <br><br>
+以下は、出力の一部です。<br>
+
+<pre># 4-3 9659931 4-3 9660952 f deletion -1032
+AACTCTCCTCTCTGTCTAGG TGCGTGAGGTATGAATGCGG 15
+                                                                                                                  Chr4-3 9659931
+                                                                                                                  |
+TTACCCGATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGCAGGGCCGGTCCTGTGTAAAATGAGGCCCTGTGCGA
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  | |   |   ||  |    | |    |       
+TTACCCGATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCT
+ |    ||  | |   | |    | |   | ||    | ||  | |  |         |  |    |                  | |        |       ||||||||||||||||||||||||||||||||||||||||||||||
+ATTAGGGAATTTTTTTATTTGAATTTGCATATAAATTTTTTGAGGCCCCTAGAAATTGGAGGCCCTGTGCGGTTGCACAACCAGCACAGCCCCAAGACCGGCCCTGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCT
+                                                                                                       |
+                                                                                                       Chr4-3 9660952
+
+# 4-3 9659931 4-3 9660952 f deletion -1032
+ACTCTCCTCTCTGTCTAGGG TGAATGCGGTTATAATCATG 10
+                                                                                                            Chr4-3 9659931
+                                                                                                            |
+GATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGCAGGGCCGGTCCTGTGTAAAATGAGGCCCTGTGCGAAATCTT
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  | |   |   ||  |    | |    |       ||    
+GATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAAAAAA
+||  | |   | |    | |   | ||    | ||  | |  |         |  |    |                  | |        |       ||||||||||||||||||||||||||||||||||||||||||||||||||||
+GAATTTTTTTATTTGAATTTGCATATAAATTTTTTGAGGCCCCTAGAAATTGGAGGCCCTGTGCGGTTGCACAACCAGCACAGCCCCAAGACCGGCCCTGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAAAAAA
+                                                                                                 |
+                                                                                                 Chr4-3 9660952
+
+# 4-3 9659931 4-3 9660952 f deletion -1032
+ATATCTCCAACTCTCCTCTC GAATGCGGTTATAATCATGT 5
+                                                                                                                Chr4-3 9659931
+                                                                                                                |
+ACCCGATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGCAGGGCCGGTCCTGTGTAAAATGAGGCCCTGTGCGAAA
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  | |   |   ||  |    | |    |       ||
+ACCCGATATCTCCAACTCTCCTCTCTGTCTAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAA
+    ||  | |   | |    | |   | ||    | ||  | |  |         |  |    |                  | |        |       ||||||||||||||||||||||||||||||||||||||||||||||||
+TAGGGAATTTTTTTATTTGAATTTGCATATAAATTTTTTGAGGCCCCTAGAAATTGGAGGCCCTGTGCGGTTGCACAACCAGCACAGCCCCAAGACCGGCCCTGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAA
+                                                                                                     |
+                                                                                                     Chr4-3 9660952
+
+# 4-3 9659931 4-3 9660952 f deletion -1032
+ATGACGTCCGCCTCGGCGTC AAAAACGAAACAAAACTAAA 10
+                                                                                   Chr4-3 9659931
+                                                                                   |
+TAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGCAGGGCCGGTCCTGTGTAAAATGAGGCCCTGTGCGAAATCTTGAATGTGGCCTCTTTTTTTTTTTTT
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||  | |   |   ||  |    | |    |       ||      |            |  || |  |
+TAGGGGTGTTATGACGTCCGCCTCGGCGTCGTTGGGATGCTGCCAGACCTGGTGATAAATGGTCTAAACCTTATGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAAAAAACGAAACAAAACTAAATCCTTATAGT
+||    | ||  | |  |         |  |    |                  | |        |       |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+TAAATTTTTTGAGGCCCCTAGAAATTGGAGGCCCTGTGCGGTTGCACAACCAGCACAGCCCCAAGACCGGCCCTGGGTTTGTGTTGCGTGAGGTATGAATGCGGTTATAATCATGTTCTAAAAAACGAAACAAAACTAAATCCTTATAGT
+                                                                        |
+                                                                        Chr4-3 9660952
+
+
+</pre>
+    vcfファイルは、indelの始まる一つ前の塩基の位置を出力しますが、ped.plのアラインメントでは、変異が始まった最初の塩基の位置を出力しています。<br>
+    indelのアラインメントの検索を行う場合は、vcfファイルの位置に1を加えた値で検索してください。
+
+    <li>リファレンスにCamarosaの代わりに麗江のものを用いたい場合は、<br>
+<a href = "http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome" target="_blank">http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome</a>のサイトより配列をダウンロードします。<br>
+Downloadのリンクより辿れる<a href = "https://drive.google.com/drive/folders/1klU5vNA4nwJVRDJaujuGKvs4RUMxwRvM" target="_blank">https://drive.google.com/drive/folders/1klU5vNA4nwJVRDJaujuGKvs4RUMxwRvM</a>より、<br>
+FAN_r2.3.chr-1-7.fasta.gzをダウンロードします。<br>
+ped.plのあるディレクトリにReikou2.3というディレクトリをつくり、その中にダウンロードしたFAN_r2.3.chr-1-7.fasta.gzを移します。<br>
+    $ cd ped<br>
+    $ mkdir Reikou2.3<br>
+    $ mv somewhere/FAN_r2.3.chr-1-7.fasta.gz Reikou2.3<br>
+    $ perl ped.pl target=SRR14477896,ref=Reikou2.3<br>
+で、麗江を元にしたリファレンス配列での多型検出ができます。
+    <li>2つの解析結果からの遺伝子型の比較<br>
+    $ perl compare.pl SRR14477896 SRR14477897<br>
+    とすると、SRR14477896とSRR14477897のSNPの遺伝子型と確認用プライマー配列が表示されます。<br><br>
+    構造変異を見たい場合は、<br>
+    $ perl compare.pl SRR14477896 SRR14477897 sv<br>
+とします。<br>
+ファイルに出力したい場合は、<br>
+    $ perl compare.pl SRR14477896 SRR14477897 > result.txt<br>
+のようにします。<br>
+エクセルに取り込み、遺伝子型に色を付けるとセグメントがわかります。<br>
+<a href = "compare.png" target = "_blank"><img src = "compare.png" width = "25%"></a>     </ul>
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構次世代作物開発研究センター<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+  </body>
+</html>
