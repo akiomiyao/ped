@@ -264,7 +264,7 @@ print LOG $log;
 
 report("Job begin: $method method");
 
-if ($ref ne "" and ! (-e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and -e "$wd/$ref/sort_uniq/$ref.TTT.gz")){
+if ($ref ne "" and ! (-s "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" > 100 and -s "$wd/$ref/sort_uniq/$ref.TTT.gz" > 100)){
     &mkRef;
 }
 
@@ -1151,6 +1151,10 @@ sub mkChr{
     }
     my $i = 0;
     chdir "$wd/$ref";
+    if (! -e $file){
+	&report("$file is not found. Please save $file in $wd/$ref.");
+	exit;
+    }
     &report("Making chromosome file from $file");
     if ($ref eq "hg38"){
 	open(IN, "$zcat $file|");
