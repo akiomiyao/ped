@@ -37,6 +37,10 @@ $usage = '
  perl ped.pl target=ERR194147,ref=hg38,thread=14
  In the case of file open error, reduce muximum number of threads.
 
+ In the case of over the threads (processes) number limit,
+ perl ped.pl target=ERR194147,ref=hg38,thread=14,wait=1
+ Default wait time to make new process is 0.1 seconds.
+
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
 
@@ -249,7 +253,8 @@ if ($sub ne ""){
 if ($target ne ""){
     open(REPORT, "> $wd/$target/$target.report");
     open(LOG, "> $wd/$target/$target.log");
-}elsif($ref ne ""){
+}
+if($ref ne ""){
     system("mkdir $wd/$ref") if ! -e "$wd/$ref";
     system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     open(REPORT, "> $wd/$ref/$ref.log");
@@ -259,7 +264,7 @@ print LOG $log;
 
 report("Job begin: $method method");
 
-if ($ref ne "" and ! -e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and ! -e "$wd/$ref/sort_uniq/$ref.TTT.gz"){
+if ($ref ne "" and ! (-e "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" and -e "$wd/$ref/sort_uniq/$ref.TTT.gz")){
     &mkRef;
 }
 
@@ -3348,6 +3353,7 @@ sub canFork{
     while(1){
 	my $count = 0;
 	$wait_time = 0.1 if $wait_time eq "";
+	$wait_time = $wait if $wait ne "";
 	select undef, undef, undef, $wait_time;
 	opendir(CDIR, "$wd/child");
 	foreach(readdir(CDIR)){
