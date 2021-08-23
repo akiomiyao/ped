@@ -12,15 +12,18 @@ $usage = '
 
 e.g. perl download.pl ACCESSION Working_directory
      perl download.pl ERR194147 /mnt/ssd/data
+     perl download.pl ERR194147
 
      or 
 
      perl download.pl accession=ACCESSION,wd=Working_directory
      perl download.pl accession=ERR194147,wd=/mnt/ssd/data
+     perl download.pl accession=ERR194147
 
-     Working_directory can be omitted.
+     Without specification of wd, ERR194147 directory will be created
+     in the current directory and fastq files will be saved in ./ERR194147/read
 
-Author: Akio Miyao <miyao@affrc.go.jp>
+Author: MIYAO Akio <miyao@affrc.go.jp>
 
 ';
 
@@ -47,4 +50,4 @@ if ($wd eq ""){
 system("mkdir $wd/$accession");
 system("mkdir $wd/$accession/read");
 chdir "$wd/$accession/read";
-system("fastq-dump --split-files -A $accession");
+system("fastq-dump --split-files $accession");
