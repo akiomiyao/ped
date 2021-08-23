@@ -250,14 +250,14 @@ if ($sub ne ""){
     system("mkdir $wd/child");
 }
 
-if ($target ne ""){
-    open(REPORT, "> $wd/$target/$target.report");
-    open(LOG, "> $wd/$target/$target.log");
-}
 if($ref ne ""){
     system("mkdir $wd/$ref") if ! -e "$wd/$ref";
     system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
     open(REPORT, "> $wd/$ref/$ref.log");
+}
+if ($target ne ""){
+    open(REPORT, "> $wd/$target/$target.report");
+    open(LOG, "> $wd/$target/$target.log");
 }
 
 print LOG $log;
