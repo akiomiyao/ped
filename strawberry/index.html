@@ -125,7 +125,7 @@ TAAATTTTTTGAGGCCCCTAGAAATTGGAGGCCCTGTGCGGTTGCACAACCAGCACAGCCCCAAGACCGGCCCTGGGTTT
     vcfファイルは、indelの始まる一つ前の塩基の位置を出力しますが、ped.plのアラインメントでは、変異が始まった最初の塩基の位置を出力しています。<br>
     indelのアラインメントの検索を行う場合は、vcfファイルの位置に1を加えた値で検索してください。
 
-    <li>リファレンスにCamarosaの代わりに麗江のものを用いたい場合は、<br>
+    <li>リファレンスにCamarosaの代わりに麗紅のものを用いたい場合は、<br>
 <a href = "http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome" target="_blank">http://strawberry-garden.kazusa.or.jp/cgi-bin/seqlist.cgi?db=FAN_r2.3&ext=genome</a>のサイトより配列をダウンロードします。<br>
 Downloadのリンクより辿れる<a href = "https://drive.google.com/drive/folders/1klU5vNA4nwJVRDJaujuGKvs4RUMxwRvM" target="_blank">https://drive.google.com/drive/folders/1klU5vNA4nwJVRDJaujuGKvs4RUMxwRvM</a>より、<br>
 FAN_r2.3.chr-1-7.fasta.gzをダウンロードします。<br>
@@ -134,7 +134,7 @@ ped.plのあるディレクトリにReikou2.3というディレクトリをつ�
     $ mkdir Reikou2.3<br>
     $ mv somewhere/FAN_r2.3.chr-1-7.fasta.gz Reikou2.3<br>
     $ perl ped.pl target=SRR14477896,ref=Reikou2.3<br>
-で、麗江を元にしたリファレンス配列での多型検出ができます。
+で、麗紅を元にしたリファレンス配列での多型検出ができます。
     <li>2つの解析結果からの遺伝子型の比較<br>
     $ perl compare.pl SRR14477896 SRR14477897<br>
     とすると、SRR14477896とSRR14477897のSNPの遺伝子型と確認用プライマー配列が表示されます。<br><br>
