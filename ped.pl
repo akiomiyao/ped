@@ -253,7 +253,7 @@ if ($sub ne ""){
 if($ref ne ""){
     system("mkdir $wd/$ref") if ! -e "$wd/$ref";
     system("mkdir $wd/$ref/tmp") if ! -e "$wd/$ref/tmp";
-    open(REPORT, "> $wd/$ref/$ref.log");
+    open(REPORT, "> $wd/$ref/$ref.log") if $target eq ""; 
 }
 if ($target ne ""){
     open(REPORT, "> $wd/$target/$target.report");
