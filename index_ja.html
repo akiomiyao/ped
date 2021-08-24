@@ -23,12 +23,24 @@
 	  <a href = "virtualbox/index.html" target = "_blank">[VirtualBoxでの利用例]</a>
 	  <a href = "aws/index.html" target = "_blank">[クラウド(AWS)での利用例]</a>
 	  <a href = "sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>
+	  <a href = "qa/index_ja.html" target = "_blank">[よくある質問、お役立ち情報]</a>
+     <h2>ニュース</h2>
+     <table>
+<tr>
+<td><a href = "covid19/index_ja.html" target = "_blank"><img src = "covid19/SARS-CoV-2_mutations_selected_20210720.png" height = "200px"></a></td>
+<td><a href = "strawberry/index.html" target = "_blank"><img src = "strawberry/compare.png" height = "200px"></a></td>
+</tr>
+<tr>
+<td>1ヶ月でL452R変異を持つデルタ株と入れ替わりました。</td>
+<td>異質8倍体のイチゴの構造変異の検出</td>
+</tr>
+     </table>
      <h2>PEDとは</h2>
       <p><a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic Edge Detection (PED)</a>は、次世代シーケンサーを用いて得られた塩基配列(ショートリード)より、配列の多型のキワ(エッジ)に着目して効率よく多型を検出する方法です。
       <p>非常に正確にゲノム全体に渡るSNPとindel等構造変異を得ることができます。
       <p>次世代シーケンサーの配列を解析する場合、まず配列をリファレンスゲノム配列にマップして、不一致の部分を抽出するのが一般的ですが、大部分のショートリードは多型を含まないため効率はあまりよくありません。
       <p>PEDでは、ショートリードから多型のエッジになる部分を早い段階で抽出するアルゴリズムで、これまでにない新しい手法です。
-      <p>エッジを検出する方法として、<a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/1" target = "_blank">ショートリードを長さk(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)</a>と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
+      <p>エッジを検出する方法として、<a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/1" target = "_blank">ショートリードを長さ<i>k</i>(<i>k</i>=20)の細かい断片に分解してターゲットとコントロールのショートリードを直接比較して多型を検出する方法(<i>k</i>-mer法)</a>と、ショートリードに対してリファレンスゲノム配列を5'側からと3'側から双方向に整列してエッジを検出する双方向整列法(Bidirectional Alignment法)の2つのアルゴリズムを実装しています。
       <p><i>k</i>-mer法はリファレンス配列がなくても、3'末端に多型を持つ<i>k</i>-merを抽出することができ、連鎖解析に利用できます。
       <p><a href = "https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2955-6/figures/2" target = "_blank">双方向整列法は、SNPに加えて、挿入、欠失、逆位、転座などの構造変異が同時に検出されます。</a>また、従来法に比べて正確かつ高速に処理することができ、特に数100kbを超えるような大きな欠失も正確に検出できる特徴があります。
       <p>シンプルなアルゴリズムなので、ヒトの5倍の大きさで6倍体ゲノムのコムギのような複雑なゲノム構成の生物の多型も検出できます。また、小規模なコンピュータリソースで動作が可能です。<br>
@@ -56,7 +68,7 @@
       <ul>
       <li>Linux(Ubuntu)のインストール
       <ul>
-      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージ(CD-Rに焼くためのファイルですが、USBメモリに入れてインストールすこともできます。)のファイルをダウンロードします。
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージ(CD-Rに焼くためのファイルですが、USBメモリに入れてインストールすることもできます。)のファイルをダウンロードします。
       <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。
       </ul>
       <li>PEDのセットアップ
@@ -112,11 +124,7 @@ perl download.pl accession=Accesion_name<br>
       指定しない場合は、ped.plがあるディレクトリが作業ディレクトリになります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,thread=14<br>
 	  最大スレッド(プロセス)数を指定する場合。通常は設定する必要はありませんが、同じコンピュータで同時に別の作業もする場合は、プロセスの上限を下げると影響が少なくなります。<br>
-      通常指定する必要はないですが、1スレッドで64ファイルをオープンする場合があるので、OSのファイルオープン数に上限がある場合は、スレッド数を抑える必要があります。<br>
-      最大値はLinux OSのデフォルトファイルオープン上限(1024)に収まる14スレッドです。デフォルトはOSが認識するコア数となっています。<br>
-      ※ perlのスレッドのモジュールはメモリーリークを起こすことがわかりました。通常は問題ないのですが、PEDのように大きなデータのソートを行う場合はエラーが発生する場合があります。<br>
-      スレッドの代わりに、別プロセスで実行するようにしたところ問題が回避されることがわかりましたので、現在はスレッドの代わりにプロセスで実行するように変更しました。<br>
-      オプション名は、正確にはprocessとすべきですが、混乱をさけるためthreadのままにしてあります。
+     現在ではthreadによる分散処理からprocessベースに移行しています。オプション名は、正確にはprocessとすべきですが、混乱をさけるためthreadのままにしてあります。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,tmpdir=/mnt/ssd<br>
 	  一時ファイル置き場に高速ディスクを指定する場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer<br>
@@ -304,41 +312,45 @@ vcf形式の結果はBroad Instituteから提供されている<a href = "https:
 	 ref=nameのように表示されたゲノムの名前を指定すると、配列公開サイトから自動的にダウンロードして、データセットが生成されます。<br>
 	 一度作成されると次回以降の実行では、作成されたデータセットをもとに解析が進みます。
 	 <li>現在サポートしているリファレンスゲノムは以下の通りです。
-	 <pre>  Name           Description
-  Asagao1.2      Asagao (Ipomoea nil) Japanese morning glory
-  B73v4          Corn (Zea mays B73) RefGen v4
-  Bomo           Silkworm (Bombyx mori) Genome assembly (Nov.2016)
-  Bsubtilis      Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
-  Ecoli          Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
-  GRCm38         Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
-  Gifu1.2        Lotus japonicus Gifu 
-  Gmax275v2.0    Soybean (Glycine max) genome project assemble version 2
-  HBV            Hepatitis B virus (strain ayw, NC_003977.2)
-  IBSC2          Barley (Hordeum vulgare L. cv. Molex) Release 47
-  IRGSP1.0       Rice (Olyza sativa L. cv. Nipponbare) version 1.0
-  IWGSC1.0       Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
-  KOD1           Thermococcus kodakarensis KOD1 (NC_006624.1)
-  LJ3            Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
-  RIB40          Aspergillus oryzae RIB40 (ASM18445v3) 
-  SARS-CoV-2     Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
-  SL3            Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
-  SScrofa11.1    Pig (Sus scrofa) Release-97
-  TAIR10         Arabidopsis thaliana version TAIR10
-  UMD3.1         Cow (Bos taurus L1 Dominette 01449) UMD 3.1
-  Vcholerae      Vibrio cholerae O1 biovar El Tor str. N16961
-  WBcel235       Caenorhabditis elegans WBcel235
-  danRer11       Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
-  dmel626        Drosophila melanogaster
-  hg19           Human (Homo sapiens) Genome Reference Consortium Human Build 19
-  hg38           Human (Homo sapiens) Genome Reference Consortium Human Build 38
-  sacCer3        Saccharomyces cerevisiae (UCSC sacCer3)
+	 <pre>  Name             Description
+  97103            Water melon (Citrullus lanatus subsp. vulgaris) cv. 97213v2
+  Asagao1.2        Asagao (Ipomoea nil) Japanese morning glory
+  B73v4            Corn (Zea mays B73) RefGen v4
+  Bomo             Silkworm (Bombyx mori) Genome assembly (Nov.2016)
+  Bsubtilis        Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
+  Camarosa1.0      Strawberry (Fragaria x ananassa) Camarosa genome assembly v1.0
+  CharlestonGray2  Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
+  Ecoli            Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
+  GRCm38           Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
+  Gifu1.2          Lotus japonicus Gifu 
+  Gmax275v2.0      Soybean (Glycine max) genome project assemble version 2
+  HBV              Hepatitis B virus (strain ayw, NC_003977.2)
+  IBSC2            Barley (Hordeum vulgare L. cv. Molex) Release 47
+  IRGSP1.0         Rice (Olyza sativa L. cv. Nipponbare) version 1.0
+  IWGSC1.0         Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
+  KOD1             Thermococcus kodakarensis KOD1 (NC_006624.1)
+  LJ3              Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  RIB40            Aspergillus oryzae RIB40 (ASM18445v3) 
+  Reikou2.3        Strawberry Reikou genome v2.3
+  SARS-CoV-2       Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
+  SL3              Tomato (Solanum lycopersicum cv. Heinz 1706) Build 3.0
+  SScrofa11.1      Pig (Sus scrofa) Release-97
+  TAIR10           Arabidopsis thaliana version TAIR10
+  UMD3.1           Cow (Bos taurus L1 Dominette 01449) UMD 3.1
+  Vcholerae        Vibrio cholerae O1 biovar El Tor str. N16961
+  WBcel235         Caenorhabditis elegans WBcel235
+  danRer11         Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
+  dmel626          Drosophila melanogaster
+  hg19             Human (Homo sapiens) Genome Reference Consortium Human Build 19
+  hg38             Human (Homo sapiens) Genome Reference Consortium Human Build 38
+  sacCer3          Saccharomyces cerevisiae (UCSC sacCer3)
 </pre>
      <li>サポートされていないリファレンス配列で解析したい場合
      <ul>
      <li>任意のリファレンスの名称のディレクトリを作り、その中にfastaファイル(multi-fasta形式、圧縮可、名称は任意)を置きます。
      <li>染色体名は、番号とX、Y、Zのように単純なものにした方が、後々の解析が楽になります。
      <li>perl ped.pl target=target,control=control,ref=directory_name,file=file_name<br>
-     で任意のリファレンスのデータセットが生成されて解析が進みます。
+     で任意のリファレンスのデータセットが生成されて解析が進みます。control=controlは省略可能です。
      </ul>
 	 </ul>
 	 <a name = "Docker_install">
