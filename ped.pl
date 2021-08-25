@@ -264,7 +264,7 @@ print LOG $log;
 
 report("Job begin: $method method");
 
-if ($ref ne "" and ! (-s "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" > 100 and -s "$wd/$ref/sort_uniq/$ref.TTT.gz" > 100)){
+if ($ref ne "" and ! (-s "$wd/$ref/ref20_uniq.TTT.gz" > 100 and -s "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" > 100)){
     &mkRef;
 }
 
