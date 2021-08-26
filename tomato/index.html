@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  </head>
+  <body>
+    <h1>PEDを用いたトマトの変異検出</h1>
+    <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+    トマトは2倍体(2n=24)のゲノム構成です。ここでは<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=ERP127093&o=acc_s%3Aa" target = "_blank">フランス(INRA)からの公開配列情報</a>を、PEDで多型検出した結果について紹介します。<br>
+<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR5348981" target = "_blank">ERR5348981</a> (Sample Name PO-024)と
+<a href = "https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=ERR5348982" target = "_blank">ERR5348982</a> (Sample Name VI-0020)から多型を検出して比較しました。
+<br><br>
+<a href = "tomato_sv.png" target = "_blank"><img src = "tomato_sv.png" height = "25%"></a>
+<a href = "tomato.png" target = "_blank"><img src = "tomato.png" height = "25%"></a> 表をクリックすると拡大されます。<br>
+第3染色体の68,264,550までは、ERR5348981はリファレンスと同じで、ERR5348982がリファレンスに対して変異型のセグメントを持っており、<br>
+68,264,741からは、逆にERR5348981が変異型のセグメントを持っていることがわかります。
+
+    </ul>
+    <h2>Ubuntuのインストール</h2>
+解析にはLinux(Unix)のインストールされたコンピュータが必要です。以下は、Linux(Ubuntu)のインストールの手引きです。
+      <ul>
+      <li><a href = "https://www.ubuntulinux.jp/download/ja-remix" target = "_blank">Ubuntu Desktop 日本語 Remix</a>より日本語版のISOイメージのファイルをダウンロードします。
+      <li><a href = "https://linuxfan.info/ubuntu-20-04-install-guide" target = "_blank">Ubuntu 20.04 LTSインストールガイド【スクリーンショットつき解説】</a>が詳しいので参考にしてインストールしてください。<br>
+      PEDは解析時間をできるだけ短くするため、CPUの限界近くまで負荷がかかりますのでほかのOSとの共存は避けた方がいいです。<br>
+使わなくなった古いコンピュータなどにインストールして専用にするのがお勧めです。<br>
+マルチスレッドで動作しますので、4あるいは8コアのCPUを用いると早く処理できます。<br>
+<a href = "../virtualbox/index.html" target = "_blank">VirtualBoxを用いてWindowsマシンで解析する方法</a>や、<a href = "../aws/index.html" target = "_blank">クラウドで実行する方法</a>もあります。
+      </ul>
+      <h2>PEDのセットアップと解析例</h2>
+      <ul>
+      <li>必要なソフトをダウンロードとインストールを行います。
+      <pre>$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install curl
+$ sudo apt install git
+$ git clone https://github.com/akiomiyao/ped.git</pre>
+      <li>NCBIのアーカイブのダウンロードにはsratoolkitに含まれるfastq-dumpが必要です。<br>
+最近のバージョンのfastq-dumpは使用前にvdb-configコマンドで実行環境を設定する必要があります。<br>
+設定方法は、<a href = "../sratoolkit/index_ja.html" target = "_blank">[fastq-dumpの設定]</a>のページに記載しました。
+
+    <li>NCBI sequence read archive (SRA)からトマトの配列をダウンロードします。<br>
+    $ cd ped<br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=ERR5348981" target = "_blank">ERR5348981</a><br>
+    $ perl download.pl accession=<a href = "https://www.ncbi.nlm.nih.gov/sra/?term=ERR5348982" target = "_blank">ERR5348982</a><br>
+    <li>ped.plで多型検出を行います。<br>
+    $ perl ped.pl target=ERR5348981,ref=SL3<br>
+    $ perl ped.pl target=ERR5348982,ref=SL3<br>
+    解析結果は、targetディレクトリの中に出力されます。
+    <li>Dockerを用いる場合は、以下のようにします。ped.plを直接実行する場合は不要です。<br>
+    $ sudo apt install docker<br>
+    $ sudo apt install docker.io<br>
+    で、docker関連のプログラムがインストールできます。<br>
+    実行例<br>
+    $ sudo docker pull akiomiyao/ped<br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl download.pl accession=ERR5348981,wd=/work <br>
+    $ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl ped.pl target=ERR5348981,ref=SL3,wd=/work <br>
+    上記コマンドをコピー・ペーストしてアクセッション名等の値を修正して実行するのが楽です。<br>
+    Googleのクラウドやアマゾンウェブサービス(AWS)でも実行可能です。
+    <li>プライベートなデータの解析<br>
+    お持ちのプライベートなfastqファイルを解析する場合は、download.plを実行した時にできるディレクトリ構造と同じディレクトリ構造でリードデータを配置します。<br>
+    例<br>
+    $ cd ped<br>
+    $ mkdir momotarou<br>
+    $ mkdir momotarou/read<br>
+    $ cp read_data_dir/foo.fastq momotarou/read<br>
+    $ perl ped.pl target=momotarou,ref=SL3<br>
+    ped.plのターゲット名は、作ったディレクトリ名を指定します。<br>
+    fastqファイルは、.gz、.bzip2、.xz等の拡張子のついた圧縮ファイルの状態でも、そのままped.plで解析できます。<br>
+    解析結果一式は、momotarouのディレクトリに出力されます。
+
+    <li>双方向アラインメント上の多型の確認<br>
+    pedディレクトリで<br><br>
+$ perl search.pl target=target,chr=chromosome,pos=position<br><br>
+を実行します。
+例えば<br><br>
+$ perl search.pl target=ERR5348982,chr=3,pos=67569398<br><br>
+あるいは<br><br>
+$ sudo docker run -w /ped -v `pwd`:/work akiomiyao/ped perl search.pl target=ERR5348982,chr=3,pos=67569398,wd=/work <br><br>
+以下は、出力の一部です。<br>
+
+<pre># 3 67569398 3 67581683 f deletion -12291
+ACAACCAAAACAACATAGGA ATGTACCAATGCACGTTTAA 5
+                                     Chr3 67569398
+                                     |
+TTTTGACAACCAAAACAACATAGGAAAATTGGAAAACTGTAACGATTCAAAATTTTTTTTTTATATAAATAAGAATAAATAAGTATTTAAAGGGCGTAATTGTCCTTTCACGTTTTAAATGAATAAATAAATAAATAAATCAAAAACAGA
+|||||||||||||||||||||||||||||||||||||  |  |     ||  |||||         ||| |      |||    |||| |    |   |  ||     ||  | | ||   |  ||   |  ||   |     |||  | 
+TTTTGACAACCAAAACAACATAGGAAAATTGGAAAACATTTTCTGGAAAATGTTTTTCGCCATACCAAACACACCCTAATCTCAATTTTACATACTGCAAGGTTTGCGCAGCTCTGAAGAAATAAATGTACCAATGCACGTTTAAATTGC
+| | | |          |    ||        ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+TCTCGTCTGGGGTCTAGATTCCGGTCGTGACAAAAACATTTTCTGGAAAATGTTTTTCGCCATACCAAACACACCCTAATCTCAATTTTACATACTGCAAGGTTTGCGCAGCTCTGAAGAAATAAATGTACCAATGCACGTTTAAATTGC
+                               |
+                               Chr3 67581683
+
+# 3 67569398 3 67581683 f deletion -12291
+ACCAAAACAACATAGGAAAA CGTTTAAATTGCATAATTTG 0
+                             Chr3 67569398
+                             |
+ACCAAAACAACATAGGAAAATTGGAAAACTGTAACGATTCAAAATTTTTTTTTTATATAAATAAGAATAAATAAGTATTTAAAGGGCGTAATTGTCCTTTCACGTTTTAAATGAATAAATAAATAAATAAATCAAAAACAGATTTGTATT
+|||||||||||||||||||||||||||||  |  |     ||  |||||         ||| |      |||    |||| |    |   |  ||     ||  | | ||   |  ||   |  ||   |     |||  |  |  | | 
+ACCAAAACAACATAGGAAAATTGGAAAACATTTTCTGGAAAATGTTTTTCGCCATACCAAACACACCCTAATCTCAATTTTACATACTGCAAGGTTTGCGCAGCTCTGAAGAAATAAATGTACCAATGCACGTTTAAATTGCATAATTTG
+         |    ||        ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+GGGGTCTAGATTCCGGTCGTGACAAAAACATTTTCTGGAAAATGTTTTTCGCCATACCAAACACACCCTAATCTCAATTTTACATACTGCAAGGTTTGCGCAGCTCTGAAGAAATAAATGTACCAATGCACGTTTAAATTGCATAATTTG
+                       |
+                       Chr3 67581683
+</pre>
+    vcfファイルは、indelの始まる一つ前の塩基の位置を出力しますが、ped.plのアラインメントでは、変異が始まった最初の塩基の位置を出力しています。<br>
+    indelのアラインメントの検索を行う場合は、vcfファイルの位置に1を加えた値で検索してください。
+
+    <li>2つの解析結果からの遺伝子型の比較<br>
+    $ perl compare.pl ERR5348981 ERR5348982<br>
+    とすると、ERR5348981とERR5348982のSNPの遺伝子型と確認用プライマー配列が表示されます。<br><br>
+    置換変異を見たい場合は、<br>
+    $ perl compare.pl ERR5348981 ERR5348982<br><br>
+    構造変異を見たい場合は、<br>
+    $ perl compare.pl ERR5348981 ERR5348982 sv<br>
+とします。<br><br>
+ファイルに出力したい場合は、<br>
+    $ perl compare.pl ERR5348981 ERR5348982 > result.txt<br>
+のようにします。<br><br>
+エクセルに取り込み、遺伝子型に色を付けるとセグメントがわかります。<br>
+<a href = "tomato_sv.png" target = "_blank"><img src = "tomato_sv.png" width = "25%"></a>     </ul>
+      <h2>PEDに関する資料</h2>
+      <ul>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
+       <li>論文: <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data (2019) BMC Bioinformatics 20(1):362</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+〒305-8518<br>
+茨城県つくば市観音台2-1-2<br>
+農研機構作物研究部門<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+  </body>
+</html>
