@@ -47,7 +47,7 @@ if($type eq "sv"){
     print "Chr\tPosition\tChr\tPosition\tType\tSize\t$a\t$b\tLeft_primer\tRight_primer\tSize\n";
 }else{
     open(IN, "$a/$a.bi.primer");
-    print "Chr\tPosition\tRef\tAlt\t$a\t$b\tLeft_primer\tRight_primer\tSize\tSeqeunce aroud the mutation\n";
+    print "Chr\tPosition\tRef\tAlt\t$a\t$b\tLeft_primer\tRight_primer\tSize\tSequence around the mutation\n";
 }
 while(<IN>){
     chomp;
