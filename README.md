@@ -80,7 +80,7 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   If script runs without arguments, description of how to use the script will be shown.  
   ERR3063487.vcf is the vcf format result.  The vcf file can be opened by [Integrative Genomics Viewer](http://software.broadinstitute.org/software/igv/home).  
 - Options,  
-  thread=8 : specify the max thread (thread was changed to process in current version) number.  
+  thread=8 : specify the max thread (process) number.  
   Default is the number of logical core.  
   tmpdir=/mnt/ssd : specify the temporally directory to /mnt/ssd. Default is target directory.  
   clipping=100 : If length of short reads is not fixed, ped.pl determine the suitable clipping length.  
@@ -88,21 +88,26 @@ docker run -v `pwd`:/work -w /ped akiomiyao/ped perl ped.pl target=ERR3063487,co
   Distribution of counts by sequence length can be obtained by check_length.pl  
   perl check_length.pl target=ERR3063487  
   Clipping length between 90-95% coverage is enough.  
+  Current version of ped.pl has auto clipping function.
 - Result files,  
 ```
 File name               Description
 ERR3063487.aln          Bidirectional alignment
 ERR3063487.bi.primer    Primer data for PCR
 ERR3063487.bi.snp       SNP data (original format)
+ERR3063487.bi.snp.count SNP data (Showing snp counts from aln data)
 ERR3063487.index        Index file for alignemt search
 ERR3063487.log          Process log
 ERR3063487.report       Log of ped.pl
 ERR3063487.sv           Structural variation data
+ERR3063487.sv.count     Structural variation data (Showing snp counts from aln data)
 ERR3063487.sv.primer    Primer data for PCR
 ERR3063487.vcf          SNP and SV data (vcf format, for IGV)
 ERR3063487.full.vcf     SNP and SV data (vcf format, full output)
 ERR3063487.count.vcf    SNP and SV data (vcf format, full output with unverified data)
 ```
+For analyses of metagenome or mixed genome (e.g. SARS-CoV-2 data from a patient), using count data is recommended.  
+Because detected SNPs or SVs in closed position but on differenent genome strand may be filtered out during verification process.
 ## Installation
 - If you do not want to use the docker container, downloading of programs is required.  
 - Programs run on Unix platforms (FreeBSD or Linux) and Mac.  
@@ -273,7 +278,6 @@ Column 11: Left primer sequence
 Column 12: Right primer sequence
 Column 13: Estimated size of the amplified fragment
 Column 14: Upstream and downstream sequence around the SNP
-Primer files are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
 ```
 - A part of the structural variation result is
@@ -297,13 +301,12 @@ Column 9: Number of reads in the control sort_uniq file with target type polymor
 Column 10: Number of reads in the target sort_uniq file with control type polymorphism
 Column 11: Number of reads in the target sort_uniq file with target type polymorphism
 Column 12: Genotype (M: homozygous, H: heterozygous, R: reference type, N: not applicable)
-Column 13: Sequence between junctions (_: no sequence within junctions)
+Column 13: Sequence between junctions (_ is no sequence within junctions)
 Following columns will be appeared in the primer file.
 Column 14: Left primer sequence 
 Column 15: Right primer sequence
 Column 16: Estimated size of the amplified fragment
 Column 17: Upstream and downstream sequences around the junction
-Primer files are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
 
@@ -346,7 +349,6 @@ Column 21: Left primer sequence
 Column 22: Right primer sequence
 Column 23: Estimated size of the amplified fragment
 Column 24: Upstream and downstream sequence around the SNP
-Primer files are experimental.  
 The algorithm of detection primer sequences has been developed by my experience of PCR experiment.
 ```
 ## Detection of polymorphisms between control and target
@@ -556,4 +558,4 @@ This license is for 'Non-Commercial' use of software for polymorphic edge detect
 1. The PED may be changed, or the distribution maybe canceled without advance notification.
 1. In case the result obtained using PED in used for publication in academic journals *etc.,* please refer the publication of PED and/or acknowledge the use of PED in the publication. 
 
-Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.affrc.go.jp/english/index.html). All rights reserved.  
+Copyright (C) 2017 [National Agriculture and Food Research Organization](https://www.naro.go.jp/english/index.html). All rights reserved.  
