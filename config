@@ -41,7 +41,7 @@ GRCm38	wget	ftp://ftp.ensembl.org/pub/release-91/fasta/mus_musculus/dna/Mus_musc
 GRCm38	chromosome	1	19	X	Y
 
 Gmax275v2.0	description	Soybean (Glycine max) genome project assemble version 2
-Gmax275v2.0	wget	Login to https://phytozome.jgi.doe.gov/ , download Gmax_275_v2.0.fa.gz and save the gz file into Gmax275v2.0 directory.
+Gmax275v2.0	wget	Login to https://phytozome.jgi.doe.gov/; Download Gmax_275_v2.0.fa.gz; Save the gz file into Gmax275v2.0 directory.
 Gmax275v2.0	chromosome	1	20
 
 WBcel235	description	Caenorhabditis elegans WBcel235	
@@ -148,5 +148,5 @@ CharlestonGray2	wget	http://cucurbitgenomics.org/ftp/genome/watermelon/WCG/v2/WC
 CharlestonGray2	chromosome	1	11
 
 Camellia20200506	description	Black tea (Cammellia sinensis) assembly
-Camellia20200506	wget	wget	Access to http://tpdb.shengxin.ren/ , download  CSS_ChrLev_20200506_Genome.fas.gz and save the gz file into Camellia20200506 directory.
+Camellia20200506	wget	Access to http://tpdb.shengxin.ren/; Download CSS_ChrLev_20200506_Genome.fas.gz; Save the gz file into Camellia20200506 directory; And then run ped.pl.
 Camellia20200506	file	CSS_ChrLev_20200506_Genome.fas.gz
