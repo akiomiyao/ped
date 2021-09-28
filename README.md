@@ -178,6 +178,7 @@ After the new login, docker commands can be execute with your account.
   Bomo             Silkworm (Bombyx mori) Genome assembly (Nov.2016)
   Bsubtilis        Bacillus subtilis subsp. subtilis str. 168 (NC_000913.3)
   Camarosa1.0      Strawberry (Fragaria x ananassa) Camarosa genome assembly v1.0
+  Camellia20200506 Black tea (Cammellia sinensis) assembly
   CharlestonGray2  Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
   Ecoli            Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
   GRCm38           Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38

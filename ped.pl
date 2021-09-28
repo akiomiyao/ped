@@ -874,8 +874,13 @@ sub countKmerSub{
 sub mkRef{
     my (@row, $i, $remote_file);
     if ($file eq ""){
-	if ($file{$ref} ne "" and -e "$wd/$ref/$file{$ref}" and $chr[0] ne ""){
-	    &mkChr;
+	if ($file{$ref} ne "" and -e "$wd/$ref/$file{$ref}"){
+	    if ($chr[0] ne ""){
+		&mkChr;
+	    }else{
+		$file = $file{$ref};
+		&mkChrFromFile($file);
+	    }
 	}else{
 	    @row = split('/', $curl{$ref});
 	    $remote_file = $row[$#row];

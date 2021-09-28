@@ -147,3 +147,6 @@ CharlestonGray2	description	Water melon (Citrullus lanatus subsp. vulgaris) cv. 
 CharlestonGray2	wget	http://cucurbitgenomics.org/ftp/genome/watermelon/WCG/v2/WCG_genome_v2.fa.gz
 CharlestonGray2	chromosome	1	11
 
+Camellia20200506	description	Black tea (Cammellia sinensis) assembly
+Camellia20200506	wget	wget	Access to http://tpdb.shengxin.ren/ , download  CSS_ChrLev_20200506_Genome.fas.gz and save the gz file into Camellia20200506 directory.
+Camellia20200506	file	CSS_ChrLev_20200506_Genome.fas.gz
