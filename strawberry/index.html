@@ -7,7 +7,8 @@
     <h1>PEDを用いたイチゴの変異検出</h1>
     <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
     栽培イチゴは異質8倍体(2n=8x=56)と複雑なゲノム構成で、解析の難易度は高いです。ここでは、PEDを用いた多型検出について紹介します。<br><br>
-<a href = "compare.png" target = "_blank"><img src = "compare.png" width = "25%"></a> 構造変異の検出例です。表をクリックすると拡大されます。
+<a href = "compare.png" target = "_blank"><img src = "compare.png" width = "25%"></a> 構造変異の検出例です。表をクリックすると拡大されます。<br>
+Mが変異ホモ型、Hが変異ヘテロ型、Wがリファレンス型となっています。
 
     </ul>
     <h2>Ubuntuのインストール</h2>
@@ -135,15 +136,15 @@ ped.plのあるディレクトリにReikou2.3というディレクトリをつ�
     $ mv somewhere/FAN_r2.3.chr-1-7.fasta.gz Reikou2.3<br>
     $ perl ped.pl target=SRR14477896,ref=Reikou2.3<br>
 で、麗紅を元にしたリファレンス配列での多型検出ができます。
-    <li>2つの解析結果からの遺伝子型の比較<br>
-    $ perl compare.pl SRR14477896 SRR14477897<br>
+    <li>複数の解析結果からの遺伝子型の比較<br>
+    $ perl compare.pl target=SRR14477896:SRR14477897<br>
     とすると、SRR14477896とSRR14477897のSNPの遺伝子型と確認用プライマー配列が表示されます。<br><br>
     構造変異を見たい場合は、<br>
-    $ perl compare.pl SRR14477896 SRR14477897 sv<br>
-とします。<br>
+    $ perl compare.pl target=SRR14477896:SRR14477897,type=sv<br>
+とします。<br><br>
 ファイルに出力したい場合は、<br>
-    $ perl compare.pl SRR14477896 SRR14477897 > result.txt<br>
-のようにします。<br>
+    $ perl compare.pl target=SRR14477896:SRR14477897 > result.txt<br>
+のようにします。オプションにスペースが入るとうまく動きません。スペースを入れずに指定してください。<br><br>
 エクセルに取り込み、遺伝子型に色を付けるとセグメントがわかります。<br>
 <a href = "compare.png" target = "_blank"><img src = "compare.png" width = "25%"></a>     </ul>
       <h2>PEDに関する資料</h2>

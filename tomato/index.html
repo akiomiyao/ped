@@ -13,7 +13,8 @@
 <a href = "tomato_sv.png" target = "_blank"><img src = "tomato_sv.png" height = "25%"></a>
 <a href = "tomato.png" target = "_blank"><img src = "tomato.png" height = "25%"></a> 表をクリックすると拡大されます。<br>
 第3染色体の68,264,550までは、ERR5348981はリファレンスと同じで、ERR5348982がリファレンスに対して変異型のセグメントを持っており、<br>
-68,264,741からは、逆にERR5348981が変異型のセグメントを持っていることがわかります。
+68,264,741からは、逆にERR5348981が変異型のセグメントを持っていることがわかります。<br>
+緑色でマークしたMが変異型ホモ、ここには見えていませんがHがヘテロ、Wがリファレンスと同じ野生型となっています。
 
     </ul>
     <h2>Ubuntuのインストール</h2>
@@ -105,17 +106,20 @@ GGGGTCTAGATTCCGGTCGTGACAAAAACATTTTCTGGAAAATGTTTTTCGCCATACCAAACACACCCTAATCTCAATTT
     vcfファイルは、indelの始まる一つ前の塩基の位置を出力しますが、ped.plのアラインメントでは、変異が始まった最初の塩基の位置を出力しています。<br>
     indelのアラインメントの検索を行う場合は、vcfファイルの位置に1を加えた値で検索してください。
 
-    <li>2つの解析結果からの遺伝子型の比較<br>
-    $ perl compare.pl ERR5348981 ERR5348982<br>
+    <li>複数のの解析結果からの遺伝子型の比較<br>
+    $ perl compare.pl target=ERR5348981:ERR5348982<br>
     とすると、ERR5348981とERR5348982のSNPの遺伝子型と確認用プライマー配列が表示されます。<br><br>
     置換変異を見たい場合は、<br>
-    $ perl compare.pl ERR5348981 ERR5348982<br><br>
+    $ perl compare.pl target=ERR5348981:ERR5348982<br><br>
     構造変異を見たい場合は、<br>
-    $ perl compare.pl ERR5348981 ERR5348982 sv<br>
+    $ perl compare.pl target=ERR5348981:ERR5348982,type=sv<br>
 とします。<br><br>
 ファイルに出力したい場合は、<br>
-    $ perl compare.pl ERR5348981 ERR5348982 > result.txt<br>
-のようにします。<br><br>
+    $ perl compare.pl target=ERR5348981:ERR5348982 > result.txt<br>
+のようにします。<br>
+    ターゲット(ディレクトリ)名を:で区切って target= の後に列挙すれば、結果の遺伝子型のカラムもその順に表示されます。<br>
+    オプションにスペースを入れないように注意してください。<br><br>
+
 エクセルに取り込み、遺伝子型に色を付けるとセグメントがわかります。<br>
 <a href = "tomato_sv.png" target = "_blank"><img src = "tomato_sv.png" width = "25%"></a>     </ul>
       <h2>PEDに関する資料</h2>
