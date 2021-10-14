@@ -53,8 +53,8 @@
 	 <ul>
 	  <li>ped.plは、マルチスレッド(マルチプロセス)で高速に解析できます。Linuxをインストールした4コアや8コア等のマルチコアCPUのコンピュータでの実行に適しています。<br>
 	  時間はかかりますが、シングルコアや2コアのCPUでも動作します。MacOSでも動作しますが遅いです。<br>
-	  メモリーは4Gバイト以上、ディスクはバクテリアなら数Gバイト、ヒトを解析する場合は1TB程度必要です。<br>
-      コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみのDockerのコンテナも公開しています。AWSやGCP等のクラウド上での実行も可能です。<br>
+	  メモリーは4Gバイト以上、ディスクはバクテリアなら数Gバイト、ヒトを解析する場合はディスクは1TB程度必要です。<br>
+      コードは<a href = "https://github.com/akiomiyao/ped" target = "_blank">Github</a>から、実行に必要なファイルが設定ずみの<a href = "https://hub.docker.com/r/akiomiyao/ped" target = "_blank">Docker</a>のコンテナも公開しています。AWSやGCP等のクラウド上での実行も可能です。<br>
 	  <p><b>書式</b><br>
 	  perl ped.pl target=target,ref=reference<br>
 	  perl ped.pl target=target,control=control,ref=reference
@@ -102,10 +102,10 @@ perl ped.pl</pre>
 と引数なしで実行すると、サポートしているリファレンスが一覧されます。<br>
 その中のリファレンス名を指定してください。
 サポートされていないリファレンスで解析したい場合は、実行例の一番下をご参照ください。<br><br>
-targetの名前を決めて、targetの名称のディレクトリを作り、その中にreadのディレクトリを作ってfastqファイルを置きます。<br>
+targetの名前を決めて、決めたtargetの名称のディレクトリを作り、その中にreadという名称のディレクトリを作って、readディレクトリの中にfastqファイルを置きます。<br>
 fastqファイルは、.gz、.bzip2、.xzなどの拡張子のついた圧縮ファイルでも大丈夫です。<br>
 readディレクトリ内のファイルの圧縮形式は1種類のみにしてください。<br>
-作ったディレクトリの中に、結果がセーブされます。<br><br>
+targetのディレクトリの中に、結果がセーブされます。<br><br>
 NCBIで公開されている配列データを解析する場合は、<br>
 perl download.pl accession=Accesion_name<br>
 で、Accession_nameで指定したディレクトリができて、その中のreadディレクトリにfastqファイルがダウンロードされます。<br>
@@ -118,9 +118,11 @@ perl download.pl accession=Accesion_name<br>
       SRR11513115/read のディレクトリにfastqファイルが納められます。 
       <li>perl ped.pl target=SRR11513115,ref=SARS-CoV-2,clipping=146<br>
 	  長さが不揃いなRT-PCRの配列データを146塩基にそろえて、新型コロナウイルスのリファレンス配列に対する多型を検出します。<br>
-      結果はSRR11513115のディレクトリに納められます。
+      結果はSRR11513115のディレクトリに納められます。<br>
+      最新のped.plでは、長さの不揃いな配列データから最適リード長を算出して自動で切りそろえるようになりました。clippingオプションは原則不要です。<br>
+      自動認識のclipping長とは別の長さで解析したい場合のみclippingオプションを指定してください。
       <li>perl check_size.pl target=SRR11513115<br>
-      長さが不揃いな配列データの各リード長に対するリード数を出力します。最大リード長より少し短めにしてclippingの値とすると効率がよくなります。
+      長さが不揃いな配列データの各リード長に対するリード数を出力します。最大リード長より少し短めにしてclippingの値とすると効率がよくなります。<br>
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235<br>
 	  線虫の継代サンプルERR3063487と継代元サンプルERR3063486で継代によって発生した自然突然変異の検出の場合。
 	  <li>perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,wd=/home/your_id/data<br>
