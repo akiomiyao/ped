@@ -7,12 +7,26 @@
       <h1>PEDを用いたイネの多型解析例</h1>
       <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
       <b>ここでは、コシヒカリの多型の検出を例に、Linux(Ubuntu)のインストール、PEDのセットアップ、ゲノムブラウザでの結果の表示の方法を紹介します。</b>
+      <table>
+      <tr>
+      <td>
       <ul>
       <li>図をクリックすると拡大されます。<br>
-      <a href = "DRR099981.png" target = "_blank"><img src = "DRR099981.png" height = "20%"></a>
+      <a href = "DRR099981.png" target = "_blank"><img src = "DRR099981.png" height = "200px"></a>
       <li>SNP以外に、挿入・欠失変異も正確に検出できる特徴があります。
       <li>変異部分を増幅するプライマー対の配列も得られます。
       </ul>
+      </td>
+      <td>
+      <ul>
+      <li>図をクリックすると説明にジャンプします。<br>
+      <a href = "#sbl" target = "_blank"><img src = "nics.png" height = "200px"></a>
+      <li>コシヒカリSBLが持つ、イネ縞葉枯れ病抵抗性遺伝子領域(Stvb-i)にある欠失変異の一覧です。
+      <li>コシヒカリSBL(赤)でのみ、対象領域に多型が検出されています。
+      <li>変異部分を増幅するプライマー対の配列も得られます。
+      </ul>
+      </td>
+      </table>
 
       <h2>Ubuntuのインストール</h2>
       <ul>
@@ -101,6 +115,30 @@ IVGを開いてGenomesのプルダウンメニューよりLoad Genome from File�
 大きな構造変異を調べたい場合は、targetのディレクトリの中に出力された、svの拡張子のついたファイルを直接ご参照ください。
 
       </ul>
+      <h2><a name = "sbl">コシヒカリ類縁品種の多型の比較</a></h2>
+コシヒカリの遺伝的背景を持つ品種のNGS配列を比較してみました。<br>
+配列データは<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=DRP004128&o=acc_s%3Aa" target = "_blank">NCBI の SRA DRP004128</a>より取得可能です。<br>
+<pre>$ cd ped
+$ perl download.pl accession=DRR099981</pre>
+のようにして、順に配列データをダウンロードします。<br>
+ダウンロード後、ディレクトリ名を
+<pre>$ mv DRR099981 koshihikari
+</pre>のように品種名に変えておくとわかりやすくなります。
+<pre>$ perl ped.pl target=koshihikari,ref=IRGSP1.0
+</pre>のようにして品種ごとに順に解析します。<br>
+次に、各品種の多型を整理した表を作ります。
+<pre>$ perl compare.pl target=genkitsukushi:hinohikari:hitomebore:hoshinoyume:koshihikari:koshihikari_sbl1:nipponbare:tenkomori:tentakaku > snp.txt
+$ perl compare.pl target=genkitsukushi:hinohikari:hitomebore:hoshinoyume:koshihikari:koshihikari_sbl1:nipponbare:tenkomori:tentakaku,type=sv > sv.txt
+</pre>
+タブ区切りテキストファイルなので、エクセルで開くことができます。<br>
+構造変異のファイル(sv.txt)をエクセルにとりこんで、欠失に絞り込んで表示してみました。<br>
+1塩基、2塩基の欠失は体細胞変異の場合が多いので、19塩基までの欠失と100,000塩基以上の欠失、およびヘテロの欠失は除外しました。<br>
+<a href = "nics.png" target = "_blank"><img src = "nics.png" height = "200px"></a>クリックすると拡大図が表示されます。<br>
+コシヒカリSBL1はコシヒカリに縞葉枯れ病耐性の遺伝子を導入された品種ですが、コシヒカリSBL1の変異に絞り込んで(赤)表示させると、<br>
+第11染色体のStvb-i遺伝子(オレンジのあたり)の領域にコシヒカリSBL1特異的な欠失変異が存在することがわかります。<br>
+Stvb-i遺伝子については、<br>
+<a href = "https://doi.org/10.3389/fpls.2020.00519" target = "_blank">Hayano-Saito Y and Hayashi K (2020) Stvb-i, a Rice Gene Conferring Durable Resistance to Rice stripe virus, Protects Plant Growth From Heat Stress. Front. Plant Sci. 11:519.</a><br>
+をご覧ください。
       <h2>PEDに関する資料</h2>
       <ul>
        <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" "_blank">https://github.com/akiomiyao/ped/</a>
