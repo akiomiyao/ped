@@ -150,3 +150,7 @@ CharlestonGray2	chromosome	1	11
 Camellia20200506	description	Black tea (Cammellia sinensis) assembly
 Camellia20200506	wget	Access to http://tpdb.shengxin.ren/; Download CSS_ChrLev_20200506_Genome.fas.gz; Save the gz file into Camellia20200506 directory; And then run ped.pl.
 Camellia20200506	file	CSS_ChrLev_20200506_Genome.fas.gz
+
+CsinensisHz2	description	Sweet orange (Citrus sinensis) Hzau v2.0
+CsinensisHz2	wget	https://www.citrusgenomedb.org/citrus_downloads/Citrus_sinensis/C.sinensis_Hzau_v2.0_genome/assembly/C.sinensis_v2.0_HZAU_csi.chromosome.masked.fa
+CsinensisHz2	chromosome	1	9

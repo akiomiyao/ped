@@ -180,6 +180,7 @@ After the new login, docker commands can be execute with your account.
   Camarosa1.0      Strawberry (Fragaria x ananassa) Camarosa genome assembly v1.0
   Camellia20200506 Black tea (Cammellia sinensis) assembly
   CharlestonGray2  Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
+  CsinensisHz2     Sweet orange (Citrus sinensis) Hzau v2.0
   Ecoli            Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
   GRCm38           Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2          Lotus japonicus Gifu 
@@ -524,7 +525,7 @@ X	14258766	III	303520	f	translocation	N	6	0	9	5	H	TCACAAAATTCTTTGGCCGCCCCAAGTGTC
 ```
 
 ## Author
-MIYAO Akio, Ph.D. miyao@affrc.go.jp  
+Akio Miyao, Ph.D. miyao@affrc.go.jp  
 Institute of Crop Science / National Agriculture and Food Research Organization  
 2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
 
