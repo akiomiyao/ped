@@ -182,6 +182,7 @@ After the new login, docker commands can be execute with your account.
   CharlestonGray2  Water melon (Citrullus lanatus subsp. vulgaris) cv. Charleston Gray v2
   CsinensisHz2     Sweet orange (Citrus sinensis) Hzau v2.0
   Ecoli            Escherichia coli str. K-12 substr. MG1655 (NC_000913.3)
+  Fielder1         Wheat (Triticum aestivum L. cv. Fielder) Version 1
   GRCm38           Mouse (Mus musculus) Genome Reference Consortium Mouse Build 38
   Gifu1.2          Lotus japonicus Gifu 
   Gmax275v2.0      Soybean (Glycine max) genome project assemble version 2
