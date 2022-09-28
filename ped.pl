@@ -6,7 +6,7 @@
 #
 # License: refer to https://github.com/akiomiyao/ped
 #
-# Author: MIYAO Akio <miyao@affrc.go.jp>
+# Author: Akio Miyao <miyao@affrc.go.jp>
 #
 
 $usage = '
@@ -43,6 +43,10 @@ $usage = '
 
  For kmer method,
  perl ped.pl target=ERR3063487,control=ERR3063486,ref=WBcel235,method=kmer
+
+ For cnv detection,
+ perl ped.pl target=ttm2,control=ttm5,ref=IRGSP1.0,method=cnv
+ If control is not specified, reference seqeunce will be used as a control.
 
  If short reads have different length sequences, sequence will be clipped.
  If you want to specify the clipping length,
@@ -228,7 +232,7 @@ if ($ARGV[0] eq ""){
 	print "  $name $desc{$_}\n";
     }
     print "
- Author: MIYAO Akio <miyao\@affrc.go.jp>
+ Author: Akio Miyao <miyao\@affrc.go.jp>
  Scripts: https://github.com/akiomiyao/ped
  Web page: https://akiomiyao.github.io/ped
  Docker: https://hub.docker.com/r/akiomiyao/ped  
@@ -294,6 +298,8 @@ if ($control ne $ref && ! -e "$wd/$control/sort_uniq/$control.sort_uniq.TTT.gz")
 
 if ($method eq "kmer"){
     &kmer;
+}elsif($method eq "cnv"){
+    &cnv;
 }else{
     &bidirectional;
 }
@@ -353,9 +359,17 @@ seconds : $elapsed_time\n";
     exit;
 }
 
+sub cnv{
+    &countKmer($target) if ! -e "$wd/$target/count/$target.count.TTT.gz";
+    &countKmer($control) if ! -e "$wd/$control/count/$control.count.TTT.gz";
+    &cnvJoin;
+}
+
 sub kmer{
-    &countKmer($target);
-    &countKmer($control);
+    &countKmer($target) if ! -e "$wd/$target/count/$target.count.TTT.gz";
+    &countKmer($control) if ! -e "$wd/$control/count/$control.count.TTT.gz";
+    &lbcKmer($target) if ! -e "$wd/$target/lbc/$target.lbc.TTT.gz";
+    &lbcKmer($control) if ! -e "$wd/$control/lbc/$control.lbc.TTT.gz";
     &joinKmer;
     if($ref eq ""){
 	system("cat $tmpdir/$target.snp.* > $wd/$target/$target.kmer.snp");
@@ -742,10 +756,9 @@ sub joinKmerSub{
 sub countKmer{
     my $target = shift;
     my ($tag, $nuca, $nucb, $nucc);
-    return if -e "$wd/$target/lbc/$target.lbc.TTT.gz";
-    if (! -e "$tmpdir"){
-	system("mkdir $tmpdir");
-    }
+    system("mkdir $tmpdir") if ! -e "$tmpdir";
+    $countdir = "$wd/$target/count";
+    system("mkdir $countdir") if ! -e $countdir;
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -759,7 +772,6 @@ sub countKmer{
 
     &waitChild;
     
-    system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
@@ -774,35 +786,28 @@ sub countKmer{
     &waitChild;
 }
 
-sub countKmerMerge{
-    my ($target, $parent) = split(':', $arg);
-    my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count, $head, $prev, $nuc, %count);
-    system("touch $tmpdir/$parent.count");
+sub lbcKmer{
+    my $target = shift;
+    system("mkdir $wd/$target/lbc") if ! -e "$wd/$target/lbc";
     foreach $nuca (@nuc){
 	foreach $nucb (@nuc){
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
-		&report("Making kmer for $target. $parent Merging of $tag subfile");
-		$fin = "$parent.$tag.join.in";
-		$fout = "$parent.$tag.join.out";
-		open($fout, "> $tmpdir/$parent.count.tmp");
-		open($fin, "$zcat $tmpdir/$parent.$tag.count.gz |join -a 1 -a 2 $tmpdir/$parent.count - |");
-		while(<$fin>){
-		    chomp;
-		    @row = split;
-		    $count = $row[1] + $row[2];
-		    print $fout "$row[0]\t$count\n";
-		}
-		close($fin);
-		close($fout);
-		system("mv $tmpdir/$parent.count.tmp $tmpdir/$parent.count && rm $tmpdir/$parent.$tag.count.gz");
+		&canFork;
+		&report("Joining kmer for $target. $tag");
+		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=lbcKmerSub,arg=$target:$tag,wd=$wd &");
 	    }
 	}
     }
+
+}
+
+sub lbcKmerSub{
+    my ($target, $parent) = split(':', $arg);
     $fin = "$parent.lbc.in";
     $fout = "$parent.lbc.out";
     open($fout, "> $wd/$target/lbc/$target.lbc.$parent");
-    open($fin, "$tmpdir/$parent.count");
+    open($fin, "zcat $wd/$target/count/$target.count.$parent.gz |");
     while(<$fin>){
 	chomp;
 	($seq, $count) = split;
@@ -823,8 +828,36 @@ sub countKmerMerge{
     print $fout "$prev\t$count{A}\t$count{C}\t$count{G}\t$count{T}\n";
     close($fin);
     close($fout);
-#    system("gzip $wd/$target/lbc/$target.lbc.$parent && rm $tmpdir/$parent.count");
     system("gzip $wd/$target/lbc/$target.lbc.$parent");
+}
+
+sub countKmerMerge{
+    my ($target, $parent) = split(':', $arg);
+    my ($nuca, $nucb, $nucc, $tag, $fin, $fout, @row, $count, $head, $prev, $nuc, %count);
+    system("touch $tmpdir/$parent.count");
+    my $countdir = "$wd/$target/count";
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+#		&report("Making kmer for $target. $parent Merging of $tag subfile");
+		$fin = "$parent.$tag.join.in";
+		$fout = "$parent.$tag.join.out";
+		open($fout, "> $tmpdir/$parent.count.tmp");
+		open($fin, "$zcat $tmpdir/$parent.$tag.count.gz |join -a 1 -a 2 $tmpdir/$parent.count - |");
+		while(<$fin>){
+		    chomp;
+		    @row = split;
+		    $count = $row[1] + $row[2];
+		    print $fout "$row[0]\t$count\n";
+		}
+		close($fin);
+		close($fout);
+		system("mv $tmpdir/$parent.count.tmp  $tmpdir/$parent.count && rm $tmpdir/$parent.$tag.count.gz");
+	    }
+	}
+    }
+    system("mv $tmpdir/$parent.count $countdir/$target.count.$parent && gzip $countdir/$target.count.$parent");
 }
 
 sub countKmerSub{
@@ -864,11 +897,67 @@ sub countKmerSub{
 		$tag = $nuca . $nucb . $nucc;
 		$fout = "$tag.$parent.out";
 		close($fout);
-		&report("Making kmer for $target. Sorting of $tag.$parent subfile");
 		system("sort $sort_opt -T $tmpdir $tmpdir/$tag.$parent |uniq -c | awk '{print \$2 \"\t\" \$1}' |gzip -c > $tmpdir/$tag.$parent.count.gz && rm $tmpdir/$tag.$parent");
 	    }
 	}
     }
+}
+
+sub cnvJoin{
+    foreach $nuca (@nuc){
+	foreach $nucb (@nuc){
+	    foreach $nucc (@nuc){
+		$tag = $nuca . $nucb . $nucc;
+		&canFork;
+		&report("Join kmer between $target and $control. $tag");
+		system("perl $cwd/ped.pl target=$target,control=$control,ref=$ref,sub=cnvJoinSub,tag=$tag,wd=$wd &");
+	    }
+	}
+    }
+    &waitChild;
+    system("cat $tmpdir/map.* |sort -k 1 -n -k 2 -n $sort_opt -T $tmpdir > $wd/$target/$target.$control.cnv");
+}
+
+sub cnvJoinSub{
+    open(OUT, "> $tmpdir/cnv.$tag.tmp");
+    open(IN, "bash -c \"join -a 1 -a 2 <($zcat $wd/$control/count/$control.count.$tag.gz) <($zcat $wd/$target/count/$target.count.$tag.gz) \"|");
+    while(<IN>){
+	chomp;
+	@row = split;
+	print OUT "$row[0]\n";
+    }
+    close(OUT);
+
+    open(OUT, "> $tmpdir/cnv.$tag.$target");
+    open(IN, "zcat $wd/$target/count/$target.count.$tag.gz |join -a 1 -a 2 $tmpdir/cnv.$tag.tmp -|");
+    while(<IN>){
+	chomp;
+	@row = split;
+	$row[1] = 0 if $row[1] eq "";
+	print OUT "$row[0]\t$row[1]\n";
+    }
+    close(OUT);
+    
+    open(OUT, "> $tmpdir/cnv.$tag.$control");
+    open(IN, "zcat $wd/$control/count/$control.count.$tag.gz |join -a 1 -a 2 $tmpdir/cnv.$tag.tmp -|");
+    while(<IN>){
+	chomp;
+	@row = split;
+	$row[1] = 0 if $row[1] eq "";
+	print OUT "$row[0]\t$row[1]\n";
+    }
+    close(OUT);
+
+    system("join $tmpdir/cnv.$tag.$target $tmpdir/cnv.$tag.$control > $tmpdir/join.$tag && rm $tmpdir/cnv.$tag.*");
+
+    open(OUT, "> $tmpdir/map.$tag");
+    open(IN, "zcat $wd/$ref/ref20_uniq.$tag | join - $tmpdir/join.$tag|");
+    while(<IN>){
+	chomp;
+	@row = split;
+	print OUT "$row[1]\t$row[2]\t$row[3]\t$row[4]\t$row[5]\n";
+    }
+    close(OUT);
 }
 
 sub mkRef{
@@ -3285,7 +3374,7 @@ $tail_space Chr$tchr $tail_junction
 
 sub report{
     my $message = shift;
-    my $now = `date`;
+    my $now = `date "+%Y-%m-%d %H:%M:%S"`;
     chomp($now);
     $message = "$now : $target : $message\n";
     print $message;

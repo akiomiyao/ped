@@ -524,6 +524,12 @@ X	7312229	X	11435923	r	inversion	N	6	0	5	4	H	TATTCACCCCGTTCGACTGTGCAATGGGTTTAATC
 X	10023790	III	7850798	r	translocation	N	5	0	6	3	H	ATATCAAAATTTCATTTTTTTT
 X	14258766	III	303520	f	translocation	N	6	0	9	5	H	TCACAAAATTCTTTGGCCGCCCCAAGTGTCCTAACTCGAAG
 ```
+## Detection of Copy Number Variation  
+```
+perl ped.pl target=ttm2,control=ttm5,ref=IRGSP1.0,method=cnv
+```
+- Copy number (counts of read) in each position of reference will be saved into ttm2.ttm5.cnv file at target directory.
+If control is omitted, reference sequence will be used as the control. 
 
 ## Author
 Akio Miyao, Ph.D. miyao@affrc.go.jp  
