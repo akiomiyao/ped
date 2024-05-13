@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>List of polymorphisms in rice core collections</h1>
+      <a href = "../index.html">[To the top page]</a><br><br>
+      <b>This page describes a list of polymorphisms among Japan and world core collection of rice distributed by <a href = "https://www.gene.affrc.go.jp/index_en.php" target = "_blank">NARO genebank</a>. NGS data of core collection analyzed by <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">PED</a> program.</b>
+　　　<ul>
+      <li>To enlarge figure, click on the figure<br>
+      <a href = "ago1d.png" target = "_blank"><img src = "ago1d.png" height = "200px"></a>
+      <li>Polymorphism lists in each chromosome will be downloaded from<a href="https://doi.org/10.5281/zenodo.11159847" target = "_blank"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.11159847.svg" alt="DOI"></a>
+      <li>Nucleotide sequence of primer pairs amplified at the polymorphic loci also included in the list.
+      <li>Annotation of polymorphisms have been added with analysis of snpEff.
+      <li>Seeds of core collection are able to obtain from <a href = "https://www.gene.affrc.go.jp/databases-core_collections_en.php" target = "_blank">NARO genebank</a>. When fortunately found cultivars which have suitable mutation, <font color = "red"><b>the mutation will be introduced by crossing</b></font>.
+      <li>Information of SNPs are already published in <a href = "https://ricegenome-corecollection.dna.affrc.go.jp/" target = "_blank">TASKE+</a>. TASKE+'s SNPs were detected by BWA-mem and GATK. Comparing between the PED list and TASKE+ information will help for evaluation of both system.<br>
+Due to high threshold value of PED, number of detected SNPs by PED is less than TASKE+. Detection of structural variations by PED is better than TASKE+.
+      </ul>
+
+      <h2>Data import into Excel</h2>
+      <ul>
+      <li>Files are text format. Columns are separated by tab suitable to import by Excel.
+      <li>List are saved into separated files with chromosome and archived into single zip file, <a href = "https://zenodo.org/records/11159847/files/jrc_wrc.zip?download=1">jrc_wrc.zip</a>. The file can be obtained from <a href="https://doi.org/10.5281/zenodo.11159847" target = "_blank">Genome wide variations of rice detected by PED</a> page.
+      <li>Open in the data tab on Excel, import the chromosome file from text or CSV format.
+      <li>When open the Power Query, set Column 6 to text format.
+      <li>Select records belongs the target gene or IRGSP-1.0 accession by filtering with Column J (Gene name) or Column K (RapID).
+      <li>Nonsense or frameshift mutations may disrupt the gene function.
+      <li>Missense mutations cause no-effect of reduce (or increase in the rare case) the gene activity.
+      <li>Primer pairs which amplify the target region are provided in each mutation and can be amplified the target region for validation of the mutation.<br>
+Because length of amplified region is relatively short, the amplified fragments can be analyzed by <a href = "https://www.google.com/search?q=high+resolution+melting+analysis+(hrm)&oq=high+resolution+melting+analysis" target = "_blank">high resolution melting analysis</a>.
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+       <li>Tanaka, N., Shenton, M., Kawahara, Y. et al. (2020). Whole-Genome Sequencing of the NARO World Rice Core Collection (WRC) as the Basis for Diversity and Association Studies. Plant & cell physiology, 61(5), 922-932. <a href = "https://doi.org/10.1093/pcp/pcaa019" target = "_blank">https://doi.org/10.1093/pcp/pcaa019</a>
+       <li>Tanaka, N., Shenton, M., Kawahara, Y. et al. (2021). Investigation of the Genetic Diversity of a Rice Core Collection of Japanese Landraces using Whole-Genome Sequencing. Plant & cell physiology, 61(12), 2087-2096. <a href = "https://doi.org/10.1093/pcp/pcaa125" target = "_blank">https://doi.org/10.1093/pcp/pcaa125</a>
+       <li>Kumagai, M., Nishikawa, D., Kawahara, Y. et al. (2019). TASUKE+: a web-based platform for exploring genome-wide association studies results and large-scale resequencing data. DNA research : an international journal for rapid publication of reports on genes and genomes, 26(6), 445-452. <a href = "https://doi.org/10.1093/dnares/dsz022" target = "_blank">https://doi.org/10.1093/dnares/dsz022</a>
+       <li>Cingolani, P., Platts, A., Wang, L. L., Coon, M., et al. (2012). A program for annotating and predicting the effects of single nucleotide polymorphisms, SnpEff:  SNPs in the genome of Drosophila melanogaster strain w1118; iso-2; iso-3. Fly, 6(2), 80-92. <a href = "https://doi.org/10.4161/fly.19695" target = "_blank">https://doi.org/10.4161/fly.19695</a>
+       <li>Miyao, A., Kiyomiya, J.S., Iida, K. et al. (2019). Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data. BMC Bioinformatics 20, 362. <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
+       <li>Miyao, A. (2024). Genome wide variations of rice detected by PED [Data set]. Zenodo.  <a href = "https://doi.org/10.5281/zenodo.11159847" target = "_blank">https://doi.org/10.5281/zenodo.11159847</a>
+       <li><a href = "https://github.com/akiomiyao/ped/" target = "_blank">https://github.com/akiomiyao/ped/</a>
+      </ul> 
+      <h2>Contact</h2>
+Akio Miyao (<a href = "mailto:miyao@affrc.go.jp">miyao@affrc.go.jp</a>), <a href = "https://www.naro.go.jp/english/" target = "_blank">NARO</a>
+    </body>
+</html>
