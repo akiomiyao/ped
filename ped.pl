@@ -1533,9 +1533,9 @@ sub toVcf{
 	    next if $dp == 0;
 	    $af = int(1000 * $row[18]/$dp)/1000;
 	    if (/M/){
-		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AF:DP\t1/1:$row[17],$row[18]:$dp\n";
 	    }elsif(/H/){
-		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AF:DP\t0/1:$row[17],$row[18]:$dp\n";
 	    }
 	    print $fout $output if $output ne $prev;
 	    $prev = $output;
@@ -1544,9 +1544,9 @@ sub toVcf{
 	    next if $dp == 0;
 	    $af = int(1000 * $row[7]/$dp)/1000;
 	    if (/M/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AF:DP\t1/1:$row[6],$row[7]:$dp\n";
 	    }elsif(/H/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AF:DP\t0/1:$row[6],$row[7]:$dp\n";
 	    }
 	}
     }
@@ -1803,9 +1803,9 @@ sub bi2vcf{
 	}
 	
 	if (/M/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AF:DP\t1/1:$row[6],$row[7]:$dp\n";
 	}elsif(/H/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AF:DP\t0/1:$row[6],$row[7]:$dp\n";
 	}else{
 	    $qual = $row[7] * 10;
 	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tAD:DP\t$row[6],$row[7]:$dp\n";
@@ -1890,9 +1890,9 @@ sub bi2vcf{
 	    $info .= "PL=$row[13];PR=$row[14];PCRLEN=$row[15];";
 	}
 	if (/M/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AF:DP\t1/1:$row[9],$row[10]:$dp\n";
 	}elsif(/H/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AF:DP\t0/1:$row[9],$row[10]:$dp\n";
 	}else{
 	    $qual = $row[10] * 10;
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "AF=$af;DP=$dp\tAD:DP\t$row[9],$row[10]:$dp\n";
