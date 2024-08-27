@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>イネ(日本晴)MNU変異系統のSNP多型一覧</h1>
+      <a href = "../index_ja.html">[日本語トップページへのリンク]</a><br><br>
+      <b><a href = "https://miriq.agr.kyushu-u.ac.jp/request.php" target = "_blank">NBRP(九州大学)</a>から配付されている<a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=DRP010678" target = "_blank">日本晴メチルニトロソウレア(NMU)処理変異系統のNGS配列</a>を<a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">PED</a>で検出した多型の一覧です。</b>
+　　　<ul>
+      <li>図をクリックすると拡大されます。<br>
+      <a href = "mnu.png" target = "_blank"><img src = "mnu.png" height = "200px"></a>
+      <li>染色体ごとに分けられた一覧のデータは、<a href="https://doi.org/10.5281/zenodo.13373529" target = "_blank"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13373529.svg" alt="DOI"></a>
+よりダウンロードできます。
+      <li>変異部分を増幅するプライマー対の配列も一覧に含まれています。
+      <li>snpEffを用いて、多型に関する注釈を加えてあります。
+      <li>カラム順は、染色体番号、位置、系統名、リファレンス塩基、変異塩基、遺伝子型、アレル頻度、リード数、変異の種類、遺伝子名、アクセッション番号、遺伝子の変異部分、アミノ酸配列の変異部分、プライマー(左)、プライマー(右)、増幅配列長です。
+      <li>種子は<a href = "https://miriq.agr.kyushu-u.ac.jp/request.php" target = "_blank">NBRP(九州大学)より入手</a>できます。
+      <li>SNPに関しては、<a href = "https://miriq.agr.kyushu-u.ac.jp/index.php" target = "_blank">MiRiQ database</a>で既に公開されています。こちらはBWA-memとGATKを用いて多型検出されています。PEDで検出された多型と比較できます。<br>
+MiRiQのみ、あるいは、PEDのみで検出されたSNPもありますので、それぞれ補完的に利用できます。
+      </ul>
+
+      <h2>Excelへのデータの取り込み</h2>
+      <ul>
+      <li>タブ区切りのテキスト形式のファイルとなっています。エクセルに取り込むと便利です。
+      <li><a href="https://doi.org/10.5281/zenodo.13373529" target = "_blank">SNP List of Rice (Nipponbare) MNU Mutant Lines</a>のページより、<a href = "https://zenodo.org/records/13373529/files/mnu.zip?download=1">mnu.zip</a>をダウンロードしてzipを解凍します。
+      <li>エクセルのデータのタブを開き「テキストまたはCSVから」をクリックして目的の染色体のファイルを開きます。
+      <li>Power Queryエディタが開いたらColumn6をtext型に指定して「閉じて読み込む」をクリックしてエクセルに取り込みます。
+      <li>J列 Gene name あるいは K列 Rap IDのフィルターのプルダウンより目的の遺伝子あるいはIDで絞り込むことができます。
+      <li>ナンセンス変異や、フレームシフトの場合、その遺伝子の活性が失われていると考えられます。
+      <li>ミスセンス変異の場合は変異の入った部分、あるいは、入れ替わったアミノ酸の種類により活性が低下(まれに増加)することが考えられます。
+      <li>変異部分を増幅するプライマーで交配後代のDNAをPCR増幅して、その部分の塩基配列を調べて変異が導入されたかどうかを確認します。
+      <li>プライマーは短めに設定しているので、<a href = "https://www.google.com/search?q=HRM+%E5%A4%9A%E5%9E%8B" target = "_blank">High Resolution Melting (HRM)解析</a>等での多型検出に有効です。
+      </ul>
+      <h2>リファレンス</h2>
+      <ul>
+       <li>Kubo et al. (2024) MiRiQ Database: A Platform for In Silico Rice Mutant Screening. Plant Cell Physiol. 65:169-174. <a href = "https://doi.org/10.1093/pcp/pcad134" target = "_blank">https://doi.org/10.1093/pcp/pcad134</a><br>
+NBRP(九州大学)より入手した系統の解析結果を公表する場合は、この論文を引用してください。
+       <li>Cingolani, P., Platts, A., Wang, L. L., Coon, M., et al. (2012). A program for annotating and predicting the effects of single nucleotide polymorphisms, SnpEff:  SNPs in the genome of Drosophila melanogaster strain w1118; iso-2; iso-3. Fly, 6(2), 80-92. <a href = "https://doi.org/10.4161/fly.19695" target = "_blank">https://doi.org/10.4161/fly.19695</a>
+       <li>多型検出に用いたPEDの論文: Miyao, A., Kiyomiya, J.S., Iida, K. et al. (2019). Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data. BMC Bioinformatics 20, 362. <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
+       <li>多型データ:Miyao, A. (2024). SNP List of Rice (Nipponbare) MNU Mutant Lines [Data set]. Zenodo. <a href = "https://doi.org/10.5281/zenodo.13373529" target = "_blank">https://doi.org/10.5281/zenodo.13373529</a>
+       <li>スクリプト: <a href = "https://github.com/akiomiyao/ped/" target = "_blank">https://github.com/akiomiyao/ped/</a>
+      </ul> 
+      <h2>お問い合わせ</h2>
+農研機構<br>
+宮尾安藝雄 (miyao@affrc.go.jp)<br>
+    </body>
+</html>

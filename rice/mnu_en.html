@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <meta charset = "utf-8">
+    <link rel = "stylesheet" href = "../default.css">
+  <head>
+    <body>
+      <h1>SNP List of Rice (Nipponbare) MNU Mutant Lines</h1>
+      <a href = "../index.html">[Link to Top Page]</a><br><br>
+      <b>This is a list of polymorphisms detected using <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">PED</a> from <a href = "https://www.ncbi.nlm.nih.gov/Traces/study/?acc=DRP010678" target = "_blank">the NGS sequences of Nipponbare MNU-treated mutant lines</a> distributed by <a href = "https://miriq.agr.kyushu-u.ac.jp/request.php" target = "_blank">NBRP (Kyushu University)</a>.</b>
+　　　<ul>
+      <li>Click on the image to enlarge it.<br>
+      <a href = "mnu.png" target = "_blank"><img src = "mnu.png" height = "200px"></a>
+      <li>The data, categorized by chromosome, can be downloaded via <a href="https://doi.org/10.5281/zenodo.13373529" target = "_blank"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13373529.svg" alt="DOI"></a>
+      <li>The list also includes sequences of primer pairs used to amplify the mutated regions.
+      <li>Annotations related to polymorphisms have been added using snpEff.
+      <li>Column order is chromosome number, position, line name, ref, alt, genotype, allele frequency, number of reads, mutation type, gene name, RAP ID, position of nucleotide sequence of gene, position of amino acid sequence of gene, left primer, right primer and amplified size.
+      <li>Seeds can be obtained from <a href = "https://miriq.agr.kyushu-u.ac.jp/request.php" target = "_blank">NBRP (Kyushu University)</a>.
+      <li>SNPs have already been published in the <a href = "https://miriq.agr.kyushu-u.ac.jp/index.php" target = "_blank">MiRiQ database</a>. These SNPs were detected using BWA-mem and GATK, and can be compared with the polymorphisms detected by PED.<br>
+Since there are SNPs detected only by MiRiQ or only by PED, both can be used complementarily.
+      </ul>
+
+      <h2>Importing Data into Excel</h2>
+      <ul>
+      <li>The files are in tab-delimited text format, which is convenient for importing into Excel.
+      <li>Download the mnu.zip file from the <a href="https://doi.org/10.5281/zenodo.13373529" target = "_blank">"SNP List of Rice (Nipponbare) MNU Mutant Lines"</a> page and unzip it.
+      <li>In Excel, open the data tab and click on "From Text/CSV" to open the file for the desired chromosome.
+      <li>When the Power Query editor opens, set Column6 to text type, then click "Close & Load" to import the data into Excel.
+      <li>You can filter by the desired gene or ID using the dropdown in Column J (Gene name) or Column K (Rap ID).
+      <li>In the case of nonsense mutations or frameshift mutations, it is considered that the gene’s activity is lost.
+      <li>For missense mutations, the gene’s activity may be reduced (or rarely increased) depending on the affected region or the type of substituted amino acid.
+      <li>Amplify the mutated region using primers and PCR on the DNA of the progeny to verify if the mutation has been introduced by sequencing the region.
+      <li>The primers are designed to be short, making them effective for polymorphism detection through methods such as High-Resolution Melting (HRM) analysis.
+      </ul>
+      <h2>References</h2>
+      <ul>
+       <li>Kubo et al. (2024) MiRiQ Database: A Platform for In Silico Rice Mutant Screening. Plant Cell Physiol. 65:169-174. <a href = "https://doi.org/10.1093/pcp/pcad134" target = "_blank">https://doi.org/10.1093/pcp/pcad134</a><br>
+When publishing analysis results of lines obtained from NBRP (Kyushu University), please cite this paper.
+       <li>Cingolani, P., Platts, A., Wang, L. L., Coon, M., et al. (2012). A program for annotating and predicting the effects of single nucleotide polymorphisms, SnpEff:  SNPs in the genome of Drosophila melanogaster strain w1118; iso-2; iso-3. Fly, 6(2), 80-92. <a href = "https://doi.org/10.4161/fly.19695" target = "_blank">https://doi.org/10.4161/fly.19695</a>
+       <li>The paper on PED used for polymorphism detection: Miyao, A., Kiyomiya, J.S., Iida, K. et al. (2019). Polymorphic edge detection (PED): two efficient methods of polymorphism detection from next-generation sequencing data. BMC Bioinformatics 20, 362. <a href = "https://doi.org/10.1186/s12859-019-2955-6" target = "_blank">https://doi.org/10.1186/s12859-019-2955-6</a>
+       <li>Polymorphism Data:Miyao, A. (2024). SNP List of Rice (Nipponbare) MNU Mutant Lines [Data set]. Zenodo. <a href = "https://doi.org/10.5281/zenodo.13373529" target = "_blank">https://doi.org/10.5281/zenodo.13373529</a>
+       <li>Script: <a href = "https://github.com/akiomiyao/ped/" target = "_blank">https://github.com/akiomiyao/ped/</a>
+      </ul> 
+      <h2>Contact</h2>
+Akio Miyao (<a href = "mailto:miyao@affrc.go.jp">miyao@affrc.go.jp</a>), Naro<br>
+    </body>
+</html>
