@@ -158,3 +158,8 @@ Camellia20200506	file	CSS_ChrLev_20200506_Genome.fas.gz
 CsinensisHz2	description	Sweet orange (Citrus sinensis) Hzau v2.0
 CsinensisHz2	wget	https://www.citrusgenomedb.org/citrus_downloads/Citrus_sinensis/C.sinensis_Hzau_v2.0_genome/assembly/C.sinensis_v2.0_HZAU_csi.chromosome.masked.fa
 CsinensisHz2	chromosome	1	9
+
+Lactuca_sativa	description	Lettuce (Lactuca sativa)
+Lactuca_sativa	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/.vol2/all/GCA/002/870/075/GCA_002870075.4_Lsat_Salinas_v11/GCA_002870075.4_Lsat_Salinas_v11_genomic.fna.gz
+Lactuca_sativa	chromosome	1	9
+

@@ -192,6 +192,7 @@ After the new login, docker commands can be execute with your account.
   IWGSC1.0         Wheat (Triticum aestivum L. cv. Chinese Spring) Version 1.0
   KOD1             Thermococcus kodakarensis KOD1 (NC_006624.1)
   LJ3              Lotus japonicus MG20 v3.0 (Download from https://lotus.au.dk/data/download into LJ3 directory)
+  Lactuca_sativa   lettuce (Lactuca sativa)
   RIB40            Aspergillus oryzae RIB40 (ASM18445v3) 
   Reikou2.3        Strawberry Reikou genome v2.3
   SARS-CoV-2       Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2, NC_045512.2)
