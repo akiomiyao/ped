@@ -236,9 +236,6 @@ perl ped.pl target=ERR3063487,ref=WBcel235,method=kmer
   ERR3063487.kmer.primer is the list of primer sequence to detect SNPs.   
   Primer files are experimental.  
   The algorithm of detection primer sequences has been developed by my experience of PCR experiment.  
-  Quality score in vcf file is fixed to 1000.  
-  Because our system does not use aligner program, *e.g.* bwa, output of quality score is difficult.  
-  Please check quality of polymorphism with depth (DP) in vcf file.  
 - The *k*-mer method is able to detect polymorphisms by the direct comparison between two short read data.  
   If you want to SNP detection between target and control without reference data,  
   run script without reference specification.  

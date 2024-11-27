@@ -1532,10 +1532,16 @@ sub toVcf{
 	    $dp = $row[17] + $row[18];
 	    next if $dp == 0;
 	    $af = int(1000 * $row[18]/$dp)/1000;
+	    $p = (0.001 * $dp) ** $row[18];
+	    if ($p == 0){
+		$qual = 1000;
+	    }else{
+		$qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
+	    }
 	    if (/M/){
-		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t$qual\t.\tGT=1/1;AF=$af;DP=$row[18]\tGT:AD:DP\t1/1:$row[17],$row[18]:$dp\n";
 	    }elsif(/H/){
-		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t1000\tPASS\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
+		$output = "$row[0]\t$row[1]\t.\t$row[4]\t$row[5]\t$qual\t.\tGT=0/1;AF=$af;DP=$row[18]\tGT:AD:DP\t0/1:$row[17],$row[18]:$dp\n";
 	    }
 	    print $fout $output if $output ne $prev;
 	    $prev = $output;
@@ -1543,10 +1549,16 @@ sub toVcf{
 	    $dp = $row[6] + $row[7];
 	    next if $dp == 0;
 	    $af = int(1000 * $row[7]/$dp)/1000;
+	    $p = (0.001 * $dp) ** $row[7];
+	    if ($p == 0){
+		$qual = 1000;
+	    }else{
+		$qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
+	    }
 	    if (/M/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t$qual\t.\tGT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
 	    }elsif(/H/){
-		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t1000\tPASS\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+		print $fout "$row[0]\t$row[1]\t.\t$row[2]\t$row[3]\t$qual\t.\tGT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
 	    }
 	}
     }
@@ -1603,8 +1615,13 @@ sub biCount2vcf{
 	$af = int($row[4]*1000/$max)/1000;
 	$gt = "0/1" if $af < 1;
 	$info = "GT=$gt;AF=$af;DP=$row[4]";
-	
-	print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:DP\t$gt:$row[4]\n";
+	$p = (0.001 * $row[4]) ** $row[4];
+	if ($p == 0){
+	    $qual = 1000;
+	}else{
+	    $qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
+	}
+	print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tGT:DP\t$gt:$row[4]\n";
     }
 
     %count = ();
@@ -1715,9 +1732,13 @@ sub biCount2vcf{
 	$af = int($dp*1000/$max)/1000;
 	$gt = "0/1" if $af < 1;
 	$info = "GT=$gt;AF=$af;";
-
-	
-	print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "DP=$dp\tGT:DP\t$gt:$dp\n";
+	$p = (0.001 * $row[7]) ** $row[7];
+	if ($p == 0){
+	    $qual = 1000;
+	}else{
+	    $qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
+	}
+	print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "DP=$dp\tGT:DP\t$gt:$dp\n";
     }	
     close(TMP);
     close(ALN);
@@ -1767,7 +1788,7 @@ sub biCount2vcf{
 }
 
 sub bi2vcf{
-    my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out);
+    my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, $p);
     report("Convert to vcf format");
     open(ALN, "$wd/$target/$target.aln");
     open(TMP, "|sort -S 1M -T $wd/$target > $wd/$target/$target.tmp");
@@ -1788,8 +1809,14 @@ sub bi2vcf{
 	
 	$dp = $row[6] + $row[7];
 	next if $dp == 0;
-	$af = int(1000 * $row[7]/$dp)/1000;
 	next if $row[7] <= 2;
+	$af = int(1000 * $row[7]/$dp)/1000;
+	$p = (0.001 * $dp) ** $row[7];
+	if ($p == 0){
+	    $qual = 1000;
+	}else{
+	    $qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
+	}
 	if (/M/){
 	    $info = "GT=1/1;";
 	}elsif(/H/){
@@ -1803,11 +1830,10 @@ sub bi2vcf{
 	}
 	
 	if (/M/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tGT:AD:DP\t1/1:$row[6],$row[7]:$dp\n";
 	}elsif(/H/){
-	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t1000\t.\t$info\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
+	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tGT:AD:DP\t0/1:$row[6],$row[7]:$dp\n";
 	}else{
-	    $qual = $row[7] * 10;
 	    print TMP "$chr\t$pos\t.\t$row[2]\t$row[3]\t$qual\t.\t$info\tAD:DP\t$row[6],$row[7]:$dp\n";
 	}
     }
@@ -1880,6 +1906,8 @@ sub bi2vcf{
 	next if $dp == 0;
 	$af = int(1000 * $row[10]/$dp)/1000;
 	next if $row[10] <= 2;
+	$p = (0.001 * $dp) ** $row[10];
+	$qual = int((-10 * log($p) / log(10)) * 1000) / 1000;
 	if ($chr =~ /[0-9]/ and $chr !~ /[a-z]/i){
 	    $chr = "000$chr";
 	    $chr = substr($chr, length($chr) - 3, 3);
@@ -1890,11 +1918,10 @@ sub bi2vcf{
 	    $info .= "PL=$row[13];PR=$row[14];PCRLEN=$row[15];";
 	}
 	if (/M/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "GT=1/1;AF=$af;DP=$dp\tGT:AD:DP\t1/1:$row[9],$row[10]:$dp\n";
 	}elsif(/H/){
-	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t1000\t.\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[9],$row[10]:$dp\n";
+	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "GT=0/1;AF=$af;DP=$dp\tGT:AD:DP\t0/1:$row[9],$row[10]:$dp\n";
 	}else{
-	    $qual = $row[10] * 10;
 	    print TMP  "$chr\t$pos\t.\t$reference\t$alt\t$qual\t.\t$info" . "AF=$af;DP=$dp\tAD:DP\t$row[9],$row[10]:$dp\n";
 	}	
     }
@@ -1947,7 +1974,6 @@ sub bi2vcf{
     while(<IN>){
 	next if /<DEL>|<INS>|<INV>|BND/;
 	@row = split;
-	next if $row[5] ne "1000" and $row[0] !~/^#/;
 	print OUT $_;
     }
     close(IN);
