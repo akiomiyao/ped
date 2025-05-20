@@ -530,9 +530,9 @@ perl ped.pl target=ttm2,control=ttm5,ref=IRGSP1.0,method=cnv
 If control is omitted, reference sequence will be used as the control. 
 
 ## Author
-Akio Miyao, Ph.D. miyao@affrc.go.jp  
-Institute of Crop Science / National Agriculture and Food Research Organization  
-2-1-2, Kannondai, Tsukuba, Ibaraki 305-8518, Japan  
+Akio Miyao, Ph.D. miyao.akio700@naro.go.jp  
+Strategic Planning Headquarters / National Agriculture and Food Research Organization  
+2-1-12, Kannondai, Tsukuba, Ibaraki 305-8642, Japan  
 
 ## Version
 Version 1.6 Scripts for grid engine have been removed.  
