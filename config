@@ -52,6 +52,10 @@ dmel626	description	Drosophila melanogaster	release 6.26
 dmel626	wget	ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r6.26_FB2019_01/fasta/dmel-all-chromosome-r6.26.fasta.gz
 dmel626	chromosome	0	0	2L	2R	3L	3R	4	X	Y
 
+dmel664	description	Drosophila melanogaster	release 6.64
+dmel664	wget	https://flybase.org/genomes/Drosophila_melanogaster/dmel_r6.64_FB2025_03/fasta/dmel-all-chromosome-r6.64.fasta.gz
+dmel664	chromosome	0	0	2L	2R	3L	3R	4	X	Y
+
 danRer11	description	Zebrafish (Danio rerio) Genome Reference Consortium Zebrafish Build 11
 danRer11	wget	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/002/035/GCF_000002035.6_GRCz11/GCF_000002035.6_GRCz11_genomic.fna.gz
 danRer11	chromosome	1	25
