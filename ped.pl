@@ -232,7 +232,7 @@ if ($ARGV[0] eq ""){
 	print "  $name $desc{$_}\n";
     }
     print "
- Author: Akio Miyao <miyao\@affrc.go.jp>
+ Author: Akio Miyao <miyao.akio700\@naro.go.jp>
  Scripts: https://github.com/akiomiyao/ped
  Web page: https://akiomiyao.github.io/ped
  Docker: https://hub.docker.com/r/akiomiyao/ped  
@@ -702,14 +702,11 @@ sub joinKmer{
 
 sub joinKmerSub{
     my $tag = shift;
-    $cutoff = 10 if $cutoff eq "";
+    $cutoff = 3 if $cutoff eq "";
     my $fin = "join.in.$tag";
     my $fout = "join.out.$tag";
-    system("zcat $wd/$target/lbc/$target.lbc.$tag.gz > $tmpdir/$target.lbc.$tag");
-    system("zcat $wd/$control/lbc/$control.lbc.$tag.gz > $tmpdir/$control.lbc.$tag");
-
-    open($fout, "> $tmpdir/$target.snp.$tag");
-    open($fin, "join $tmpdir/$control.lbc.$tag $tmpdir/$target.lbc.$tag |");
+    open($fout, "> $tmpdir/$target.snp.$tag.tmp");
+    open($fin, "bash -c \"join <(zcat $wd/$control/lbc/$control.lbc.$tag.gz) <(zcat $wd/$target/lbc/$target.lbc.$tag.gz)\" |");
     while(<$fin>){
 	my $rep = 0;
 	my $a = "";
@@ -750,7 +747,38 @@ sub joinKmerSub{
     }
     close($fin);
     close($fout);
-    system("rm $tmpdir/$target.lbc.$tag $tmpdir/$control.lbc.$tag");
+    open($fout, "> $tmpdir/$target.snp.$tag");
+    open($fin, "$tmpdir/$target.snp.$tag.tmp");
+    while(<$fin>){
+	my ($name, $cont, $alt, %c, %t);
+	($name, $cont, $alt, $c{A}, $c{C}, $c{G}, $c{T}, $t{A}, $t{C}, $t{G}, $t{T}) = split;
+	my $ctotal = 0;
+	my $ttotal = 0;
+	foreach $nuc (@nuc){
+	    $ctotal += $c{$nuc};
+	}
+	next if $ctotal == 0;
+	foreach $nuc (@nuc){
+	    $ttotal += $t{$nuc};
+	}
+	next if $ttotal == 0;
+	$cont = "";
+	$alt = "";
+	foreach $nuc (@nuc){
+	    if ($c{$nuc} / $ctotal> 0.25){
+		$cont .= $nuc;
+	    }
+	}
+	foreach $nuc (@nuc){
+	    if ($t{$nuc} / $ttotal> 0.25){
+		$alt .= $nuc;
+	    }
+	}
+	print $fout "$name\t$cont\t$alt\t$c{A}\t$c{C}\t$c{G}\t$c{T}\t$t{A}\t$t{C}\t$t{G}\t$t{T}\n" if $cont ne $alt;
+    }
+    close($fin);
+    close($fout);
+    system("rm $tmpdir/$target.snp.$tag.tmp");
 }
 
 sub countKmer{
