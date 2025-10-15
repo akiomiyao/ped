@@ -6,7 +6,7 @@
 #
 # License: refer to https://github.com/akiomiyao/ped
 #
-# Author: Akio Miyao <miyao@affrc.go.jp>
+# Author: Akio Miyao <miyao.akio700@naro..go.jp>
 #
 
 $usage = '
@@ -223,7 +223,7 @@ while(<IN>){
 close(IN);
 
 if ($ARGV[0] eq ""){
-    print " Currently, reference genomes listed below are suported.
+    print " Currently, the reference genomes listed below are supported.
 
   Name             Description\n";
     foreach (sort keys %desc){
@@ -266,7 +266,7 @@ if ($target ne ""){
 
 print LOG $log;
 
-report("Job begin: $method method");
+report("Job started: $method method");
 
 if ($ref ne "" and ! (-s "$wd/$ref/ref20_uniq.TTT.gz" > 100 and -s "$wd/$ref/sort_uniq/$ref.sort_uniq.TTT.gz" > 100)){
     &mkRef;
@@ -348,7 +348,7 @@ sub finish{
     $end_timestamp = `date`;
     chomp($start_timestamp);
     chomp($end_timestamp);
-    report("Job completed: $method method.$additionalReport
+    report("Job finished: $method method.$additionalReport
 $etime ($elapsed_time seconds) elapsed.");
     print LOG "start : $start_timestamp
 end : $end_timestamp
@@ -465,7 +465,7 @@ sub primer{
 	&canFork;
 	$num = "000$i";
 	$num = substr($num, length($num) - 4, 4);
-	&report("Output primer sequences. $num");
+	&report("Outputting primer sequences. $num");
 	system("perl $cwd/ped.pl target=$target,ref=$ref,sub=primerFunc,arg=$num:$type,wd=$wd &");
     }
     &waitChild;
@@ -692,7 +692,7 @@ sub joinKmer{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Detection SNPs between $target and $control. $tag");
+		&report("Detecting SNPs between $target and $control. $tag");
 		system("perl $cwd/ped.pl target=$target,control=$control,ref=$ref,sub=joinKmerSub,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -792,7 +792,7 @@ sub countKmer{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Making kmer for $target. $tag");
+		&report("Generating k-mers for $target. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=countKmerSub,arg=$target:$tag,wd=$wd &");
 	    }
 	}
@@ -805,7 +805,7 @@ sub countKmer{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Joining kmer for $target. $tag");
+		&report("Joining k-mers for $target. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=countKmerMerge,arg=$target:$tag,wd=$wd &");
 	    }
 	}
@@ -822,7 +822,7 @@ sub lbcKmer{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Joining kmer for $target. $tag");
+		&report("Joining k-mers for $target. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=lbcKmerSub,arg=$target:$tag,wd=$wd &");
 	    }
 	}
@@ -937,7 +937,7 @@ sub cnvJoin{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Join kmer between $target and $control. $tag");
+		&report("Joining k-mers between $target and $control. $tag");
 		system("perl $cwd/ped.pl target=$target,control=$control,ref=$ref,sub=cnvJoinSub,tag=$tag,wd=$wd &");
 	    }
 	}
@@ -1006,7 +1006,7 @@ sub mkRef{
 		    &report($curl{$ref});
 		    &finish;
 		}
-		&report("Downloading $curl{$ref}");
+		&report("Downloading reference from $curl{$ref}");
 		system("cd $wd/$ref && curl -O $curl{$ref} && cd $wd");
 		if ($ref eq "sacCer3"){
 		    system("tar xfz S288C_reference_genome_R64-1-1_20110203.tgz");
@@ -1025,7 +1025,7 @@ sub mkRef{
 }
 
 sub mkChrFromFile{
-    &report("Making chromosome file for $ref.");
+    &report("Generating chromosome file for $ref.");
     my $out;
     chdir "$wd/$ref";
     die "$file is not found in $wd/$ref." if ! -e "$wd/$ref/$file";
@@ -1060,7 +1060,7 @@ sub mkChrFromFile{
 }
 
 sub mkControlRead{
-    &report("Making Control Read.");
+    &report("Generating Control Read.");
     if (! -e "$wd/$ref/sort_uniq"){
 	system("mkdir $wd/$ref/sort_uniq");
     }
@@ -1068,7 +1068,7 @@ sub mkControlRead{
     for (@chr){
 	next if $_ eq "NOP";
 	&canFork;
-	&report("Processing Chr$_");
+	&report("Processing chromosome $_");
 	system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkControlReadChr,arg=$_,wd=$wd &");
     }
     &waitChild;
@@ -1078,7 +1078,7 @@ sub mkControlRead{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		&report("Making Control Read. $tag");
+		&report("Generating Control Read. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkControlReadSub,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -1212,11 +1212,11 @@ sub mk20mer{
 
 sub mk20{
     if (! -e "$wd/$ref/ref20_uniq.AAA.gz"){
-	&report("Making 20mer position file.");
+	&report("Generating 20mer position file.");
 	foreach $i (@chr){
 	    next if $i eq "NOP";
 	    &canFork;
-	    &report("Processing Chr$i");
+	    &report("Processing chromosome $i");
 	    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mk20mer,arg=$i,wd=$wd &");
 	}
 	&waitChild;
@@ -1239,7 +1239,7 @@ sub mk20{
 		$tag = join('', @tag);
 		if ($tag{$tag}){
 		    &canFork;
-		    &report("making ref20_uniq.$tag.gz");
+		    &report("Generating ref20_uniq.$tag.gz");
 		    system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkUniq,arg=$tag,wd=$wd &");
 		}
 	    }
@@ -1249,7 +1249,7 @@ sub mk20{
 }
 
 sub mkChrFasta{
-    &report("Making fasta file of reference. $ref.fasta");
+    &report("Generating FASTA file for reference. $ref.fasta");
     open(OUT, "> $wd/$ref/$ref.fasta");
     foreach $chr (@chr){
 	next if $chr eq "NOP";
@@ -1274,10 +1274,10 @@ sub mkChr{
     my $i = 0;
     chdir "$wd/$ref";
     if (! -e $file){
-	&report("$file is not found. Please save $file in $wd/$ref.");
+	&report("$file not found. Please save it in $wd/$ref.");
 	exit;
     }
-    &report("Making chromosome file from $file");
+    &report("Generating chromosome file from $file");
     if ($ref eq "hg38"){
 	open(IN, "$zcat $file|");
 	while(<IN>){
@@ -1365,7 +1365,7 @@ sub mkChr{
 sub mkSortUniq{
     my $subject = shift;
     my ($cmd, $gz_file, $bz_file, $xz_file, $fq_file);
-    report("Making sort_uniq files for $subject");
+    report("Generating sort_uniq files for $subject");
     opendir(DIR, "$wd/$subject/read");
     foreach (sort readdir(DIR)){
 	if (/gz$/){
@@ -1411,7 +1411,7 @@ sub mkSortUniq{
 
 sub sortUniqSort{
     my ($tag, $subject) = split(':', $arg);
-    report("Making $subject.sort_uniq files: Sorting for $subject.sort_uniq.$tag.gz");
+    report("Generating $subject.sort_uniq files: sorting $subject.sort_uniq.$tag.gz");
     system("rm $subject.sort_uniq.$tag") if -e "$subject.sort_uniq.$tag";
     system("sort -T $wd/$subject/sort_uniq/ $sort_opt $wd/$subject/sort_uniq/$tag.tmp | uniq | gzip -c > $wd/$subject/sort_uniq/$subject.sort_uniq.$tag.gz");
     system("rm $wd/$subject/sort_uniq/$tag.tmp");
@@ -1466,7 +1466,7 @@ sub sortUniqSub{
 	    }
 	    $total ++;
 	    if ($total % 1000000 == 0){
-		report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
+		report("Genarating $subject.sort_uniq files: splitting into subfiles. $total reads processed");
 	    }
 	}elsif($count == 4){
 	    $count = 0;
@@ -1491,9 +1491,9 @@ sub sortUniqSub{
 	}elsif($clipping < 75){
 	    $clipping = 75;
 	}
-	$additionalReport = "\nValue of clipping has been adjusted to $clipping.";
+	$additionalReport = "\nClipping value has been adjusted to $clipping.";
 	print LOG "clipping : $clipping\n";
-	report("Value of clipping has been adjusted to $clipping.");
+	report("The clipping value has been adjusted to $clipping.");
 	open(IN, $cmd);
 	while(<IN>){
 	    if ($count == 1 and !/N/){
@@ -1514,7 +1514,7 @@ sub sortUniqSub{
 		}
 		$total ++;
 		if ($total % 1000000 == 0){
-		    report("Making $subject.sort_uniq files: Split to subfiles. $total reads processed");
+		    report("Generating $subject.sort_uniq files: splitting into subfiles. $total reads processed");
 		}
 	    }elsif($count == 4){
 		$count = 0;
@@ -1530,7 +1530,7 @@ sub sortUniqSub{
 }
 
 sub toVcf{
-    report("Convert to vcf format");
+    report("Converting to VCF format");
     my (@row, $dp, $af, $output, $prev);
     my $fin = "in-vcf";
     my $fout ="out-vcf";
@@ -1594,7 +1594,7 @@ sub toVcf{
 
 sub biCount2vcf{
     my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, %count, $total, $limit, $sum, $max);
-    report("Convert count data to vcf format");
+    report("Converting count data to VCF format");
 
     open(IN, "$wd/$target/$target.bi.snp.count");
     while(<IN>){
@@ -1817,7 +1817,7 @@ sub biCount2vcf{
 
 sub bi2vcf{
     my (@row, $dp, $chr, $pos, $end, $af, $qual, $prev_chr, $alt, $seq, $reference, $homseq, $homlen, $info, $out, $p);
-    report("Convert to vcf format");
+    report("Converting into VCF format");
     open(ALN, "$wd/$target/$target.aln");
     open(TMP, "|sort -S 1M -T $wd/$target > $wd/$target/$target.tmp");
     open(IN, "cat $wd/$target/$target.bi.primer|");
@@ -2085,7 +2085,7 @@ sub getInsert{
 }
 
 sub snpMkT{
-    report("Making data for verification of snp. target");
+    report("Generating data for SNP verification: $target");
     &getLength;
     my (@row, $chr, $pos, $ref, $alt, $count, $ref_seq, $mut_seq, $head, $tail, $i, $ipos, $iref, $ialt, $tpos, $tw, $tm, $tag, $nuca, $nucb, $nucc, @dat, $prev_chr, $dat);
 
@@ -2166,7 +2166,7 @@ sub snpMkT{
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
 	    @dat = ();
-	    report("Making data for verification of snp. target chr$chr");
+	    report("Generating data for SNP verification. target chr$chr");
 	}
 	$prev_chr = $chr;
 	$count = int(1 + $count/4);
@@ -2255,7 +2255,7 @@ sub snpMkC{
 	    my $chr_file = "$refdir/chr$chr";
 	    open (IN, $chr_file);
 	    @dat = ();
-	    report("Making data for verification of snp. control chr$chr");
+	    report("Generating data for SNP verification. control chr$chr");
 	}
 	$prev_chr = $chr;
 	$count = int(1 + $count/4);
@@ -2382,7 +2382,7 @@ sub svReadCount{
     print OUT "$prev[0]\t$prev[1]\t$prev[2]\t$prev[3]\t$prev[4]\t$prev[5]\t$prev[6]\t$cw\t$cm\t$tw\t$tm\t$genotype\t$prev[7]\n";
     close(OUT);
     system("rm $tmpdir/*.target $tmpdir/*.control");
-    &report("Output SV data. complete");
+    &report("SV data output completed");
 }
 
 sub kmerReadCount{
@@ -2575,7 +2575,7 @@ sub snpReadCount{
 
 sub joinControlFunc{
     my $tag = shift;
-    report("Selecting control sequence data for verify. $tag");
+    report("Selecting control sequence data for verification. $tag");
     if (-e "$wd/$control/sort_uniq/$control.$tag.gz"){
 	system("bash -c \"join <($zcat $wd/$control/sort_uniq/$control.$tag.gz) <($zcat $tmpdir/$tag.gz)$tmpdir/$tag | cut -d ' ' -f 2- > $tmpdir/$tag.control\"");
     }else{
@@ -2600,7 +2600,7 @@ sub joinControl{
 
 sub joinTargetFunc{
     my $tag = shift;
-    report("Selecting target sequence data for verify. $tag");
+    report("Selecting target sequence data for verification. $tag");
     system("bash -c \"join <($zcat $wd/$target/sort_uniq/$target.sort_uniq.$tag.gz) <($zcat $tmpdir/$tag.gz) | cut -d ' ' -f 2- > $tmpdir/$tag.target\"");
     system("rm $tmpdir/$tag.gz");
 }
@@ -2632,7 +2632,7 @@ sub sortSeq{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		report("Sorting sequence data for verify. $tag");
+		report("Sorting sequence data for verification. $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=sortSeqFunc,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -2641,7 +2641,7 @@ sub sortSeq{
 }
 
 sub svMkC{
-    report("Making control data for verification of sv");
+    report("Generating control data for SV verification");
     my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $cm, $cw, $hchr_seq, $prev_chr);
     &getLength;
     foreach $nuca (@nuc){
@@ -2813,7 +2813,7 @@ sub svMkC{
 }
 
 sub svMkT{
-    report("Making target data for verification of sv");
+    report("Generating target data for SV verification.");
     my ($nuca, $nucb, $nucc, $tag, $hchr, $hpos, $tchr, $tpos, $direction, $type, $size, @row, $current, $prev, $prev_hchr, $posa, $posb, $inside, $head, $tail, $ref_seq, $mut_seq, $slength, $tm, $tw, $hchr_seq);
     &getLength;
     foreach $nuca (@nuc){
@@ -2982,11 +2982,11 @@ sub svMkT{
 	    }
 	}
     }
-    report("Making target data for verification of sv complete");
+    report("Completed generating target data for SV verification");
 }
     
 sub svSort{
-    report("Making $target.sv.sort");
+    report("Genrating $target.sv.sort");
     my ($flag, @row, $chr, $out, $count);
     my $fin = "in-sv";
     my $fout = "out-sv";
@@ -3042,11 +3042,11 @@ sub svSort{
     close($fin);
     close($fout);
     system("rm $tmpdir/$target.sv.count");
-    report("Making $target.sv.sort complete");
+    report("Generation of $target.sv.sort completed.");
 }
 
 sub index{
-    report("Making index");
+    report("Generating index");
     my $pos  = 0;
     my ($length, @row);
     open(INDEXOUT, "|sort $sort_opt -T $tmpdir > $wd/$target/$target.index");
@@ -3067,7 +3067,7 @@ sub index{
     }
     close(INDEXIN);
     close(INDEXOUT);
-    report("Making index complete");
+    report("Index creation completed");
 }
 
 sub sortData4Map{ 
@@ -3086,7 +3086,7 @@ sub sortData4Map{
 
 sub sortData4MapFunc{
     my $tag = shift;
-    report("Sorting sequence data. $tag");
+    report("Sorting sequence data: $tag");
     system("cat $tmpdir/$tag.tmp.* |sort $sort_opt -T $tmpdir |gzip -c > $tmpdir/$tag.gz");
     system("rm $tmpdir/$tag.tmp.*");
 }
@@ -3098,7 +3098,7 @@ sub mkData4MapF{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		report("Bidirectional alignment: Making data for first mapping. $tag");
+		report("Bidirectional alignment: generating data for first mapping : $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkData4MapFFunc,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -3149,7 +3149,7 @@ sub mkData4MapR{
 	    foreach $nucc (@nuc){
 		$tag = $nuca . $nucb . $nucc;
 		&canFork;
-		report("Making data for second mapping. $tag");
+		report("Generating data for second mapping :  $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mkData4MapRFunc,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -3202,7 +3202,7 @@ sub map{
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
 		&canFork;
-		report("Mapping. $tag");
+		report("Mapping: $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=mapFunc,arg=$tag,wd=$wd &");
 	    }
 	}
@@ -3224,7 +3224,7 @@ sub align{
 		$tag = $nuca . $nucb . $nucc;
 		close($tag);
 		&canFork;
-		report("Bidirectional alignment. $tag");
+		report("Bidirectional alignment: $tag");
 		system("perl $cwd/ped.pl target=$target,ref=$ref,sub=alignFunc,arg=$tag,wd=$wd &");
 	    }
 	}
